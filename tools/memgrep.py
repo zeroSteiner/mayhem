@@ -34,9 +34,9 @@ import sys
 sys.path.append('..')
 from argparse import ArgumentParser
 
-from mayhem.utils import align_down, align_up, print_hexdump
 from mayhem.proc import ProcessError
 from mayhem.proc.native import NativeProcess
+from mayhem.utilities import align_down, align_up, print_hexdump
 
 def main():
 	parser = ArgumentParser(description = 'memgrep: memory search utility', conflict_handler = 'resolve')

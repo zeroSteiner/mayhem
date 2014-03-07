@@ -102,6 +102,11 @@ class Process(object):
 			address += 16
 		return string.split('\x00', 1)[0]
 
+	def read_region(self, region):
+		if isinstance(region, (int, long)):
+			region = self.maps.get(region)
+		return self.read_memory(region.addr_low, region.size)
+
 	@property
 	def arch(self):
 		return self.__arch__

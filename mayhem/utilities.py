@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-#  mayhem/proc/utils.py
+#  mayhem/utilities.py
 #
 #  Redistribution and use in source and binary forms, with or without
 #  modification, are permitted provided that the following conditions are
@@ -77,7 +77,7 @@ def print_hexdump(data, address = 0):
 		sys.stdout.write(address_format_string.format(address + i))
 		for j in range(16):
 			if i+j < l:
-				sys.stdout.write("%02X " % ord(x[i+j]))
+				sys.stdout.write("{0:02X} ".format(ord(x[i+j])))
 			else:
 				sys.stdout.write("   ")
 			if j%16 == 7:

@@ -40,8 +40,8 @@ import platform
 import subprocess
 
 from mayhem.proc import Process, ProcessError, Hook, MemoryRegion
-from mayhem.utils import architecture_is_32bit, architecture_is_64bit, struct_pack, struct_unpack
 from mayhem.datatypes import elf
+from mayhem.utilities import architecture_is_32bit, architecture_is_64bit, struct_pack, struct_unpack
 
 libc = ctypes.cdll.LoadLibrary(ctypes.util.find_library('c'))
 ptrace = libc.ptrace

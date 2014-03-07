@@ -34,9 +34,9 @@ import sys
 sys.path.append('..')
 from argparse import ArgumentParser
 
-from mayhem.utils import align_up, architecture_is_32bit, architecture_is_64bit
 from mayhem.proc import ProcessError
 from mayhem.proc.native import NativeProcess
+from mayhem.utilities import align_up, architecture_is_32bit, architecture_is_64bit
 
 def main():
 	parser = ArgumentParser(description = 'syringe: library & shellcode injection utility', conflict_handler = 'resolve',
