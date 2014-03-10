@@ -50,6 +50,18 @@ def align_up(number, alignment = 16):
 	else:
 		return number
 
+def eval_number(number):
+	if number.startswith('0b'):
+		return int(number[2:], 2)
+	elif number.startswith('0x'):
+		return int(number[2:], 16)
+	elif number.startswith('0'):
+		return int(number, 8)
+	elif number.isdigit():
+		return int(number)
+	else:
+		raise ValueError('unknown numerical value: \'' + number + '\'')
+
 def make_call(*args):
 	if len(args) == 2:
 		offset = args[1] - args[0]

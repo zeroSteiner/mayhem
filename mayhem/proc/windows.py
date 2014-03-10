@@ -31,11 +31,12 @@
 #
 
 import ctypes
-import ctypes.wintypes as wintypes
 import os
 import platform
 
 from mayhem.proc import Process, ProcessError, Hook, MemoryRegion
+from mayhem.datatypes import windows as wintypes
+from mayhem.utilities import eval_number
 
 CONSTANTS = {
 	'GENERIC_READ'  : 0x80000000,
@@ -95,307 +96,12 @@ CONSTANTS = {
 	'FILE_FLAG_OVERLAPPED' : 0x40000000
 }
 
-IMAGE_NUMBEROF_DIRECTORY_ENTRIES = 16
-
 IMAGE_DIRECTORY_ENTRY_EXPORT = 0
 IMAGE_DIRECTORY_ENTRY_IMPORT = 1
 IMAGE_DIRECTORY_ENTRY_RESOURCE = 2
 IMAGE_DIRECTORY_ENTRY_BASERELOC = 5
 IMAGE_DIRECTORY_ENTRY_DEBUG = 6
 IMAGE_DIRECTORY_ENTRY_TLS = 9
-
-wintypes.LPTSTR = ctypes.POINTER(ctypes.c_char)
-wintypes.PSTR = ctypes.POINTER(ctypes.c_char)
-wintypes.PWSTR = ctypes.POINTER(ctypes.c_wchar)
-wintypes.LPBYTE = ctypes.POINTER(ctypes.c_ubyte)
-wintypes.PUCHAR = ctypes.POINTER(ctypes.c_ubyte)
-wintypes.UCHAR = ctypes.c_ubyte
-wintypes.HANDLE = ctypes.c_void_p
-wintypes.PVOID = ctypes.c_void_p
-wintypes.PULONG = ctypes.POINTER(wintypes.ULONG)
-wintypes.ULONGLONG = ctypes.c_uint64
-wintypes.PULONGLONG = ctypes.POINTER(wintypes.ULONGLONG)
-
-class __LIST_ENTRY(ctypes.Structure):
-	_fields_ = [("Flink", ctypes.c_void_p),
-				("Blink", ctypes.c_void_p),]
-wintypes.LIST_ENTRY = __LIST_ENTRY
-
-class __UNICODE_STRING(ctypes.Structure):
-	_fields_ = [("Length", wintypes.USHORT),
-				("MaximumLength", wintypes.USHORT),
-				("Buffer", ctypes.c_void_p),]
-wintypes.UNICODE_STRING = __UNICODE_STRING
-
-class __STARTUPINFO(ctypes.Structure):
-	"""see:
-	http://msdn.microsoft.com/en-us/library/windows/desktop/ms686331(v=vs.85).aspx
-	"""
-	_fields_ = [("cb", wintypes.DWORD),
-				("lpReserved", wintypes.LPTSTR),
-				("lpDesktop", wintypes.LPTSTR),
-				("lpTitle", wintypes.LPTSTR),
-				("dwX", wintypes.DWORD),
-				("dwY", wintypes.DWORD),
-				("dwXSize", wintypes.DWORD),
-				("dwYSize", wintypes.DWORD),
-				("dwXCountChars", wintypes.DWORD),
-				("dwYCountChars", wintypes.DWORD),
-				("dwFillAttribute",wintypes.DWORD),
-				("dwFlags", wintypes.DWORD),
-				("wShowWindow", wintypes.WORD),
-				("cbReserved2", wintypes.WORD),
-				("lpReserved2", wintypes.LPBYTE),
-				("hStdInput", wintypes.HANDLE),
-				("hStdOutput", wintypes.HANDLE),
-				("hStdError", wintypes.HANDLE),]
-wintypes.STARTUPINFO = __STARTUPINFO
-
-class __LOADED_IMAGE(ctypes.Structure):
-	"""see:
-	http://msdn.microsoft.com/en-us/library/windows/desktop/ms680349%28v=vs.85%29.aspx
-	"""
-	_fields_ = [("ModuleName", wintypes.PSTR),
-				("hFile", wintypes.HANDLE),
-				("MappedAddress", wintypes.PUCHAR),
-				("FileHeader", ctypes.c_void_p),
-				("LastRvaSection", ctypes.c_void_p),
-				("NumberOfSections", wintypes.ULONG),
-				("Sections", ctypes.c_void_p),
-				("Characteristics", wintypes.ULONG),
-				("fSystemImage", wintypes.BOOLEAN),
-				("fDOSImage", wintypes.BOOLEAN),
-				("fReadOnly", wintypes.BOOLEAN),
-				("Version", wintypes.UCHAR),
-				("Links", ctypes.c_void_p),
-				("SizeOfImage", wintypes.ULONG),]
-wintypes.LOADED_IMAGE = __LOADED_IMAGE
-
-class __LDR_MODULE(ctypes.Structure):
-	_fields_ = [("InLoadOrderModuleList", wintypes.LIST_ENTRY),
-				("InMemoryOrderModuleList", wintypes.LIST_ENTRY),
-				("InInitializationOrderModuleList", wintypes.LIST_ENTRY),
-				("BaseAddress", ctypes.c_void_p),
-				("EntryPoint", ctypes.c_void_p),
-				("SizeOfImage", wintypes.ULONG),
-				("FullDllName", wintypes.UNICODE_STRING),
-				("BaseDllName", wintypes.UNICODE_STRING),
-				("Flags", wintypes.ULONG),
-				("LoadCount", wintypes.SHORT),
-				("TlsIndex", wintypes.SHORT),
-				("HashTableEntry", wintypes.LIST_ENTRY),
-				("TimeDateStamp", wintypes.ULONG),]
-wintypes.LDR_MODULE = __LDR_MODULE
-
-class __IMAGE_DATA_DIRECTORY(ctypes.Structure):
-	"""see:
-	http://msdn.microsoft.com/en-us/library/windows/desktop/ms680305%28v=vs.85%29.aspx
-	"""
-	_fields_ = [("VirtualAddress", wintypes.DWORD),
-				("Size", wintypes.DWORD),]
-wintypes.IMAGE_DATA_DIRECTORY = __IMAGE_DATA_DIRECTORY
-
-class __IMAGE_DOS_HEADER(ctypes.Structure):
-	_fields_ = [("e_magic", wintypes.WORD),
-				("e_cblp", wintypes.WORD),
-				("e_cp", wintypes.WORD),
-				("e_crlc", wintypes.WORD),
-				("e_cparhdr", wintypes.WORD),
-				("e_minalloc", wintypes.WORD),
-				("e_maxalloc", wintypes.WORD),
-				("e_ss", wintypes.WORD),
-				("e_sp", wintypes.WORD),
-				("e_csum", wintypes.WORD),
-				("e_ip", wintypes.WORD),
-				("e_cs", wintypes.WORD),
-				("e_lfarlc", wintypes.WORD),
-				("e_ovno", wintypes.WORD),
-				("e_res", wintypes.WORD * 4),
-				("e_oemid", wintypes.WORD),
-				("e_oeminfo", wintypes.WORD),
-				("e_res2", wintypes.WORD * 10),
-				("e_lfanew", wintypes.LONG),]
-wintypes.IMAGE_DOS_HEADER = __IMAGE_DOS_HEADER
-
-class __IMAGE_EXPORT_DIRECTORY(ctypes.Structure):
-	_fields_ = [("Characteristics", wintypes.DWORD),
-				("TimeDateStamp", wintypes.DWORD),
-				("MajorVersion", wintypes.WORD),
-				("MinorVersion", wintypes.WORD),
-				("Name", wintypes.DWORD),
-				("Base", wintypes.DWORD),
-				("NumberOfFunctions", wintypes.DWORD),
-				("NumberOfNames", wintypes.DWORD),
-				("AddressOfFunctions", wintypes.DWORD),
-				("AddressOfNames", wintypes.DWORD),
-				("AddressOfNameOrdinals", wintypes.DWORD),]
-wintypes.IMAGE_EXPORT_DIRECTORY = __IMAGE_EXPORT_DIRECTORY
-
-class __IMAGE_FILE_HEADER(ctypes.Structure):
-	_fields_ = [("Machine", wintypes.WORD),
-				("NumberOfSections", wintypes.WORD),
-				("TimeDateStamp", wintypes.DWORD),
-				("PointerToSymbolTable", wintypes.DWORD),
-				("NumberOfSymbols", wintypes.DWORD),
-				("SizeOfOptionalHeader", wintypes.WORD),
-				("Characteristics", wintypes.WORD),]
-wintypes.IMAGE_FILE_HEADER = __IMAGE_FILE_HEADER
-
-class __IMAGE_OPTIONAL_HEADER(ctypes.Structure):
-	_fields_ = [("Magic", wintypes.WORD),
-				("MajorLinkerVersion", wintypes.BYTE),
-				("MinorLinkerVersion", wintypes.BYTE),
-				("SizeOfCode", wintypes.DWORD),
-				("SizeOfInitializedData", wintypes.DWORD),
-				("SizeOfUninitializedData", wintypes.DWORD),
-				("AddressOfEntryPoint", wintypes.DWORD),
-				("BaseOfCode", wintypes.DWORD),
-				("BaseOfData", wintypes.DWORD),
-				("ImageBase", wintypes.DWORD),
-				("SectionAlignment", wintypes.DWORD),
-				("FileAlignment", wintypes.DWORD),
-				("MajorOperatingSystemVersion", wintypes.WORD),
-				("MinorOperatingSystemVersion", wintypes.WORD),
-				("MajorImageVersion", wintypes.WORD),
-				("MinorImageVersion", wintypes.WORD),
-				("MajorSubsystemVersion", wintypes.WORD),
-				("MinorSubsystemVersion", wintypes.WORD),
-				("Win32VersionValue", wintypes.DWORD),
-				("SizeOfImage", wintypes.DWORD),
-				("SizeOfHeaders", wintypes.DWORD),
-				("CheckSum", wintypes.DWORD),
-				("Subsystem", wintypes.WORD),
-				("DllCharacteristics", wintypes.WORD),
-				("SizeOfStackReserve", wintypes.DWORD),
-				("SizeOfStackCommit", wintypes.DWORD),
-				("SizeOfHeapReserve", wintypes.DWORD),
-				("SizeOfHeapCommit", wintypes.DWORD),
-				("LoaderFlags", wintypes.DWORD),
-				("NumberOfRvaAndSizes", wintypes.DWORD),
-				("DataDirectory", wintypes.IMAGE_DATA_DIRECTORY * IMAGE_NUMBEROF_DIRECTORY_ENTRIES),]
-wintypes.IMAGE_OPTIONAL_HEADER = __IMAGE_OPTIONAL_HEADER
-
-class __IMAGE_IMPORT_BY_NAME(ctypes.Structure):
-	_fields_ = [("Hint", wintypes.WORD),
-				("Name", wintypes.BYTE),]
-wintypes.IMAGE_IMPORT_BY_NAME = __IMAGE_IMPORT_BY_NAME
-
-class __IMAGE_IMPORT_DESCRIPTOR(ctypes.Structure):
-	_fields_ = [("OriginalFirstThunk", wintypes.DWORD), # import lookup table
-				("TimeDateStamp", wintypes.DWORD),
-				("ForwarderChain", wintypes.DWORD),
-				("Name", wintypes.DWORD),
-				("FirstThunk", wintypes.DWORD),] # import address table
-wintypes.IMAGE_IMPORT_DESCRIPTOR = __IMAGE_IMPORT_DESCRIPTOR
-
-class __IMAGE_THUNK_DATA32(ctypes.Structure):
-	_fields_ = [("ForwarderString", wintypes.DWORD),
-				("Function", wintypes.DWORD),
-				("Ordinal", wintypes.DWORD),
-				("AddressOfData", wintypes.DWORD),]
-wintypes.IMAGE_THUNK_DATA32 = __IMAGE_THUNK_DATA32
-
-class __IMAGE_NT_HEADERS32(ctypes.Structure):
-	_fields_ = [("Signature", wintypes.DWORD),
-				("FileHeader", wintypes.IMAGE_FILE_HEADER),
-				("OptionalHeader", wintypes.IMAGE_OPTIONAL_HEADER),]
-wintypes.IMAGE_NT_HEADERS32 = __IMAGE_NT_HEADERS32
-
-class __PEB(ctypes.Structure):
-	"""see:
-	http://msdn.microsoft.com/en-us/library/windows/desktop/aa813706%28v=vs.85%29.aspx
-	"""
-	_fields_ = [("Reserved1", wintypes.BYTE * 2),
-				("BeingDebugged", wintypes.BYTE),
-				("SpareBool", wintypes.BYTE),
-				("Mutant", ctypes.c_void_p),
-				("ImageBaseAddress", ctypes.c_void_p),
-				("Ldr", ctypes.c_void_p),
-				("ProcessParameters", ctypes.c_void_p),
-				("SubSystemData", ctypes.c_void_p),
-				("ProcessHeap", ctypes.c_void_p),
-				("Reserved4", wintypes.BYTE * 96),
-				("Reserved5", ctypes.c_void_p * 52),
-				("PostProcessInitRoutine", ctypes.c_void_p),
-				("Reserved6", wintypes.BYTE * 128),
-				("Reserved7", ctypes.c_void_p),
-				("SessionId", wintypes.ULONG),]
-wintypes.PEB = __PEB
-
-class __PEB_LDR_DATA(ctypes.Structure):
-	_fields_ = [("Length", wintypes.ULONG),
-				("Reserved", wintypes.UCHAR * 4),
-				("SsHandle", wintypes.HANDLE),
-				("InLoadOrderModuleList", wintypes.LIST_ENTRY),
-				("InMemoryOrderModuleList", wintypes.LIST_ENTRY),
-				("InInitializationOrderModuleList", wintypes.LIST_ENTRY),]
-wintypes.PEB_LDR_DATA = __PEB_LDR_DATA
-
-class __PROCESS_BASIC_INFORMATION(ctypes.Structure):
-	"""see:
-	http://msdn.microsoft.com/en-us/library/windows/desktop/ms684280%28v=vs.85%29.aspx
-	"""
-	_fields_ = [("Reserved1", ctypes.c_void_p),
-				("PebBaseAddress", wintypes.c_void_p),
-				("Reserved2", ctypes.c_void_p * 2),
-				("UniqueProcessId", wintypes.PULONG),
-				("Reserved3", ctypes.c_void_p),]
-wintypes.PROCESS_BASIC_INFORMATION = __PROCESS_BASIC_INFORMATION
-
-class __SYSTEM_INFO(ctypes.Structure):
-	"""see:
-	http://msdn.microsoft.com/en-us/library/windows/desktop/ms724958(v=vs.85).aspx
-	"""
-	_fields_ = [("wProcessorArchitecture", wintypes.WORD),
-				("wReserved", wintypes.WORD),
-				("dwPageSize", wintypes.DWORD),
-				("lpMinimumApplicationAddress", wintypes.c_void_p),
-				("lpMaximumApplicationAddress", wintypes.c_void_p),
-				("dwActiveProcessorMask", wintypes.DWORD),
-				("dwNumberOfProcessors", wintypes.DWORD),
-				("dwProcessorType", wintypes.DWORD),
-				("dwAllocationGranularity", wintypes.DWORD),
-				("wProcessorLevel", wintypes.WORD),
-				("wProcessorRevision", wintypes.WORD),]
-wintypes.SYSTEM_INFO = __SYSTEM_INFO
-
-class __PROCESS_INFORMATION(ctypes.Structure):
-	"""see:
-	http://msdn.microsoft.com/en-us/library/windows/desktop/ms684873(v=vs.85).aspx
-	"""
-	_fields_ = [("hProcess", wintypes.HANDLE),
-				("hThread", wintypes.HANDLE),
-				("dwProcessId", wintypes.DWORD),
-				("dwThreadId", wintypes.DWORD),]
-wintypes.PROCESS_INFORMATION = __PROCESS_INFORMATION
-
-class __MEMORY_BASIC_INFORMATION(ctypes.Structure):
-	"""see:
-	http://msdn.microsoft.com/en-us/library/windows/desktop/aa366775(v=vs.85).aspx
-	"""
-	_fields_ = [("BaseAddress", wintypes.ULONG),
-				("AllocationBase", wintypes.PVOID),
-				("AllocationProtect", wintypes.DWORD),
-				("RegionSize", wintypes.ULONG),
-				("State", wintypes.DWORD),
-				("Protect", wintypes.DWORD),
-				("Type", wintypes.DWORD),]
-wintypes.MEMORY_BASIC_INFORMATION = __MEMORY_BASIC_INFORMATION
-
-class __MEMORY_BASIC_INFORMATION64(ctypes.Structure):
-	"""see:
-	http://msdn.microsoft.com/en-us/library/windows/desktop/aa366775(v=vs.85).aspx
-	"""
-	_fields_ = [("BaseAddress", wintypes.ULONG),
-				("AllocationBase", wintypes.PVOID),
-				("AllocationProtect", wintypes.DWORD),
-				("__alignment1", wintypes.DWORD),
-				("RegionSize", wintypes.ULONG),
-				("State", wintypes.DWORD),
-				("Protect", wintypes.DWORD),
-				("Type", wintypes.DWORD),
-				("__alignment2", wintypes.DWORD),]
-wintypes.MEMORY_BASIC_INFORMATION64 = __MEMORY_BASIC_INFORMATION64
 
 class WindowsProcessError(ProcessError):
 	def __init__(self, *args, **kwargs):
@@ -424,12 +130,7 @@ def flags(flags):
 			last_operator = part
 			continue
 		else:
-			if part.isdigit():
-				part = int(part)
-			elif part.startswith('0x'):
-				part = int(part[2:], 16)
-			else:
-				raise ValueError('unknown token: ' + part)
+			part = eval_number(part)
 		if last_operator == None:
 			parsed_flags = part
 		else:
