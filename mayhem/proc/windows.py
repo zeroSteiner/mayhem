@@ -306,10 +306,6 @@ class WindowsProcess(Process):
 
 			self.k32.ReadProcessMemory(self.handle, module.BaseDllName.Buffer, base_dll_name, module.BaseDllName.Length + 2, 0)
 			base_dll_name = base_dll_name[:(module.BaseDllName.Length / 2)]
-			try:
-				print base_dll_name
-			except:
-				pass
 			if name == base_dll_name:
 				return module
 			fLink = module.InLoadOrderModuleList.Flink
