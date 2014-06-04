@@ -39,61 +39,61 @@ from mayhem.datatypes import windows as wintypes
 from mayhem.utilities import eval_number
 
 CONSTANTS = {
-	'GENERIC_READ'  : 0x80000000,
-	'GENERIC_WRITE' : 0x40000000,
+	'GENERIC_READ': 0x80000000,
+	'GENERIC_WRITE': 0x40000000,
 
-	'OPEN_EXISTING' : 0x03,
-	'CREATE_ALWAYS' : 0x02,
+	'OPEN_EXISTING': 0x03,
+	'CREATE_ALWAYS': 0x02,
 
 	# http://msdn.microsoft.com/en-us/library/windows/desktop/aa366890%28v=vs.85%29.aspx
-	'MEM_COMMIT'     : 0x00001000,
-	'MEM_RESERVE'    : 0x00002000,
-	'MEM_RESET'      : 0x00080000,
-	'MEM_RESET_UNDO' : 0x01000000,
+	'MEM_COMMIT': 0x00001000,
+	'MEM_RESERVE': 0x00002000,
+	'MEM_RESET': 0x00080000,
+	'MEM_RESET_UNDO': 0x01000000,
 	'MEM_LARGE_PAGES': 0x20000000,
-	'MEM_PHYSICAL'   : 0x00400000,
-	'MEM_TOP_DOWN'   : 0x00100000,
+	'MEM_PHYSICAL': 0x00400000,
+	'MEM_TOP_DOWN': 0x00100000,
 
 	# http://msdn.microsoft.com/en-us/library/windows/desktop/aa366775%28v=vs.85%29.aspx
-	'MEM_IMAGE'      : 0x01000000,
-	'MEM_MAPPED'     : 0x00040000,
-	'MEM_PRIVATE'    : 0x00020000,
+	'MEM_IMAGE': 0x01000000,
+	'MEM_MAPPED': 0x00040000,
+	'MEM_PRIVATE': 0x00020000,
 
 	# http://msdn.microsoft.com/en-us/library/windows/desktop/aa366894%28v=vs.85%29.aspx
-	'MEM_DECOMMIT'   : 0x4000,
-	'MEM_RELEASE'    : 0x8000,
+	'MEM_DECOMMIT': 0x4000,
+	'MEM_RELEASE': 0x8000,
 
 	# http://msdn.microsoft.com/en-us/library/windows/desktop/aa366786%28v=vs.85%29.aspx
-	'PAGE_EXECUTE'                      : 0x10,
-	'PAGE_EXECUTE_READ'                 : 0x20,
-	'PAGE_EXECUTE_READWRITE'            : 0x40,
-	'PAGE_EXECUTE_WRITECOPY'            : 0x80,
-	'PAGE_NOACCESS'                     : 0x01,
-	'PAGE_READONLY'                     : 0x02,
-	'PAGE_READWRITE'                    : 0x04,
-	'PAGE_WRITECOPY'                    : 0x08,
+	'PAGE_EXECUTE': 0x10,
+	'PAGE_EXECUTE_READ': 0x20,
+	'PAGE_EXECUTE_READWRITE': 0x40,
+	'PAGE_EXECUTE_WRITECOPY': 0x80,
+	'PAGE_NOACCESS': 0x01,
+	'PAGE_READONLY': 0x02,
+	'PAGE_READWRITE': 0x04,
+	'PAGE_WRITECOPY': 0x08,
 
 	# http://msdn.microsoft.com/en-us/library/windows/desktop/ms684880%28v=vs.85%29.aspx
-	'PROCESS_CREATE_PROCESS'            : 0x0080,
-	'PROCESS_CREATE_THREAD'             : 0x0002,
-	'PROCESS_DUP_HANDLE'                : 0x0040,
-	'PROCESS_QUERY_INFORMATION'         : 0x0400,
-	'PROCESS_QUERY_LIMITED_INFORMATION' : 0x1000,
-	'PROCESS_SET_INFORMATION'           : 0x0200,
-	'PROCESS_SET_QUOTA'                 : 0x0100,
-	'PROCESS_SUSPEND_RESUME'            : 0x0800,
-	'PROCESS_TERMINATE'                 : 0x0001,
-	'PROCESS_VM_OPERATION'              : 0x0008,
-	'PROCESS_VM_READ'                   : 0x0010,
-	'PROCESS_VM_WRITE'                  : 0x0020,
-	'SYNCHRONIZE'                       : 0x00100000,
+	'PROCESS_CREATE_PROCESS': 0x0080,
+	'PROCESS_CREATE_THREAD': 0x0002,
+	'PROCESS_DUP_HANDLE': 0x0040,
+	'PROCESS_QUERY_INFORMATION': 0x0400,
+	'PROCESS_QUERY_LIMITED_INFORMATION': 0x1000,
+	'PROCESS_SET_INFORMATION': 0x0200,
+	'PROCESS_SET_QUOTA': 0x0100,
+	'PROCESS_SUSPEND_RESUME': 0x0800,
+	'PROCESS_TERMINATE': 0x0001,
+	'PROCESS_VM_OPERATION': 0x0008,
+	'PROCESS_VM_READ': 0x0010,
+	'PROCESS_VM_WRITE': 0x0020,
+	'SYNCHRONIZE': 0x00100000,
 
 	# http://msdn.microsoft.com/en-us/library/windows/desktop/aa363858%28v:vs.85%29.aspx
-	'FILE_SHARE_READ'   : 0x00000001,
-	'FILE_SHARE_WRITE'  : 0x00000002,
-	'FILE_SHARE_DELETE' : 0x00000004,
+	'FILE_SHARE_READ': 0x00000001,
+	'FILE_SHARE_WRITE': 0x00000002,
+	'FILE_SHARE_DELETE': 0x00000004,
 
-	'FILE_FLAG_OVERLAPPED' : 0x40000000
+	'FILE_FLAG_OVERLAPPED': 0x40000000
 }
 
 IMAGE_DIRECTORY_ENTRY_EXPORT = 0
@@ -113,7 +113,7 @@ class WindowsProcessError(ProcessError):
 
 def flags(flags):
 	supported_operators = ['|', '+', '-', '^']
-	if isinstance(flags, int) or isinstance(flags, long):
+	if isinstance(flags, (int, long)):
 		return flags
 	if flags[0] == '(' and flags[-1] == ')':
 		flags = flags[1:-1]
@@ -138,7 +138,9 @@ def flags(flags):
 	return parsed_flags
 
 class WindowsProcess(Process):
-	def __init__(self, pid = None, exe = None, handle = None, arch = 'x86', access = None):
+	def __init__(self, pid=None, exe=None, handle=None, arch='x86', access=None):
+		if platform.system() != 'Windows':
+			raise RuntimeError('incompatible platform')
 		self.__arch__ = arch
 		self.k32 = ctypes.windll.kernel32
 		self.ntdll = ctypes.windll.ntdll
@@ -153,7 +155,7 @@ class WindowsProcess(Process):
 		if pid:
 			self.handle = self.k32.OpenProcess(flags(access), False, pid)
 			if not self.handle:
-				raise Exception('could not open PID')
+				raise ProcessError('could not open PID')
 		elif exe:
 			startupinfo = wintypes.STARTUPINFO()
 			process_info = wintypes.PROCESS_INFORMATION()
@@ -163,11 +165,11 @@ class WindowsProcess(Process):
 			self.k32.CreateProcessA(exe, None, None, None, True, 0, None, None, ctypes.byref(startupinfo), ctypes.byref(process_info))
 			self.handle = process_info.hProcess
 			if not self.handle:
-				raise Exception('could not the create process')
+				raise ProcessError('could not the create process')
 		elif handle:
 			self.handle = handle
 		else:
-			raise Exception('either a pid, exe or a handle must be specified')
+			raise ProcessError('either a pid, exe or a handle must be specified')
 		self.pid = self.k32.GetProcessId(self.handle)
 		_name = (ctypes.c_char * 0x400)
 		name = _name()
@@ -321,7 +323,7 @@ class WindowsProcess(Process):
 			meminfo = wintypes.MEMORY_BASIC_INFORMATION()
 		MEM_COMMIT = flags('MEM_COMMIT')
 		MEM_PRIVATE = flags('MEM_PRIVATE')
-		PROTECT_FLAGS = { 0x10: '--x', 0x20: 'r-x', 0x40: 'rwx', 0x80: 'r-x', 0x01: '---', 0x02: 'r--', 0x04: 'rw-', 0x08: 'r--' }
+		PROTECT_FLAGS = {0x10: '--x', 0x20: 'r-x', 0x40: 'rwx', 0x80: 'r-x', 0x01: '---', 0x02: 'r--', 0x04: 'rw-', 0x08: 'r--'}
 		while address_cursor < sys_info.lpMaximumApplicationAddress:
 			if self.k32.VirtualQueryEx(self.handle, address_cursor, ctypes.byref(meminfo), ctypes.sizeof(meminfo)) == 0:
 				break
@@ -338,7 +340,7 @@ class WindowsProcess(Process):
 			self.maps[addr_low] = MemoryRegion(addr_low, addr_high, perms)
 		return
 
-	def install_hook(self, mod_name, new_address, name = None, ordinal = None):
+	def install_hook(self, mod_name, new_address, name=None, ordinal=None):
 		if not (bool(name) ^ bool(ordinal)):
 			raise ValueError('must select either name or ordinal, not both')
 		image_import_descriptors = self.get_proc_attribute('image_import_descriptor')
@@ -367,7 +369,7 @@ class WindowsProcess(Process):
 				if hook_it:
 					old_address = iat[idx]
 
-					iat_ent_addr =  image_dos_header_addr
+					iat_ent_addr = image_dos_header_addr
 					iat_ent_addr += iid.FirstThunk
 					iat_ent_addr += (ctypes.sizeof(ctypes.c_void_p) * idx)
 
@@ -380,16 +382,16 @@ class WindowsProcess(Process):
 							errno = 0
 							old_permissions = wintypes.DWORD()
 							if (self.k32.VirtualProtectEx(self.handle, iat_ent_addr, 0x400, flags('PAGE_READWRITE'), ctypes.byref(old_permissions)) == 0):
-								raise WindowsProcessError('Error: VirtualProtectEx', get_last_error = self.k32.GetLastError())
+								raise WindowsProcessError('Error: VirtualProtectEx', get_last_error=self.k32.GetLastError())
 							if self.k32.WriteProcessMemory(self.handle, iat_ent_addr, ctypes.byref(new_addr), ctypes.sizeof(new_addr), ctypes.byref(written)) == 0:
 								errno = self.k32.GetLastError()
-							self.protect(iat_ent_addr, permissions = old_permissions)
+							self.protect(iat_ent_addr, permissions=old_permissions)
 						if errno:
-							raise WindowsProcessError('Error: WriteProcessMemory', get_last_error = errno)
+							raise WindowsProcessError('Error: WriteProcessMemory', get_last_error=errno)
 					hook = Hook('iat', iat_ent_addr, old_address, new_address)
 					self._installed_hooks.append(hook)
 					return hook
-		raise Exception('failed to find location to install hook')
+		raise ProcessError('failed to find location to install hook')
 
 	def close(self):
 		self.k32.CloseHandle(self.handle)
@@ -415,11 +417,11 @@ class WindowsProcess(Process):
 		self._update_maps()
 		return exitcode.value
 
-	def read_memory(self, address, size = 0x400):
+	def read_memory(self, address, size=0x400):
 		_data = (ctypes.c_char * size)
 		data = _data()
 		if (self.k32.ReadProcessMemory(self.handle, address, ctypes.byref(data), ctypes.sizeof(data), 0) == 0):
-			raise WindowsProcessError('Error: ReadProcessMemory', get_last_error = self.k32.GetLastError())
+			raise WindowsProcessError('Error: ReadProcessMemory', get_last_error=self.k32.GetLastError())
 		return ''.join(data)
 
 	def write_memory(self, address, data):
@@ -428,10 +430,10 @@ class WindowsProcess(Process):
 		wr_data.value = data
 		written = wintypes.DWORD()
 		if (self.k32.WriteProcessMemory(self.handle, address, ctypes.byref(wr_data), ctypes.sizeof(wr_data), ctypes.byref(written)) == 0):
-			raise WindowsProcessError('Error: WriteProcessMemory', get_last_error = self.k32.GetLastError())
+			raise WindowsProcessError('Error: WriteProcessMemory', get_last_error=self.k32.GetLastError())
 		return
 
-	def allocate(self, size = 0x400, address = None, permissions = 'PAGE_EXECUTE_READWRITE'):
+	def allocate(self, size=0x400, address=None, permissions='PAGE_EXECUTE_READWRITE'):
 		alloc_type = flags('MEM_COMMIT')
 		permissions = flags(permissions)
 		result = self.k32.VirtualAllocEx(self.handle, address, size, alloc_type, permissions)
@@ -441,21 +443,21 @@ class WindowsProcess(Process):
 	def free(self, address):
 		free_type = flags('MEM_RELEASE')
 		if (self.k32.VirtualFreeEx(self.handle, address, 0, free_type) == 0):
-			raise WindowsProcessError('Error: VirtualFreeEx', get_last_error = self.k32.GetLastError())
+			raise WindowsProcessError('Error: VirtualFreeEx', get_last_error=self.k32.GetLastError())
 		self._update_maps()
 		return
 
-	def protect(self, address, permissions = 'PAGE_EXECUTE_READWRITE', size = 0x400):
+	def protect(self, address, permissions='PAGE_EXECUTE_READWRITE', size=0x400):
 		permissions = flags(permissions)
 		old_permissions = wintypes.DWORD()
 		if (self.k32.VirtualProtectEx(self.handle, address, size, permissions, ctypes.byref(old_permissions)) == 0):
-			raise WindowsProcessError('Error: VirtualProtectEx', get_last_error = self.k32.GetLastError())
+			raise WindowsProcessError('Error: VirtualProtectEx', get_last_error=self.k32.GetLastError())
 		return
 
-	def start_thread(self, address, targ = None):
+	def start_thread(self, address, targ=None):
 		handle = self.k32.CreateRemoteThread(self.handle, None, 0, address, targ, 0, None)
 		if handle == 0:
-			raise WindowsProcessError('Error: CreateRemoteThread', get_last_error = self.k32.GetLastError())
+			raise WindowsProcessError('Error: CreateRemoteThread', get_last_error=self.k32.GetLastError())
 		return handle
 
 	def join_thread(self, thread_id):

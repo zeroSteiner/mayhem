@@ -49,42 +49,42 @@ ptrace.argtypes = [ctypes.c_uint, ctypes.c_int, ctypes.c_void_p, ctypes.c_void_p
 ptrace.restype = ctypes.c_long
 
 CONSTANTS = {
-	'PROT_NONE'    : 0x00,
-	'PROT_READ'    : 0x01,
-	'PROT_WRITE'   : 0x02,
-	'PROT_EXEC'    : 0x04,
-	'PROT_SEM'     : 0x08,
+	'PROT_NONE': 0x00,
+	'PROT_READ': 0x01,
+	'PROT_WRITE': 0x02,
+	'PROT_EXEC': 0x04,
+	'PROT_SEM': 0x08,
 
-	'MAP_SHARED'    : 0x01,
-	'MAP_PRIVATE'   : 0x02,
-	'MAP_FIXED'     : 0x10,
-	'MAP_ANONYMOUS' : 0x20,
+	'MAP_SHARED': 0x01,
+	'MAP_PRIVATE': 0x02,
+	'MAP_FIXED': 0x10,
+	'MAP_ANONYMOUS': 0x20,
 
-	'RTLD_LOCAL'    : 0x00,
-	'RTLD_LAZY'     : 0x01,
-	'RTLD_NOW'      : 0x02,
-	'RTLD_DEEPBIND' : 0x0008,
-	'RTLD_GLOBAL'   : 0x0100,
+	'RTLD_LOCAL': 0x00,
+	'RTLD_LAZY': 0x01,
+	'RTLD_NOW': 0x02,
+	'RTLD_DEEPBIND': 0x0008,
+	'RTLD_GLOBAL': 0x0100,
 }
 
-PTRACE_TRACEME			= 0
-PTRACE_PEEKTEXT			= 1
-PTRACE_PEEKDATA			= 2
-PTRACE_PEEKUSR			= 3
-PTRACE_POKETEXT			= 4
-PTRACE_POKEDATA			= 5
-PTRACE_POKEUSR			= 6
-PTRACE_CONT				= 7
-PTRACE_KILL				= 8
-PTRACE_SINGLESTEP		= 9
-PTRACE_GETREGS			= 12
-PTRACE_SETREGS			= 13
-PTRACE_ATTACH			= 16
-PTRACE_DETACH			= 17
-PTRACE_SYSCALL			= 24
+PTRACE_TRACEME = 0
+PTRACE_PEEKTEXT = 1
+PTRACE_PEEKDATA = 2
+PTRACE_PEEKUSR = 3
+PTRACE_POKETEXT = 4
+PTRACE_POKEDATA = 5
+PTRACE_POKEUSR = 6
+PTRACE_CONT = 7
+PTRACE_KILL = 8
+PTRACE_SINGLESTEP = 9
+PTRACE_GETREGS = 12
+PTRACE_SETREGS = 13
+PTRACE_ATTACH = 16
+PTRACE_DETACH = 17
+PTRACE_SYSCALL = 24
 
 class LinuxMemoryRegion(MemoryRegion):
-	def __init__(self, addr_low, addr_high, perms, pathname = None):
+	def __init__(self, addr_low, addr_high, perms, pathname=None):
 		self.pathname = pathname
 		super(LinuxMemoryRegion, self).__init__(addr_low, addr_high, perms)
 
@@ -162,7 +162,9 @@ def flags(flags):
 	return parsed_flags
 
 class LinuxProcess(Process):
-	def __init__(self, pid = None, exe = None):
+	def __init__(self, pid=None, exe=None):
+		if platform.system() != 'Linux':
+			raise RuntimeError('incompatible platform')
 		# Ensure that we are running in a version of python that matches the native architecture of the system.
 		if platform.architecture()[0] == '32bit':
 			if not architecture_is_32bit(platform.machine()):
@@ -175,7 +177,7 @@ class LinuxProcess(Process):
 		self._proc_h = None
 		signal.signal(signal.SIGCHLD, self._signal_sigchld)
 		if exe:
-			self._proc_h = subprocess.Popen([exe], stdin = subprocess.PIPE, stdout = subprocess.PIPE, stderr = subprocess.PIPE, close_fds = True)
+			self._proc_h = subprocess.Popen([exe], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, close_fds=True)
 			pid = self._proc_h.pid
 		if pid == -1:
 			pid = os.fork()
@@ -380,7 +382,7 @@ class LinuxProcess(Process):
 				if filter(lambda mr: (address > mr.addr_low and address < mr.addr_high), exe_maps):
 					return address
 				else:
-					return address + sorted(exe_maps, key = lambda mr: mr.addr_low)[0].addr_low
+					return address + sorted(exe_maps, key=lambda mr: mr.addr_low)[0].addr_low
 			strtab = 0
 			symtab = 0
 		raise ProcessError('unable to locate function')
@@ -390,7 +392,7 @@ class LinuxProcess(Process):
 			raise Exception('can not pass more than 6 arguments')
 		registers_backup = self._get_registers()
 		if architecture_is_32bit(self.__arch__):
-			registers = {'eip':function_address, 'eax':function_address}
+			registers = {'eip': function_address, 'eax': function_address}
 			self._set_registers(registers)
 			backup_sp = self.read_memory(registers_backup['esp'], 4)
 			self.write_memory(registers_backup['esp'], '\x00\x00\x00\x00')
@@ -407,7 +409,7 @@ class LinuxProcess(Process):
 			ending_ip = self._get_registers()['eip']
 			result = self._get_registers()['eax']
 		elif architecture_is_64bit(self.__arch__):
-			registers = {'rip':function_address, 'rax':function_address}
+			registers = {'rip': function_address, 'rax': function_address}
 			arg_registers = ['rdi', 'rsi', 'rdx', 'rcx', 'r8', 'r9']
 			for i in range(len(args)):
 				registers[arg_registers[i]] = args[i]
@@ -428,8 +430,8 @@ class LinuxProcess(Process):
 		structure_data = self.read_memory(address, ctypes.sizeof(structure))
 		return struct_unpack(structure, structure_data)
 
-	def _ptrace(self, command, arg1 = 0, arg2 = 0, check_error = True):
-		return ptrace(command, self.pid, arg1, arg2, check_error = check_error)
+	def _ptrace(self, command, arg1=0, arg2=0, check_error=True):
+		return ptrace(command, self.pid, arg1, arg2, check_error=check_error)
 
 	def _get_registers(self):
 		if not architecture_is_supported(self.__arch__):
@@ -437,7 +439,7 @@ class LinuxProcess(Process):
 		_raw_registers = (ctypes.c_ulong * 32)
 		raw_registers = _raw_registers()
 		if self._ptrace(PTRACE_GETREGS, 0, ctypes.byref(raw_registers)) != 0:
-			raise LinuxProcessError('Error: PTRACE_GETREGS', errno = get_errno())
+			raise LinuxProcessError('Error: PTRACE_GETREGS', errno=get_errno())
 		registers = {}
 		# constants from sys/reg.h
 		if architecture_is_32bit(platform.machine()):
@@ -508,7 +510,7 @@ class LinuxProcess(Process):
 				registers = converted_registers
 		return registers
 
-	def _set_registers(self, registers = {}):
+	def _set_registers(self, registers={}):
 		if not architecture_is_supported(self.__arch__):
 			raise LinuxProcessError('unsupported architecture: ' + repr(self.__arch__))
 		old_registers = self._get_registers()
@@ -539,7 +541,7 @@ class LinuxProcess(Process):
 				_raw_registers = (ctypes.c_ulong * 32)
 				raw_registers = _raw_registers()
 				if self._ptrace(PTRACE_GETREGS, 0, ctypes.byref(raw_registers)) != 0:
-					raise LinuxProcessError('Error: PTRACE_GETREGS', errno = get_errno())
+					raise LinuxProcessError('Error: PTRACE_GETREGS', errno=get_errno())
 				raw_registers[4] = old_registers['ebp']
 				raw_registers[5] = old_registers['ebx']
 				raw_registers[10] = old_registers['eax']
@@ -586,7 +588,7 @@ class LinuxProcess(Process):
 				raw_registers[25] = old_registers['fs']
 				raw_registers[26] = old_registers['gs']
 		if self._ptrace(PTRACE_SETREGS, 0, ctypes.byref(raw_registers)) != 0:
-			raise LinuxProcessError('Error: PTRACE_SETREGS', errno = get_errno())
+			raise LinuxProcessError('Error: PTRACE_SETREGS', errno=get_errno())
 		return
 
 	def _allocate_malloc(self, size):
@@ -619,7 +621,7 @@ class LinuxProcess(Process):
 		self._update_maps()
 		return
 
-	def _allocate_mmap(self, size, address, permissions, mmap_flags = None):
+	def _allocate_mmap(self, size, address, permissions, mmap_flags=None):
 		mmap_addr = self._get_function_address('libc-', 'mmap')
 		address = (address or 0)
 		permissions = (permissions or 'PROT_READ | PROT_WRITE | PROT_EXEC')
@@ -692,7 +694,7 @@ class LinuxProcess(Process):
 				return hook
 		raise ProcessError('unable to locate function')
 
-	def allocate(self, size = 0x400, address = None, permissions = None):
+	def allocate(self, size=0x400, address=None, permissions=None):
 		if not architecture_is_supported(self.__arch__):
 			raise LinuxProcessError('unsupported architecture: ' + repr(self.__arch__))
 		if address != None or permissions != None:
@@ -709,7 +711,7 @@ class LinuxProcess(Process):
 		else:
 			self._free_free(address)
 
-	def protect(self, address, permissions = 'PROT_READ | PROT_WRITE | PROT_EXEC', size = 0x400):
+	def protect(self, address, permissions='PROT_READ | PROT_WRITE | PROT_EXEC', size=0x400):
 		mprotect_addr = self._get_function_address('libc-', 'mprotect')
 		permissions = flags(permissions)
 		result = self._call_function(mprotect_addr, address, size, permissions)
@@ -718,7 +720,7 @@ class LinuxProcess(Process):
 		self._update_maps()
 		return
 
-	def start_thread(self, address, targ = None):
+	def start_thread(self, address, targ=None):
 		thread_create_addr = self._get_function_address('libpthread', 'pthread_create')
 		thread_id_addr = self._allocate_malloc(0x10)
 		result = self._call_function(thread_create_addr, thread_id_addr, 0, address, targ)
@@ -758,7 +760,7 @@ class LinuxProcess(Process):
 		self._update_maps()
 		return result
 
-	def read_memory(self, address, size = 0x400):
+	def read_memory(self, address, size=0x400):
 		data = ''
 		address_cursor = address
 		size_of_long = ctypes.sizeof(ctypes.c_long)
@@ -767,7 +769,7 @@ class LinuxProcess(Process):
 			if value == -1:
 				errno = get_errno()
 				if errno != 0:
-					raise LinuxProcessError('Error: PTRACE_PEEKDATA', errno = get_errno())
+					raise LinuxProcessError('Error: PTRACE_PEEKDATA', errno=get_errno())
 			data += struct.pack('l', value)
 			address_cursor += size_of_long
 		data = data[:size]
@@ -784,8 +786,8 @@ class LinuxProcess(Process):
 		if sz_overlap > 0 and sz_overlap < 8:
 			data = data + self.read_memory(address_cursor + len(data), sz_overlap)
 		for idx in xrange(0, len(data), size_of_long):
-			data_chunk = data[idx:(idx+size_of_long)]
+			data_chunk = data[idx:(idx + size_of_long)]
 			data_chunk = struct.unpack('l', data_chunk)[0]
 			if self._ptrace(PTRACE_POKEDATA, address_cursor + idx, data_chunk) != 0:
-				raise LinuxProcessError('Error: PTRACE_POKEDATA', errno = get_errno())
+				raise LinuxProcessError('Error: PTRACE_POKEDATA', errno=get_errno())
 		return None
