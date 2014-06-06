@@ -39,16 +39,16 @@ from mayhem.proc.native import NativeProcess
 from mayhem.utilities import align_up, architecture_is_32bit, architecture_is_64bit
 
 def main():
-	parser = ArgumentParser(description = 'syringe: library & shellcode injection utility', conflict_handler = 'resolve',
-		epilog = 'The PID argument can be specified as -1 to inject into the context of the syringe process.')
-	parser.add_argument('-l', '--load', dest = 'library', action = 'store', help = 'load the library in the target process')
-	parser.add_argument('-i', '--inject', dest = 'shellcode', action = 'store', help = 'inject code into the process')
-	parser.add_argument('-d', '--decode', dest = 'decode', action = 'store', choices = ('b64', 'hex', 'raw'), default = 'b64', help = 'decode the shellcode prior to execution')
-	parser.add_argument('pid', action = 'store', type = int, help = 'process to control')
+	parser = ArgumentParser(description='syringe: library & shellcode injection utility', conflict_handler='resolve',
+		epilog='The PID argument can be specified as -1 to inject into the context of the syringe process.')
+	parser.add_argument('-l', '--load', dest='library', action='store', help='load the library in the target process')
+	parser.add_argument('-i', '--inject', dest='shellcode', action='store', help='inject code into the process')
+	parser.add_argument('-d', '--decode', dest='decode', action='store', choices=('b64', 'hex', 'raw'), default = 'b64', help = 'decode the shellcode prior to execution')
+	parser.add_argument('pid', action='store', type=int, help='process to control')
 	arguments = parser.parse_args()
 
-	process_h = NativeProcess(pid = arguments.pid)
-	print("[+] Opened a handle to pid: {0}".format(arguments.pid)))
+	process_h = NativeProcess(pid=arguments.pid)
+	print("[+] Opened a handle to pid: {0}".format(arguments.pid))
 
 	if arguments.library:
 		try:
@@ -71,9 +71,9 @@ def main():
 			stub = "\x48\x8b\x44\x24\x08" # mov rax,[rsp+8]
 
 		shellcode_sz = align_up(len(stub + shellcode), 1024)
-		address = process_h.allocate(size = shellcode_sz, address = 0)
+		address = process_h.allocate(size=shellcode_sz, address=0)
 		print("[+] Allocated {0} bytes at 0x{1:08x}".format(shellcode_sz, address))
-		process_h.protect(address, size = shellcode_sz)
+		process_h.protect(address, size=shellcode_sz)
 		process_h.write_memory(address, stub + shellcode)
 		thread_id = process_h.start_thread(address, (address + len(stub)))
 		print("[+] Started thread at 0x{0:08x}".format(address))
