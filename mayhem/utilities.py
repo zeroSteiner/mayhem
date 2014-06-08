@@ -98,20 +98,6 @@ def eval_number(number):
 	else:
 		raise ValueError('unknown numerical value: \'' + number + '\'')
 
-def make_call(*args):
-	if len(args) == 2:
-		offset = args[1] - args[0]
-	else:
-		offset = args[0]
-	return '\xe8' + (pack('I', offset - 5))
-
-def make_jmp(*args):
-	if len(args) == 2:
-		offset = args[1] - args[0]
-	else:
-		offset = args[0]
-	return '\xe9' + (pack('i', offset - 5))
-
 def print_hexdump(data, address=0):
 	"""
 	Print data to stdout in a visually pleasant hex format.

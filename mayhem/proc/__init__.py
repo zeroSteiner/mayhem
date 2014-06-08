@@ -34,6 +34,10 @@ import os
 import uuid
 
 class ProcessError(Exception):
+	"""
+	This base exception describes process related errors and are raised
+	by :py:class:`mayhem.proc.Process` classes.
+	"""
 	def __init__(self, msg):
 		self.msg = msg
 
@@ -41,7 +45,21 @@ class ProcessError(Exception):
 		return repr(self.msg)
 
 class Hook:
+	"""
+	This object describes a hook which has been installed to modify the
+	behavior of native code. This is generally used for hijacking functions
+	to force them to execute different instructions when they are called.
+	The *Hook* specifically referes to the data which has been modified
+	to alter the flow of execution. This is generally a modified funciton
+	pointer or an assembly stub which redirects code to the *new_handler*.
+	"""
 	def __init__(self, hook_type, hook_location, old_address, new_address):
+		"""
+		:param str hook_type: The type of hook (iat or eat).
+		:param int hook_location: The address of where the hook has been installed.
+		:param int old_address: The original address of the hooked function.
+		:param int new_address: The new modified address of the hooked function.
+		"""
 		self.hook_type = hook_type
 		self.hook_location = hook_location
 		self.old_handler_address = old_address
@@ -57,7 +75,19 @@ class Hook:
 		return False
 
 class MemoryRegion(object):
+	"""
+	This describes a memory region in a platform independant way. Permissions
+	are described with a string using 'rwx' for full read, write and execute
+	permissions and substituting '-' for missing permissions. For example
+	a page with only read and execute permissions would have permissions
+	of 'r-x'.
+	"""
 	def __init__(self, addr_low, addr_high, perms):
+		"""
+		:param int addr_low: The address of where this memory region starts.
+		:param int addr_high: The address of where this memory region ends.
+		:param str perms: The permissions that this memory region has.
+		"""
 		self.addr_low = addr_low
 		self.addr_high = addr_high
 		self.perms = perms
@@ -67,26 +97,32 @@ class MemoryRegion(object):
 
 	@property
 	def size(self):
+		"""The size of the memory region."""
 		return (self.addr_high - self.addr_low)
 
 	@property
 	def is_readable(self):
+		"""Whether or not the memory region contains the read permission."""
 		return bool(self.perms[0] == 'r')
 
 	@property
 	def is_writeable(self):
+		"""Whether or not the memory region contains the write permission."""
 		return bool(self.perms[1] == 'w')
 
 	@property
 	def is_executable(self):
+		"""Whether or not the memory region contains the execute permission."""
 		return bool(self.perms[2] == 'x')
 
 	@property
 	def is_private(self):
+		"""Whether or not the memory region is marked as private."""
 		return bool(self.perms[3] == 'p')
 
 	@property
 	def is_shared(self):
+		"""Whether or not the memory region is marked as shared."""
 		return bool(self.perms[3] == 's')
 
 class Process(object):
