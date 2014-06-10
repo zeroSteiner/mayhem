@@ -35,9 +35,17 @@ import platform
 system_name = platform.system()
 if system_name == 'Linux':
 	from mayhem.proc.linux import LinuxProcess
-	NativeProcess = LinuxProcess
+	_NativeProcess = LinuxProcess
 elif system_name == 'Windows':
 	from mayhem.proc.windows import WindowsProcess
-	NativeProcess = WindowsProcess
+	_NativeProcess = WindowsProcess
 else:
 	raise Exception('unsupported platform: ' + repr(system_name))
+
+class NativeProcess(_NativeProcess):
+	"""
+	This class represents a process in the native environment on which it is
+	imported. It aims to allow applications to access a :py:class:`.Process`
+	object suitable for its environment with out checking the operating system.
+	"""
+	pass

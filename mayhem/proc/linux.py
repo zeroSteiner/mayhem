@@ -180,6 +180,7 @@ def flags(flags):
 	return parsed_flags
 
 class LinuxProcess(Process):
+	"""This class represents a process in a POSIX Linux environment."""
 	def __init__(self, pid=None, exe=None):
 		if platform.system() != 'Linux':
 			raise RuntimeError('incompatible platform')

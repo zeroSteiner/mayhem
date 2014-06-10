@@ -11,6 +11,7 @@ Classes
 -------
 
 .. autoclass:: mayhem.proc.windows.WindowsProcess
+   :show-inheritance:
    :members:
    :special-members: __init__
 
@@ -18,5 +19,7 @@ Exceptions
 ----------
 
 .. autoexception:: mayhem.proc.windows.WindowsProcessError
+   :show-inheritance:
    :members:
+   :inherited-members:
    :undoc-members:

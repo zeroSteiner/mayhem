@@ -18,10 +18,13 @@ Classes
 -------
 
 .. autoclass:: mayhem.proc.linux.LinuxMemoryRegion
+   :show-inheritance:
    :members:
+   :inherited-members:
    :undoc-members:
 
 .. autoclass:: mayhem.proc.linux.LinuxProcess
+   :show-inheritance:
    :members:
    :special-members: __init__
 
@@ -29,5 +32,7 @@ Exceptions
 ----------
 
 .. autoexception:: mayhem.proc.linux.LinuxProcessError
+   :show-inheritance:
    :members:
+   :inherited-members:
    :undoc-members:

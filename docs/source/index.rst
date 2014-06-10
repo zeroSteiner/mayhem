@@ -9,6 +9,7 @@ Contents:
    mayhem.rst
    mayhem.proc.rst
    mayhem.proc.linux.rst
+   mayhem.proc.native.rst
    mayhem.proc.windows.rst
    mayhem.utilities.rst
 

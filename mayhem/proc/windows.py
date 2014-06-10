@@ -138,6 +138,7 @@ def flags(flags):
 	return parsed_flags
 
 class WindowsProcess(Process):
+	"""This class represents a process in a Windows environment."""
 	def __init__(self, pid=None, exe=None, handle=None, arch='x86', access=None):
 		if platform.system() != 'Windows':
 			raise RuntimeError('incompatible platform')
