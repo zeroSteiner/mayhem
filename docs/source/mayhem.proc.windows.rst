@@ -1,0 +1,22 @@
+:mod:`mayhem.proc.windows` --- Windows manipulation classes
+===========================================================
+
+.. module:: mayhem.proc.windows
+   :synopsis: Windows manipulation classes
+
+This module contains classes functions and exceptions specific to Windows
+environments.
+
+Classes
+-------
+
+.. autoclass:: mayhem.proc.windows.WindowsProcess
+   :members:
+   :special-members: __init__
+
+Exceptions
+----------
+
+.. autoexception:: mayhem.proc.windows.WindowsProcessError
+   :members:
+   :undoc-members:

@@ -162,39 +162,116 @@ class Process(object):
 		return self.read_memory(region.addr_low, region.size)
 
 	def allocate(self, size=0x400, address=None, permissions=None):
+		"""
+		Allocate memory in the attached process. If *permissions* is not
+		specified it will be the platform specific version of read, write
+		and execute.
+
+		:param int size: The size of the space to allocate.
+		:param int address: The preferred address to allocate space at.
+		:param str permissions: The permissions to set in the newly allocated space.
+		"""
 		raise NotImplementedError()
 
 	def close(self):
+		"""
+		Close the handle to the process and perform any necessary clean
+		up operations. No further calls should be made to the object after
+		this function is called.
+		"""
 		raise NotImplementedError()
 
 	def free(self, address):
+		"""
+		Unallocate the memory at *address*.
+
+		:param int address: The address to unallocate.
+		"""
 		raise NotImplementedError()
 
 	def get_proc_attribute(self, attribute):
+		"""
+		Look up a platform specific attribute of the process. Valid values
+		for *attribute* will be different depending on the class.
+
+		:param str attribute: The attribute to look up.
+		"""
 		raise NotImplementedError()
 
 	def install_hook(self, mod_name, new_address, name=None, ordinal=None):
+		"""
+		Install a hook to redirect execution from the specified function
+		to *new_address*. Different platform implemenations of this function
+		may not support both the *name* and *ordinal* parameters.
+
+		:param str mod_name: The module where the target function to hook resides.
+		:param int new_address: The address of the new code to be executed.
+		:param str name: The name of the function to hook.
+		:param int ordinal: The ordinal of the function to hook.
+		"""
 		raise NotImplementedError()
 
 	def join_thread(self, thread_id):
+		"""
+		Wait for the thread described in *thread_id* to finish execution.
+
+		:param int thread_id: The ID of the thread to wait for.
+		"""
 		raise NotImplementedError()
 
 	def kill(self):
+		"""Kill the process which is currently being manipulated."""
 		raise NotImplementedError()
 
 	def load_library(self, libpath):
+		"""
+		Load the library specified by *libpath* into the address space
+		of the attached process.
+
+		:param str libpath: The path to the library to load.
+		"""
 		raise NotImplementedError()
 
 	def protect(self, address, permissions=None, size=0x400):
+		"""
+		Change the access permissions to the memory residing at *address*.
+		If *permissions* is not specified it will be the platform specific
+		version of read, write and execute.
+
+		:param int address: The address to change the permissions of.
+		:param str permissions: The permissions to set for *address*.
+		:param int size: The size of the space starting at *address* to change the permissions of.
+		"""
 		raise NotImplementedError()
 
 	def read_memory(self, address, size=0x400):
+		"""
+		Return the contents of memory at *address*.
+
+		:param int address: The location from which to read memory.
+		:param int size: The number of bytes to read.
+		:return: The contents of memory at *address*.
+		:rtype: str
+		"""
 		raise NotImplementedError()
 
 	def start_thread(self, address, targ=None):
+		"""
+		Execute *address* in the context of a new thread.
+
+		:param int address: The entry point of the thread.
+		:param targ: The arguments to supply for the thread.
+		:return: A platform specific thread identifier.
+		"""
 		raise NotImplementedError()
 
 	def write_memory(self, address, data):
+		"""
+		Write arbitrary data to the processes memory.
+
+		:param int address: The location to start writing to.
+		:param str data: The data to write into memory.
+		"""
 		raise NotImplementedError()
 
 	@property

@@ -99,17 +99,33 @@ class LinuxMemoryRegion(MemoryRegion):
 class LinuxProcessError(ProcessError):
 	def __init__(self, *args, **kwargs):
 		self.errno = None
+		"""The libc error number at the time the exception was raised."""
 		if 'errno' in kwargs:
 			self.errno = kwargs['errno']
 			del kwargs['errno']
 		ProcessError.__init__(self, *args, **kwargs)
 
 def get_errno():
+	"""
+	Get the value of the error from the last function call.
+
+	:return: The error number from libc.
+	:rtype: int
+	"""
 	get_errno_loc = libc.__errno_location
 	get_errno_loc.restype = ctypes.POINTER(ctypes.c_int)
 	return get_errno_loc()[0]
 
 def parse_proc_maps(pid):
+	"""
+	Parse the memory maps file for *pid* into a dictionary of
+	:py:class:`.LinuxMemoryRegion` objects with keys of their starting
+	address.
+
+	:param int pid: The pid to parse the maps file from /proc for.
+	:return: The parsed memory regions for *pid*.
+	:rtype: dict
+	"""
 	maps = {}
 	maps_h = open('/proc/' + str(pid) + '/maps', 'r')
 	for memory_region in maps_h:

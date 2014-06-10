@@ -8,6 +8,8 @@ Contents:
 
    mayhem.rst
    mayhem.proc.rst
+   mayhem.proc.linux.rst
+   mayhem.proc.windows.rst
    mayhem.utilities.rst
 
 Indices and tables
