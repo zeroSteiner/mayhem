@@ -127,11 +127,18 @@ class MemoryRegion(object):
 
 class Process(object):
 	__arch__ = None
-
 	def __repr__(self):
 		return "{0}(pid={1}, exe='{2}')".format(self.__class__.__name__, self.pid, os.path.basename(self.exe_file))
 
 	def read_memory_string(self, address):
+		"""
+		Read bytes from *address* until a NULL termination character is
+		encountered.
+
+		:param int address: The address to start reading from.
+		:return: The string residing at *address*.
+		:rtype: str
+		"""
 		string = ''
 		while string.find('\x00') == -1:
 			string += self.read_memory(address, 16)
@@ -139,10 +146,58 @@ class Process(object):
 		return string.split('\x00', 1)[0]
 
 	def read_region(self, region):
+		"""
+		Read an entire region from memory. If *region* is a
+		:py:class:`.MemoryRegion` instance, it is returned. If *region*
+		is an int, it must be the starting address of a memory region in
+		the :py:attr:`.maps` attribute.
+
+		:param region: The region to read from.
+		:type region: int, :py:class:`.MemoryRegion`
+		:return: The contents of the memory region.
+		:rtype: str
+		"""
 		if isinstance(region, (int, long)):
 			region = self.maps.get(region)
 		return self.read_memory(region.addr_low, region.size)
 
+	def allocate(self, size=0x400, address=None, permissions=None):
+		raise NotImplementedError()
+
+	def close(self):
+		raise NotImplementedError()
+
+	def free(self, address):
+		raise NotImplementedError()
+
+	def get_proc_attribute(self, attribute):
+		raise NotImplementedError()
+
+	def install_hook(self, mod_name, new_address, name=None, ordinal=None):
+		raise NotImplementedError()
+
+	def join_thread(self, thread_id):
+		raise NotImplementedError()
+
+	def kill(self):
+		raise NotImplementedError()
+
+	def load_library(self, libpath):
+		raise NotImplementedError()
+
+	def protect(self, address, permissions=None, size=0x400):
+		raise NotImplementedError()
+
+	def read_memory(self, address, size=0x400):
+		raise NotImplementedError()
+
+	def start_thread(self, address, targ=None):
+		raise NotImplementedError()
+
+	def write_memory(self, address, data):
+		raise NotImplementedError()
+
 	@property
 	def arch(self):
+		"""The architecture of the process."""
 		return self.__arch__

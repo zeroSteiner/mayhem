@@ -401,19 +401,19 @@ class WindowsProcess(Process):
 		self.k32.TerminateProcess(self.handle, 0)
 		self.close()
 
-	def load_library(self, dllpath):
-		dllpath = os.path.abspath(dllpath)
+	def load_library(self, libpath):
+		libpath = os.path.abspath(libpath)
 		LoadLibraryA = self.k32.GetProcAddress(self.k32.GetModuleHandleA("kernel32.dll"), "LoadLibraryA")
-		RemotePage = self.k32.VirtualAllocEx(self.handle, None, len(dllpath) + 1, flags("MEM_COMMIT"), flags("PAGE_EXECUTE_READWRITE"))
-		self.k32.WriteProcessMemory(self.handle, RemotePage, dllpath, len(dllpath), None)
+		RemotePage = self.k32.VirtualAllocEx(self.handle, None, len(libpath) + 1, flags("MEM_COMMIT"), flags("PAGE_EXECUTE_READWRITE"))
+		self.k32.WriteProcessMemory(self.handle, RemotePage, libpath, len(libpath), None)
 		RemoteThread = self.k32.CreateRemoteThread(self.handle, None, 0, LoadLibraryA, RemotePage, 0, None)
 		self.k32.WaitForSingleObject(RemoteThread, -1)
 
 		exitcode = wintypes.DWORD(0)
 		self.k32.GetExitCodeThread(RemoteThread, ctypes.byref(exitcode))
-		self.k32.VirtualFreeEx(self.handle, RemotePage, len(dllpath), flags("MEM_RELEASE"))
+		self.k32.VirtualFreeEx(self.handle, RemotePage, len(libpath), flags("MEM_RELEASE"))
 		if exitcode.value == 0:
-			raise WindowsProcessError('Error: failed to load: ' + repr(dllpath))
+			raise WindowsProcessError('Error: failed to load: ' + repr(libpath))
 		self._update_maps()
 		return exitcode.value
 
@@ -433,9 +433,9 @@ class WindowsProcess(Process):
 			raise WindowsProcessError('Error: WriteProcessMemory', get_last_error=self.k32.GetLastError())
 		return
 
-	def allocate(self, size=0x400, address=None, permissions='PAGE_EXECUTE_READWRITE'):
+	def allocate(self, size=0x400, address=None, permissions=None):
 		alloc_type = flags('MEM_COMMIT')
-		permissions = flags(permissions)
+		permissions = flags(permissions or 'PAGE_EXECUTE_READWRITE')
 		result = self.k32.VirtualAllocEx(self.handle, address, size, alloc_type, permissions)
 		self._update_maps()
 		return result
@@ -447,8 +447,8 @@ class WindowsProcess(Process):
 		self._update_maps()
 		return
 
-	def protect(self, address, permissions='PAGE_EXECUTE_READWRITE', size=0x400):
-		permissions = flags(permissions)
+	def protect(self, address, permissions=None, size=0x400):
+		permissions = flags(permissions or 'PAGE_EXECUTE_READWRITE')
 		old_permissions = wintypes.DWORD()
 		if (self.k32.VirtualProtectEx(self.handle, address, size, permissions, ctypes.byref(old_permissions)) == 0):
 			raise WindowsProcessError('Error: VirtualProtectEx', get_last_error=self.k32.GetLastError())

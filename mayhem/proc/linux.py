@@ -84,8 +84,10 @@ PTRACE_DETACH = 17
 PTRACE_SYSCALL = 24
 
 class LinuxMemoryRegion(MemoryRegion):
+	"""Describe a memory region on Linux."""
 	def __init__(self, addr_low, addr_high, perms, pathname=None):
 		self.pathname = pathname
+		"""The file which mapped the region, if known."""
 		super(LinuxMemoryRegion, self).__init__(addr_low, addr_high, perms)
 
 	def __repr__(self):
@@ -645,7 +647,7 @@ class LinuxProcess(Process):
 		self._update_maps()
 		return
 
-	def install_hook(self, mod_name, new_address, func_name):
+	def install_hook(self, mod_name, new_address, name=None, ordinal=None):
 		if architecture_is_32bit(self.__arch__):
 			lm_struct = elf.Elf32_Link_Map
 			dyn_struct = elf.Elf32_Dyn
@@ -656,6 +658,10 @@ class LinuxProcess(Process):
 			sym_struct = elf.Elf64_Sym
 		else:
 			raise LinuxProcessError('unsupported architecture: ' + repr(self.__arch__))
+		if ordinal:
+			raise NotImplementedError('an ordinal is not supported for this implementation')
+		if not name:
+			raise RuntimeError('a name is required for this implementation')
 		lm = self._read_structure_from_memory(self.get_proc_attribute('link_map_addr'), lm_struct)
 		if os.path.isabs(mod_name):
 			validate_name = lambda lm: bool(self.read_memory_string(lm.l_name) == mod_name)
@@ -684,7 +690,7 @@ class LinuxProcess(Process):
 			sym = self._read_structure_from_memory(symtab + (ctypes.sizeof(sym_struct) * idx), sym_struct)
 			if (sym.st_info & 0xf) != elf.constants.STT_FUNC:
 				continue
-			if self.read_memory_string(strtab + sym.st_name) == func_name:
+			if self.read_memory_string(strtab + sym.st_name) == name:
 				sym_addr = (symtab + (ctypes.sizeof(sym_struct) * idx))
 				old_address = lm.l_addr + sym.st_value
 				sym.st_value = (lm.l_addr - new_address)
@@ -695,6 +701,7 @@ class LinuxProcess(Process):
 		raise ProcessError('unable to locate function')
 
 	def allocate(self, size=0x400, address=None, permissions=None):
+		permissions = (permissions or 'PROT_READ | PROT_WRITE | PROT_EXEC')
 		if not architecture_is_supported(self.__arch__):
 			raise LinuxProcessError('unsupported architecture: ' + repr(self.__arch__))
 		if address != None or permissions != None:
@@ -711,7 +718,8 @@ class LinuxProcess(Process):
 		else:
 			self._free_free(address)
 
-	def protect(self, address, permissions='PROT_READ | PROT_WRITE | PROT_EXEC', size=0x400):
+	def protect(self, address, permissions=None, size=0x400):
+		permissions = (permissions or 'PROT_READ | PROT_WRITE | PROT_EXEC')
 		mprotect_addr = self._get_function_address('libc-', 'mprotect')
 		permissions = flags(permissions)
 		result = self._call_function(mprotect_addr, address, size, permissions)
