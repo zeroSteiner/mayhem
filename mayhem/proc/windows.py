@@ -36,7 +36,7 @@ import platform
 
 from mayhem.proc import Process, ProcessError, Hook, MemoryRegion
 from mayhem.datatypes import windows as wintypes
-from mayhem.utilities import eval_number
+from mayhem.utilities import align_up, eval_number
 
 CONSTANTS = {
 	'GENERIC_READ': 0x80000000,
@@ -146,6 +146,7 @@ class WindowsProcess(Process):
 		self.k32 = ctypes.windll.kernel32
 		self.ntdll = ctypes.windll.ntdll
 		self.psapi = ctypes.windll.psapi
+		self._setup_winapi()
 
 		self.handle = None
 		if pid == -1:
@@ -314,10 +315,34 @@ class WindowsProcess(Process):
 			fLink = module.InLoadOrderModuleList.Flink
 		return None
 
+	def _setup_winapi(self):
+		if platform.architecture()[0] == '64bit':
+			PMEMORY_BASIC_INFORMATION = ctypes.POINTER(wintypes.MEMORY_BASIC_INFORMATION64)
+			SIZE_T = ctypes.c_uint64
+		else:
+			PMEMORY_BASIC_INFORMATION = ctypes.POINTER(wintypes.MEMORY_BASIC_INFORMATION)
+			SIZE_T = ctypes.c_uint32
+		self.k32.CreateRemoteThread.argtypes = [wintypes.HANDLE, ctypes.POINTER(wintypes.SECURITY_ATTRIBUTES), SIZE_T, ctypes.c_void_p, wintypes.LPVOID, wintypes.DWORD, wintypes.PDWORD]
+		self.k32.CreateRemoteThread.restype = wintypes.HANDLE
+		self.k32.GetExitCodeThread.argtypes = [wintypes.HANDLE, wintypes.PDWORD]
+		self.k32.GetModuleHandleA.restype = wintypes.HANDLE
+		self.k32.GetProcAddress.argtypes = [wintypes.HMODULE, wintypes.LPCSTR]
+		self.k32.GetProcAddress.restype = ctypes.c_void_p
+		self.k32.ReadProcessMemory.argtypes = [wintypes.HANDLE, wintypes.LPCVOID, wintypes.LPVOID, SIZE_T, SIZE_T]
+		self.k32.VirtualAllocEx.argtypes = [wintypes.HANDLE, wintypes.LPVOID, SIZE_T, wintypes.DWORD, wintypes.DWORD]
+		self.k32.VirtualAllocEx.restype = SIZE_T
+		self.k32.VirtualFreeEx.argtypes = [wintypes.HANDLE, wintypes.LPVOID, SIZE_T, wintypes.DWORD]
+		self.k32.VirtualQueryEx.argtypes = [wintypes.HANDLE, wintypes.LPCVOID, PMEMORY_BASIC_INFORMATION, SIZE_T]
+		self.k32.VirtualQueryEx.restype = SIZE_T
+		self.k32.WaitForSingleObject.argtypes = [wintypes.HANDLE, wintypes.DWORD]
+		self.k32.WaitForSingleObject.restype = wintypes.DWORD
+		self.k32.WriteProcessMemory.argtypes = [wintypes.HANDLE, wintypes.LPVOID, wintypes.LPCVOID, SIZE_T, ctypes.POINTER(SIZE_T)]
+
 	def _update_maps(self):
 		sys_info = self.get_proc_attribute('system_info')
 		self.maps = {}
 		address_cursor = 0
+		VirtualQueryEx = self.k32.VirtualQueryEx
 		if platform.architecture()[0] == '64bit':
 			meminfo = wintypes.MEMORY_BASIC_INFORMATION64()
 		else:
@@ -326,7 +351,7 @@ class WindowsProcess(Process):
 		MEM_PRIVATE = flags('MEM_PRIVATE')
 		PROTECT_FLAGS = {0x10: '--x', 0x20: 'r-x', 0x40: 'rwx', 0x80: 'r-x', 0x01: '---', 0x02: 'r--', 0x04: 'rw-', 0x08: 'r--'}
 		while address_cursor < sys_info.lpMaximumApplicationAddress:
-			if self.k32.VirtualQueryEx(self.handle, address_cursor, ctypes.byref(meminfo), ctypes.sizeof(meminfo)) == 0:
+			if VirtualQueryEx(self.handle, address_cursor, ctypes.byref(meminfo), ctypes.sizeof(meminfo)) == 0:
 				break
 			address_cursor = meminfo.BaseAddress + meminfo.RegionSize
 			if (meminfo.State & MEM_COMMIT) == 0:
@@ -404,8 +429,11 @@ class WindowsProcess(Process):
 
 	def load_library(self, libpath):
 		libpath = os.path.abspath(libpath)
+		libpath_len = align_up(len(libpath) + 1, 0x200)
 		LoadLibraryA = self.k32.GetProcAddress(self.k32.GetModuleHandleA("kernel32.dll"), "LoadLibraryA")
 		RemotePage = self.k32.VirtualAllocEx(self.handle, None, len(libpath) + 1, flags("MEM_COMMIT"), flags("PAGE_EXECUTE_READWRITE"))
+		if not RemotePage:
+			raise WindowsProcessError('Error: failed to allocate space for library name in the target process')
 		self.k32.WriteProcessMemory(self.handle, RemotePage, libpath, len(libpath), None)
 		RemoteThread = self.k32.CreateRemoteThread(self.handle, None, 0, LoadLibraryA, RemotePage, 0, None)
 		self.k32.WaitForSingleObject(RemoteThread, -1)

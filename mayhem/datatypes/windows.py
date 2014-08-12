@@ -36,17 +36,22 @@ _IMAGE_NUMBEROF_DIRECTORY_ENTRIES = 16
 
 # http://msdn.microsoft.com/en-us/library/windows/desktop/aa383751(v=vs.85).aspx
 BOOLEAN = ctypes.c_byte
+BOOL = ctypes.c_int
 BYTE = ctypes.c_uint8
 
 DWORD = ctypes.c_uint32
 DWORDLONG = ctypes.c_uint64
 DWORD32 = ctypes.c_uint32
 DWORD64 = ctypes.c_uint64
+PDWORD = ctypes.POINTER(DWORD)
+LPDWORD = PDWORD
 
 LONG = ctypes.c_int32
 LONGLONG = ctypes.c_int64
 LONG32 = ctypes.c_int32
 LONG64 = ctypes.c_int64
+PLONG = ctypes.POINTER(LONG)
+LPLONG = PLONG
 
 QWORD = ctypes.c_uint64
 
@@ -59,14 +64,24 @@ USHORT = ctypes.c_uint16
 
 WORD = ctypes.c_uint16
 
-LPTSTR = ctypes.POINTER(ctypes.c_char)
+PCSTR = ctypes.POINTER(ctypes.c_char)
+LPCSTR = PCSTR
+PTSTR = ctypes.POINTER(ctypes.c_char)
+LPTSTR = PTSTR
 PSTR = ctypes.POINTER(ctypes.c_char)
 PWSTR = ctypes.POINTER(ctypes.c_wchar)
 LPBYTE = ctypes.POINTER(ctypes.c_ubyte)
-PUCHAR = ctypes.POINTER(ctypes.c_ubyte)
+
 UCHAR = ctypes.c_ubyte
+PUCHAR = ctypes.POINTER(ctypes.c_ubyte)
+
 HANDLE = ctypes.c_void_p
+HINSTANCE = HANDLE
+HMODULE = HANDLE
+LPCVOID = ctypes.c_void_p
 PVOID = ctypes.c_void_p
+LPVOID = PVOID
+
 PULONG = ctypes.POINTER(ULONG)
 ULONGLONG = ctypes.c_uint64
 PULONGLONG = ctypes.POINTER(ULONGLONG)
@@ -280,6 +295,14 @@ class PROCESS_BASIC_INFORMATION(ctypes.Structure):
 				("UniqueProcessId", PULONG),
 				("Reserved3", ctypes.c_void_p),]
 
+class SECURITY_ATTRIBUTES(ctypes.Structure):
+	"""see:
+	http://msdn.microsoft.com/en-us/library/windows/desktop/aa379560(v=vs.85).aspx
+	"""
+	_fields_ = [("nLength", DWORD),
+				("lpSecurityDescriptor", LPVOID),
+				("bInheritHandle", BOOL),]
+
 class SYSTEM_INFO(ctypes.Structure):
 	"""see:
 	http://msdn.microsoft.com/en-us/library/windows/desktop/ms724958(v=vs.85).aspx
@@ -321,11 +344,11 @@ class MEMORY_BASIC_INFORMATION64(ctypes.Structure):
 	"""see:
 	http://msdn.microsoft.com/en-us/library/windows/desktop/aa366775(v=vs.85).aspx
 	"""
-	_fields_ = [("BaseAddress", ULONG),
+	_fields_ = [("BaseAddress", ULONGLONG),
 				("AllocationBase", PVOID),
 				("AllocationProtect", DWORD),
 				("__alignment1", DWORD),
-				("RegionSize", ULONG),
+				("RegionSize", ULONGLONG),
 				("State", DWORD),
 				("Protect", DWORD),
 				("Type", DWORD),
