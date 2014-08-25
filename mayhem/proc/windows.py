@@ -137,6 +137,25 @@ def flags(flags):
 			parsed_flags = eval(str(parsed_flags) + last_operator + str(part))
 	return parsed_flags
 
+def process_is_wow64(handle=None):
+	"""
+	Determine whether the process associated with the handle is running
+	in WOW64 or not.
+
+	:param int handle: A handle to the process to check.
+	:return: Whether the process is running in WOW64 or not.
+	:rtype: bool
+	"""
+	if not hasattr(ctypes.windll.kernel32, 'IsWow64Process'):
+		return False
+	if platform.architecture()[0] == '64bit':
+		ctypes.windll.kernel32.IsWow64Process.argtypes = [ctypes.c_uint64, ctypes.POINTER(ctypes.c_bool)]
+	handle = (handle or -1)
+	is_wow64 = ctypes.c_bool()
+	if not ctypes.windll.kernel32.IsWow64Process(handle, ctypes.byref(is_wow64)):
+		raise WindowsProcessError('Error: IsWow64Process', get_last_error=ctypes.windll.kernel32.GetLastError())
+	return is_wow64.value
+
 class WindowsProcess(Process):
 	"""This class represents a process in a Windows environment."""
 	def __init__(self, pid=None, exe=None, handle=None, arch='x86', access=None):
