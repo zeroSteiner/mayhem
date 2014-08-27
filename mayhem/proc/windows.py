@@ -191,6 +191,8 @@ class WindowsProcess(Process):
 			self.handle = handle
 		else:
 			raise ProcessError('either a pid, exe or a handle must be specified')
+		if process_is_wow64() != process_is_wow64(self.handle):
+			raise ProcessError('the python process must be the same architecture as the target process')
 		self.pid = self.k32.GetProcessId(self.handle)
 		_name = (ctypes.c_char * 0x400)
 		name = _name()

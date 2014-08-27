@@ -47,14 +47,18 @@ def main():
 	parser.add_argument('pid', action='store', type=int, help='process to control')
 	arguments = parser.parse_args()
 
-	process_h = NativeProcess(pid=arguments.pid)
+	try:
+		process_h = NativeProcess(pid=arguments.pid)
+	except ProcessError as error:
+		print("[-] {0}".format(error.msg))
+		return
 	print("[+] Opened a handle to pid: {0}".format(arguments.pid))
 
 	if arguments.library:
 		try:
 			lib_h = process_h.load_library(arguments.library)
-		except ProcessError as err:
-			print("[-] {0}".format(err.msg))
+		except ProcessError as error:
+			print("[-] {0}".format(error.msg))
 		else:
 			print("[+] Loaded {0} with handle 0x{1:08x}".format(arguments.library, lib_h))
 
