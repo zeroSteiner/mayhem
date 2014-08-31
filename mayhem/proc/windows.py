@@ -337,37 +337,28 @@ class WindowsProcess(Process):
 		return None
 
 	def _setup_winapi(self):
-		if platform.architecture()[0] == '64bit':
-			PMEMORY_BASIC_INFORMATION = ctypes.POINTER(wintypes.MEMORY_BASIC_INFORMATION64)
-			SIZE_T = ctypes.c_uint64
-		else:
-			PMEMORY_BASIC_INFORMATION = ctypes.POINTER(wintypes.MEMORY_BASIC_INFORMATION)
-			SIZE_T = ctypes.c_uint32
-		self.k32.CreateRemoteThread.argtypes = [wintypes.HANDLE, ctypes.POINTER(wintypes.SECURITY_ATTRIBUTES), SIZE_T, ctypes.c_void_p, wintypes.LPVOID, wintypes.DWORD, wintypes.PDWORD]
+		self.k32.CreateRemoteThread.argtypes = [wintypes.HANDLE, ctypes.POINTER(wintypes.SECURITY_ATTRIBUTES), wintypes.SIZE_T, ctypes.c_void_p, wintypes.LPVOID, wintypes.DWORD, wintypes.PDWORD]
 		self.k32.CreateRemoteThread.restype = wintypes.HANDLE
 		self.k32.GetExitCodeThread.argtypes = [wintypes.HANDLE, wintypes.PDWORD]
 		self.k32.GetModuleHandleA.restype = wintypes.HANDLE
-		self.k32.GetProcAddress.argtypes = [wintypes.HMODULE, wintypes.LPCSTR]
+		self.k32.GetProcAddress.argtypes = [wintypes.HMODULE, wintypes.LPSTR]
 		self.k32.GetProcAddress.restype = ctypes.c_void_p
-		self.k32.ReadProcessMemory.argtypes = [wintypes.HANDLE, wintypes.LPCVOID, wintypes.LPVOID, SIZE_T, SIZE_T]
-		self.k32.VirtualAllocEx.argtypes = [wintypes.HANDLE, wintypes.LPVOID, SIZE_T, wintypes.DWORD, wintypes.DWORD]
-		self.k32.VirtualAllocEx.restype = SIZE_T
-		self.k32.VirtualFreeEx.argtypes = [wintypes.HANDLE, wintypes.LPVOID, SIZE_T, wintypes.DWORD]
-		self.k32.VirtualQueryEx.argtypes = [wintypes.HANDLE, wintypes.LPCVOID, PMEMORY_BASIC_INFORMATION, SIZE_T]
-		self.k32.VirtualQueryEx.restype = SIZE_T
+		self.k32.ReadProcessMemory.argtypes = [wintypes.HANDLE, wintypes.LPCVOID, wintypes.LPVOID, wintypes.SIZE_T, wintypes.SIZE_T]
+		self.k32.VirtualAllocEx.argtypes = [wintypes.HANDLE, wintypes.LPVOID, wintypes.SIZE_T, wintypes.DWORD, wintypes.DWORD]
+		self.k32.VirtualAllocEx.restype = wintypes.SIZE_T
+		self.k32.VirtualFreeEx.argtypes = [wintypes.HANDLE, wintypes.LPVOID, wintypes.SIZE_T, wintypes.DWORD]
+		self.k32.VirtualQueryEx.argtypes = [wintypes.HANDLE, wintypes.LPCVOID, wintypes.PMEMORY_BASIC_INFORMATION, wintypes.SIZE_T]
+		self.k32.VirtualQueryEx.restype = wintypes.SIZE_T
 		self.k32.WaitForSingleObject.argtypes = [wintypes.HANDLE, wintypes.DWORD]
 		self.k32.WaitForSingleObject.restype = wintypes.DWORD
-		self.k32.WriteProcessMemory.argtypes = [wintypes.HANDLE, wintypes.LPVOID, wintypes.LPCVOID, SIZE_T, ctypes.POINTER(SIZE_T)]
+		self.k32.WriteProcessMemory.argtypes = [wintypes.HANDLE, wintypes.LPVOID, wintypes.LPCVOID, wintypes.SIZE_T, ctypes.POINTER(wintypes.SIZE_T)]
 
 	def _update_maps(self):
 		sys_info = self.get_proc_attribute('system_info')
 		self.maps = {}
 		address_cursor = 0
 		VirtualQueryEx = self.k32.VirtualQueryEx
-		if platform.architecture()[0] == '64bit':
-			meminfo = wintypes.MEMORY_BASIC_INFORMATION64()
-		else:
-			meminfo = wintypes.MEMORY_BASIC_INFORMATION()
+		meminfo = wintypes.MEMORY_BASIC_INFORMATION()
 		MEM_COMMIT = flags('MEM_COMMIT')
 		MEM_PRIVATE = flags('MEM_PRIVATE')
 		PROTECT_FLAGS = {0x10: '--x', 0x20: 'r-x', 0x40: 'rwx', 0x80: 'r-x', 0x01: '---', 0x02: 'r--', 0x04: 'rw-', 0x08: 'r--'}

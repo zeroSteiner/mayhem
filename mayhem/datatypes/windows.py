@@ -31,60 +31,66 @@
 #
 
 import ctypes
+import platform
 
 _IMAGE_NUMBEROF_DIRECTORY_ENTRIES = 16
 
 # http://msdn.microsoft.com/en-us/library/windows/desktop/aa383751(v=vs.85).aspx
 BOOLEAN = ctypes.c_byte
-BOOL = ctypes.c_int
-BYTE = ctypes.c_uint8
-
-DWORD = ctypes.c_uint32
-DWORDLONG = ctypes.c_uint64
-DWORD32 = ctypes.c_uint32
-DWORD64 = ctypes.c_uint64
-PDWORD = ctypes.POINTER(DWORD)
-LPDWORD = PDWORD
-
-LONG = ctypes.c_int32
-LONGLONG = ctypes.c_int64
-LONG32 = ctypes.c_int32
-LONG64 = ctypes.c_int64
-PLONG = ctypes.POINTER(LONG)
-LPLONG = PLONG
-
-QWORD = ctypes.c_uint64
-
-SHORT = ctypes.c_int16
-
-UCHAR = ctypes.c_uint8
-ULONG = ctypes.c_uint32
-ULONGLONG = ctypes.c_uint64
-USHORT = ctypes.c_uint16
+BOOL    = ctypes.c_int
+BYTE    = ctypes.c_uint8
+PBYTE   = ctypes.POINTER(BYTE)
+LPBYTE  = PBYTE
 
 WORD = ctypes.c_uint16
 
-PCSTR = ctypes.POINTER(ctypes.c_char)
-LPCSTR = PCSTR
-PTSTR = ctypes.POINTER(ctypes.c_char)
-LPTSTR = PTSTR
-PSTR = ctypes.POINTER(ctypes.c_char)
-PWSTR = ctypes.POINTER(ctypes.c_wchar)
-LPBYTE = ctypes.POINTER(ctypes.c_ubyte)
+DWORD     = ctypes.c_uint32
+DWORDLONG = ctypes.c_uint64
+DWORD32   = ctypes.c_uint32
+DWORD64   = ctypes.c_uint64
+PDWORD    = ctypes.POINTER(DWORD)
+LPDWORD   = PDWORD
 
-UCHAR = ctypes.c_ubyte
+QWORD   = ctypes.c_uint64
+PQWORD  = ctypes.POINTER(QWORD)
+LPQWORD = PQWORD
+
+SHORT = ctypes.c_int16
+
+LONG     = ctypes.c_int32
+LONGLONG = ctypes.c_int64
+LONG32   = ctypes.c_int32
+LONG64   = ctypes.c_int64
+PLONG    = ctypes.POINTER(LONG)
+LPLONG   = PLONG
+
+UCHAR      = ctypes.c_uint8
+USHORT     = ctypes.c_uint16
+ULONG      = ctypes.c_uint32
+PULONG     = ctypes.POINTER(ULONG)
+ULONGLONG  = ctypes.c_uint64
+PULONGLONG = ctypes.POINTER(ULONGLONG)
+
+PSTR   = ctypes.POINTER(ctypes.c_char)
+LPSTR  = PSTR
+PWSTR  = ctypes.POINTER(ctypes.c_wchar)
+LPWSTR = PWSTR
+
+UCHAR  = ctypes.c_ubyte
 PUCHAR = ctypes.POINTER(ctypes.c_ubyte)
 
-HANDLE = ctypes.c_void_p
+HANDLE    = ctypes.c_void_p
 HINSTANCE = HANDLE
-HMODULE = HANDLE
-LPCVOID = ctypes.c_void_p
-PVOID = ctypes.c_void_p
-LPVOID = PVOID
+HMODULE   = HANDLE
+PVOID     = ctypes.c_void_p
+LPVOID    = PVOID
+LPCVOID   = PVOID
 
-PULONG = ctypes.POINTER(ULONG)
-ULONGLONG = ctypes.c_uint64
-PULONGLONG = ctypes.POINTER(ULONGLONG)
+# platform specific data primitives
+if platform.architecture()[0] == '64bit':
+	SIZE_T = ctypes.c_uint64
+else:
+	SIZE_T = ctypes.c_uint32
 
 class LIST_ENTRY(ctypes.Structure):
 	_fields_ = [("Flink", ctypes.c_void_p),
@@ -100,9 +106,9 @@ class STARTUPINFO(ctypes.Structure):
 	http://msdn.microsoft.com/en-us/library/windows/desktop/ms686331(v=vs.85).aspx
 	"""
 	_fields_ = [("cb", DWORD),
-				("lpReserved", LPTSTR),
-				("lpDesktop", LPTSTR),
-				("lpTitle", LPTSTR),
+				("lpReserved", LPSTR),
+				("lpDesktop", LPSTR),
+				("lpTitle", LPSTR),
 				("dwX", DWORD),
 				("dwY", DWORD),
 				("dwXSize", DWORD),
@@ -328,7 +334,7 @@ class PROCESS_INFORMATION(ctypes.Structure):
 				("dwProcessId", DWORD),
 				("dwThreadId", DWORD),]
 
-class MEMORY_BASIC_INFORMATION(ctypes.Structure):
+class MEMORY_BASIC_INFORMATION32(ctypes.Structure):
 	"""see:
 	http://msdn.microsoft.com/en-us/library/windows/desktop/aa366775(v=vs.85).aspx
 	"""
@@ -353,3 +359,10 @@ class MEMORY_BASIC_INFORMATION64(ctypes.Structure):
 				("Protect", DWORD),
 				("Type", DWORD),
 				("__alignment2", DWORD),]
+
+# platform specific structures
+if platform.architecture()[0] == '64bit':
+	MEMORY_BASIC_INFORMATION = MEMORY_BASIC_INFORMATION64
+else:
+	MEMORY_BASIC_INFORMATION = MEMORY_BASIC_INFORMATION32
+PMEMORY_BASIC_INFORMATION = ctypes.POINTER(MEMORY_BASIC_INFORMATION)
