@@ -347,6 +347,7 @@ class WindowsProcess(Process):
 		self.k32.VirtualAllocEx.argtypes = [wintypes.HANDLE, wintypes.LPVOID, wintypes.SIZE_T, wintypes.DWORD, wintypes.DWORD]
 		self.k32.VirtualAllocEx.restype = wintypes.SIZE_T
 		self.k32.VirtualFreeEx.argtypes = [wintypes.HANDLE, wintypes.LPVOID, wintypes.SIZE_T, wintypes.DWORD]
+		self.k32.VirtualProtectEx.argtypes = [wintypes.HANDLE, wintypes.LPVOID, wintypes.SIZE_T, wintypes.DWORD, ctypes.POINTER(wintypes.DWORD)]
 		self.k32.VirtualQueryEx.argtypes = [wintypes.HANDLE, wintypes.LPCVOID, wintypes.PMEMORY_BASIC_INFORMATION, wintypes.SIZE_T]
 		self.k32.VirtualQueryEx.restype = wintypes.SIZE_T
 		self.k32.WaitForSingleObject.argtypes = [wintypes.HANDLE, wintypes.DWORD]
@@ -469,7 +470,7 @@ class WindowsProcess(Process):
 		_wr_data = (ctypes.c_char * len(data))
 		wr_data = _wr_data()
 		wr_data.value = data
-		written = wintypes.DWORD()
+		written = wintypes.SIZE_T()
 		if (self.k32.WriteProcessMemory(self.handle, address, ctypes.byref(wr_data), ctypes.sizeof(wr_data), ctypes.byref(written)) == 0):
 			raise WindowsProcessError('Error: WriteProcessMemory', get_last_error=self.k32.GetLastError())
 		return
