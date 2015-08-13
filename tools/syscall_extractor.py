@@ -74,7 +74,9 @@ def get_i386_syscall(stub):
 		return None
 	if not stub.startswith('\xb8'):
 		return None
-	if stub[5:13] != '\xba\x00\x03\xfe\x7f\xff\x12\xc2':
+	if stub[5:12] != '\xba\x00\x03\xfe\x7f\xff\x12':
+		return None
+	if not stub[12] in ('\xc2', '\xc3'):
 		return None
 	return struct.unpack('I', stub[1:5])[0]
 
