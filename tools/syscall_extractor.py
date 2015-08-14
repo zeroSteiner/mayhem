@@ -36,13 +36,9 @@ import collections
 import os
 import struct
 import sys
-import tabulate
 
-try:
-	import pefile
-except ImportError:
-	print('missing requirement pefile, https://pypi.python.org/pypi/pefile')
-	os._exit(0)
+import pefile
+import tabulate
 
 try:
 	import jarvis
@@ -50,7 +46,7 @@ except ImportError:
 	print('missing requirement jarvis, https://gist.github.com/zeroSteiner/7920683')
 	os._exit(0)
 
-__version__ = '0.1'
+__version__ = '1.0'
 
 IMAGE_FILE_MACHINE_I386 = 0x014c
 IMAGE_FILE_MACHINE_X86_64 = 0x8664
@@ -105,6 +101,7 @@ def extract_syscalls(jar, file_name):
 	else:
 		jar.print_status("not a supported machine type (0x{0:02x})".format(machine))
 		return
+	jar.vprint_status('detected file as: ' + ('i386' if machine == IMAGE_FILE_MACHINE_I386 else 'x86-64'))
 	syscalls = []
 	pe.parse_data_directories()
 	for exp in pe.DIRECTORY_ENTRY_EXPORT.symbols:
@@ -118,12 +115,12 @@ def extract_syscalls(jar, file_name):
 def main():
 	jar = jarvis.Jarvis()
 	parser = jar.build_argparser('PE File Syscall Extractor', version=__version__)
-	parser.add_argument('pe_file', help='the pe file to extract syscall numbers from')
+	parser.add_argument('pe_files', nargs='+', help='pe files to extract syscall numbers from')
 	args = parser.parse_args()
 
-	syscalls = extract_syscalls(jar, os.path.abspath(args.pe_file))
-	if syscalls is None:
-		return
+	syscalls = []
+	for pe_file in args.pe_files:
+		syscalls.extend(extract_syscalls(jar, os.path.abspath(pe_file)) or [])
 	jar.print_good("found {0:,} syscalls".format(len(syscalls)))
 	syscalls = ((syscall[0], hex(syscall[1]), syscall[2], syscall[3]) for syscall in syscalls)
 	print(tabulate.tabulate(syscalls, headers=('Number', 'RVA', 'Name', 'Ordinal')))
