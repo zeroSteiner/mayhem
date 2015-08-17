@@ -33,6 +33,8 @@
 #
 
 import collections
+import copy
+import json
 import os
 import struct
 import sys
@@ -87,7 +89,8 @@ def get_x86_64_syscall(stub):
 
 def extract_syscalls(jar, file_name):
 	pe = pefile.PE(file_name)
-	jar.print_status("scanning {0} ({1})".format(file_name, pe_format_version_str(pe)))
+	file_version = pe_format_version_str(pe)
+	jar.print_status("scanning {0} ({1})".format(file_name, file_version))
 	if not pe.is_dll:
 		jar.print_status('file is not a dll')
 		return
@@ -101,7 +104,8 @@ def extract_syscalls(jar, file_name):
 	else:
 		jar.print_status("not a supported machine type (0x{0:02x})".format(machine))
 		return
-	jar.vprint_status('detected file as: ' + ('i386' if machine == IMAGE_FILE_MACHINE_I386 else 'x86-64'))
+	arch_name = ('i386' if machine == IMAGE_FILE_MACHINE_I386 else 'x86-64')
+	jar.vprint_status('detected file as: ' + arch_name)
 	syscalls = []
 	pe.parse_data_directories()
 	for exp in pe.DIRECTORY_ENTRY_EXPORT.symbols:
@@ -110,21 +114,32 @@ def extract_syscalls(jar, file_name):
 		if syscall_number is None:
 			continue
 		syscalls.append(Syscall(syscall_number, pe.OPTIONAL_HEADER.ImageBase + exp.address, exp.name, exp.ordinal))
-	return syscalls
+	metadata = dict(file_name=os.path.basename(file_name), version=file_version, architecture=arch_name)
+	return dict(metadata=metadata, syscalls=syscalls)
 
 def main():
-	jar = jarvis.Jarvis()
+	output_formats = copy.copy(tabulate.tabulate_formats)
+	output_formats.append('json')
+	jar = jarvis.Jarvis(stream=sys.stderr)
 	parser = jar.build_argparser('PE File Syscall Extractor', version=__version__)
+	parser.add_argument('-f', '--format', dest='output_format', default='simple', choices=output_formats, help='output format')
 	parser.add_argument('pe_files', nargs='+', help='pe files to extract syscall numbers from')
 	args = parser.parse_args()
 
-	syscalls = []
+	parsed_files = []
 	for pe_file in args.pe_files:
-		syscalls.extend(extract_syscalls(jar, os.path.abspath(pe_file)) or [])
-	jar.print_good("found {0:,} syscalls".format(len(syscalls)))
-	syscalls = ((syscall[0], hex(syscall[1]), syscall[2], syscall[3]) for syscall in syscalls)
-	print(tabulate.tabulate(syscalls, headers=('Number', 'RVA', 'Name', 'Ordinal')))
+		parsed_files.append(extract_syscalls(jar, os.path.abspath(pe_file)))
+	parsed_files = list(pe_file for pe_file in parsed_files if pe_file)
+	jar.print_good("found {0:,} syscalls".format(sum(len(pe_file['syscalls']) for pe_file in parsed_files)))
 
+	if args.output_format == 'json':
+		print(json.dumps(parsed_files, sort_keys=True, indent=2, separators=(',', ': ')))
+	else:
+		syscalls = []
+		for pe_file in parsed_files:
+			syscalls.extend(pe_file['syscalls'])
+		syscalls = ((syscall[0], hex(syscall[1]), syscall[2], syscall[3]) for syscall in syscalls)
+		print(tabulate.tabulate(syscalls, headers=('Number', 'RVA', 'Name', 'Ordinal'), tablefmt=args.output_format))
 	return 0
 
 if __name__ == '__main__':
