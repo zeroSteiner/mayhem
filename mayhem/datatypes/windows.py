@@ -33,6 +33,8 @@
 import ctypes
 import platform
 
+from .windows_ntstatus import NTSTATUS_CODES
+
 _IMAGE_NUMBEROF_DIRECTORY_ENTRIES = 16
 
 # http://msdn.microsoft.com/en-us/library/windows/desktop/aa383751(v=vs.85).aspx
@@ -85,6 +87,7 @@ HMODULE   = HANDLE
 PVOID     = ctypes.c_void_p
 LPVOID    = PVOID
 LPCVOID   = PVOID
+NTSTATUS  = ctypes.c_uint32
 
 # platform specific data primitives
 if platform.architecture()[0] == '64bit':
