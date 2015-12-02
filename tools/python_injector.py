@@ -32,8 +32,9 @@
 
 import ctypes
 import ctypes.util
+import os
 import sys
-sys.path.append('..')
+sys.path.insert(1, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from argparse import ArgumentParser
 
 from mayhem.proc import ProcessError

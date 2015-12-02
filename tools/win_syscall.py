@@ -34,20 +34,21 @@ import argparse
 import code
 import ctypes
 import json
+import os
 import platform
 import sys
+sys.path.insert(1, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-sys.path.append('..')
 from mayhem.proc.windows import WindowsProcess
 from mayhem.utilities import align_up
 
-syscall_stub  = '8b442404'		# mov    eax,DWORD PTR [esp+0x4]
+syscall_stub = '8b442404'		# mov    eax,DWORD PTR [esp+0x4]
 syscall_stub += '83c408'		# add    esp,0x8
 syscall_stub += 'ba0003fe7f'	# mov    edx,0x7ffe0300
 syscall_stub += 'ff12'			# call   DWORD PTR [edx]
 syscall_stub += '83ec08'		# sub    esp,0x8
 syscall_stub += 'c3'			# ret
-syscall_stub  = syscall_stub.decode('hex')
+syscall_stub = syscall_stub.decode('hex')
 
 syscall_prototype = ctypes.CFUNCTYPE(ctypes.c_ulong)
 

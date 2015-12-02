@@ -30,8 +30,9 @@
 #  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
+import os
 import sys
-sys.path.append('..')
+sys.path.insert(1, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from argparse import ArgumentParser
 
 from mayhem.proc import ProcessError
@@ -39,9 +40,9 @@ from mayhem.proc.native import NativeProcess
 from mayhem.utilities import align_down, align_up, print_hexdump
 
 def main():
-	parser = ArgumentParser(description = 'memgrep: memory search utility', conflict_handler = 'resolve')
-	parser.add_argument('pid', action = 'store', type = int, help = 'process to control')
-	parser.add_argument('search_data', action = 'store', help = 'data to search for')
+	parser = ArgumentParser(description='memgrep: memory search utility', conflict_handler='resolve')
+	parser.add_argument('pid', action='store', type=int, help='process to control')
+	parser.add_argument('search_data', action='store', help='data to search for')
 	arguments = parser.parse_args()
 
 	search_data = arguments.search_data
@@ -49,7 +50,7 @@ def main():
 		print('[-] searching for less than 4 bytes will yield too many results')
 		return 0
 
-	process_h = NativeProcess(pid = arguments.pid)
+	process_h = NativeProcess(pid=arguments.pid)
 	print("[*] searching {0} regions of memory".format(len(process_h.maps)))
 
 	num_matches = 0
