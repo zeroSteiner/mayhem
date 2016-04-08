@@ -171,7 +171,7 @@ class WindowsProcess(Process):
 		if pid == -1:
 			handle = -1
 			pid = None
-		if access == None:
+		if access is None:
 			access = "(PROCESS_CREATE_THREAD | PROCESS_QUERY_INFORMATION | PROCESS_VM_OPERATION | PROCESS_VM_WRITE | PROCESS_VM_READ | PROCESS_TERMINATE)"
 		if pid:
 			self.handle = self.k32.OpenProcess(flags(access), False, pid)

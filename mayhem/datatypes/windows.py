@@ -95,6 +95,10 @@ if platform.architecture()[0] == '64bit':
 else:
 	SIZE_T = ctypes.c_uint32
 
+class LARGE_INTEGER(ctypes.Structure):
+	_fields_ = [("LowPart", DWORD),
+				("HighPart", LONG),]
+
 class LIST_ENTRY(ctypes.Structure):
 	_fields_ = [("Flink", ctypes.c_void_p),
 				("Blink", ctypes.c_void_p),]
@@ -327,6 +331,24 @@ class SYSTEM_INFO(ctypes.Structure):
 				("dwAllocationGranularity", DWORD),
 				("wProcessorLevel", WORD),
 				("wProcessorRevision", WORD),]
+
+class SYSTEM_PROCESS_INFORMATION(ctypes.Structure):
+	"""see:
+	https://msdn.microsoft.com/en-us/library/windows/desktop/ms725506(v=vs.85).aspx
+	http://undocumented.ntinternals.net/index.html?page=UserMode%2FUndocumented%20Functions%2FSystem%20Information%2FStructures%2FSYSTEM_PROCESS_INFORMATION.html
+	"""
+	_fields_ = [("NextEntryOffset", ULONG),
+				("NumberOfThreads", ULONG),
+				("Reserved1", BYTE * 48),
+				("Reserved2", PVOID * 3),
+				("UniqueProcessId", HANDLE),
+				("Reserved3", PVOID),
+				("HandleCount", ULONG),
+				("Reserved4", BYTE * 4),
+				("Reserved5", PVOID * 11),
+				("PeakPagefileUsage", SIZE_T),
+				("PrivatePageCount", SIZE_T),
+				("Reserved6", LARGE_INTEGER * 6),]
 
 class PROCESS_INFORMATION(ctypes.Structure):
 	"""see:
