@@ -343,6 +343,8 @@ class WindowsProcess(Process):
 		self.k32.GetModuleHandleA.restype = wintypes.HANDLE
 		self.k32.GetProcAddress.argtypes = [wintypes.HMODULE, wintypes.LPSTR]
 		self.k32.GetProcAddress.restype = ctypes.c_void_p
+		self.k32.GetProcessId.argtypes = [wintypes.HANDLE]
+		self.k32.GetProcessId.restype = wintypes.DWORD
 		self.k32.ReadProcessMemory.argtypes = [wintypes.HANDLE, wintypes.LPCVOID, wintypes.LPVOID, wintypes.SIZE_T, wintypes.SIZE_T]
 		self.k32.VirtualAllocEx.argtypes = [wintypes.HANDLE, wintypes.LPVOID, wintypes.SIZE_T, wintypes.DWORD, wintypes.DWORD]
 		self.k32.VirtualAllocEx.restype = wintypes.SIZE_T
@@ -353,6 +355,12 @@ class WindowsProcess(Process):
 		self.k32.WaitForSingleObject.argtypes = [wintypes.HANDLE, wintypes.DWORD]
 		self.k32.WaitForSingleObject.restype = wintypes.DWORD
 		self.k32.WriteProcessMemory.argtypes = [wintypes.HANDLE, wintypes.LPVOID, wintypes.LPCVOID, wintypes.SIZE_T, ctypes.POINTER(wintypes.SIZE_T)]
+		if hasattr(self.psapi, 'GetModuleFileNameExA'):
+			self.psapi.GetModuleFileNameExA.argtypes = [wintypes.HANDLE, wintypes.HMODULE, wintypes.LPSTR, wintypes.DWORD]
+			self.psapi.GetModuleFileNameExA.restype = wintypes.DWORD
+		else:
+			self.k32.GetModuleFileNameExA.argtypes = [wintypes.HANDLE, wintypes.HMODULE, wintypes.LPSTR, wintypes.DWORD]
+			self.k32.GetModuleFileNameExA.restype = wintypes.DWORD
 
 	def _update_maps(self):
 		sys_info = self.get_proc_attribute('system_info')
