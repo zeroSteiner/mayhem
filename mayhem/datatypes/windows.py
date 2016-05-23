@@ -324,6 +324,12 @@ class HANDLE_ENTRY(MayhemStructure):
 				('bFlags', ctypes.c_uint8),
 				('wUniq', ctypes.c_uint16),]
 
+	@classmethod
+	def from_handle(cls, handle):
+		shared_info = SHARED_INFO.from_user32()
+		addr = shared_info.aheList + (ctypes.sizeof(cls) * (handle & 0xffff))
+		return cls.from_address(addr)
+
 class WND_MSG(MayhemStructure):
 	_fields_ = [('maxMsgs', ctypes.c_uint32),
 				('abMsgs', ctypes.c_void_p),]
@@ -337,6 +343,12 @@ class SHARED_INFO(MayhemStructure):
 				('awmControl', WND_MSG * 31),
 				('DefWindowMsgs', WND_MSG),
 				('DefWindowSpecMsgs', WND_MSG),]
+
+	@classmethod
+	def from_user32(cls):
+		kernel32 = ctypes.windll.kernel32
+		addr = kernel32.GetProcAddress(kernel32.GetModuleHandleA('user32.dll'), 'gSharedInfo')
+		return cls.from_address(addr)
 
 class SYSTEM_INFO(MayhemStructure):
 	"""see:

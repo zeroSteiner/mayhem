@@ -33,6 +33,4 @@
 import ctypes
 
 class MayhemStructure(ctypes.Structure):
-	@classmethod
-	def from_address(cls, address):
-		return ctypes.cast(ctypes.c_void_p(address), ctypes.POINTER(cls)).contents
+	pass
