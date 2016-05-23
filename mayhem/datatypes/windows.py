@@ -18,7 +18,7 @@
 #    this software without specific prior written permission.
 #
 #  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-#  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+#  'AS IS' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
 #  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
 #  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
 #  OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
@@ -33,6 +33,7 @@
 import ctypes
 import platform
 
+from .structure import MayhemStructure
 from .windows_ntstatus import NTSTATUS_CODES
 
 _IMAGE_NUMBEROF_DIRECTORY_ENTRIES = 16
@@ -95,295 +96,316 @@ if platform.architecture()[0] == '64bit':
 else:
 	SIZE_T = ctypes.c_uint32
 
-class LARGE_INTEGER(ctypes.Structure):
-	_fields_ = [("LowPart", DWORD),
-				("HighPart", LONG),]
+class LARGE_INTEGER(MayhemStructure):
+	_fields_ = [('LowPart', DWORD),
+				('HighPart', LONG),]
 
-class LIST_ENTRY(ctypes.Structure):
-	_fields_ = [("Flink", ctypes.c_void_p),
-				("Blink", ctypes.c_void_p),]
+class LIST_ENTRY(MayhemStructure):
+	_fields_ = [('Flink', ctypes.c_void_p),
+				('Blink', ctypes.c_void_p),]
 
-class UNICODE_STRING(ctypes.Structure):
-	_fields_ = [("Length", USHORT),
-				("MaximumLength", USHORT),
-				("Buffer", ctypes.c_void_p),]
+class UNICODE_STRING(MayhemStructure):
+	_fields_ = [('Length', USHORT),
+				('MaximumLength', USHORT),
+				('Buffer', ctypes.c_void_p),]
 
-class STARTUPINFO(ctypes.Structure):
+class STARTUPINFO(MayhemStructure):
 	"""see:
 	http://msdn.microsoft.com/en-us/library/windows/desktop/ms686331(v=vs.85).aspx
 	"""
-	_fields_ = [("cb", DWORD),
-				("lpReserved", LPSTR),
-				("lpDesktop", LPSTR),
-				("lpTitle", LPSTR),
-				("dwX", DWORD),
-				("dwY", DWORD),
-				("dwXSize", DWORD),
-				("dwYSize", DWORD),
-				("dwXCountChars", DWORD),
-				("dwYCountChars", DWORD),
-				("dwFillAttribute",DWORD),
-				("dwFlags", DWORD),
-				("wShowWindow", WORD),
-				("cbReserved2", WORD),
-				("lpReserved2", LPBYTE),
-				("hStdInput", HANDLE),
-				("hStdOutput", HANDLE),
-				("hStdError", HANDLE),]
+	_fields_ = [('cb', DWORD),
+				('lpReserved', LPSTR),
+				('lpDesktop', LPSTR),
+				('lpTitle', LPSTR),
+				('dwX', DWORD),
+				('dwY', DWORD),
+				('dwXSize', DWORD),
+				('dwYSize', DWORD),
+				('dwXCountChars', DWORD),
+				('dwYCountChars', DWORD),
+				('dwFillAttribute',DWORD),
+				('dwFlags', DWORD),
+				('wShowWindow', WORD),
+				('cbReserved2', WORD),
+				('lpReserved2', LPBYTE),
+				('hStdInput', HANDLE),
+				('hStdOutput', HANDLE),
+				('hStdError', HANDLE),]
 
-class LOADED_IMAGE(ctypes.Structure):
+class LOADED_IMAGE(MayhemStructure):
 	"""see:
 	http://msdn.microsoft.com/en-us/library/windows/desktop/ms680349%28v=vs.85%29.aspx
 	"""
-	_fields_ = [("ModuleName", PSTR),
-				("hFile", HANDLE),
-				("MappedAddress", PUCHAR),
-				("FileHeader", ctypes.c_void_p),
-				("LastRvaSection", ctypes.c_void_p),
-				("NumberOfSections", ULONG),
-				("Sections", ctypes.c_void_p),
-				("Characteristics", ULONG),
-				("fSystemImage", BOOLEAN),
-				("fDOSImage", BOOLEAN),
-				("fReadOnly", BOOLEAN),
-				("Version", UCHAR),
-				("Links", ctypes.c_void_p),
-				("SizeOfImage", ULONG),]
+	_fields_ = [('ModuleName', PSTR),
+				('hFile', HANDLE),
+				('MappedAddress', PUCHAR),
+				('FileHeader', ctypes.c_void_p),
+				('LastRvaSection', ctypes.c_void_p),
+				('NumberOfSections', ULONG),
+				('Sections', ctypes.c_void_p),
+				('Characteristics', ULONG),
+				('fSystemImage', BOOLEAN),
+				('fDOSImage', BOOLEAN),
+				('fReadOnly', BOOLEAN),
+				('Version', UCHAR),
+				('Links', ctypes.c_void_p),
+				('SizeOfImage', ULONG),]
 
-class LDR_MODULE(ctypes.Structure):
-	_fields_ = [("InLoadOrderModuleList", LIST_ENTRY),
-				("InMemoryOrderModuleList", LIST_ENTRY),
-				("InInitializationOrderModuleList", LIST_ENTRY),
-				("BaseAddress", ctypes.c_void_p),
-				("EntryPoint", ctypes.c_void_p),
-				("SizeOfImage", ULONG),
-				("FullDllName", UNICODE_STRING),
-				("BaseDllName", UNICODE_STRING),
-				("Flags", ULONG),
-				("LoadCount", SHORT),
-				("TlsIndex", SHORT),
-				("HashTableEntry", LIST_ENTRY),
-				("TimeDateStamp", ULONG),]
+class LDR_MODULE(MayhemStructure):
+	_fields_ = [('InLoadOrderModuleList', LIST_ENTRY),
+				('InMemoryOrderModuleList', LIST_ENTRY),
+				('InInitializationOrderModuleList', LIST_ENTRY),
+				('BaseAddress', ctypes.c_void_p),
+				('EntryPoint', ctypes.c_void_p),
+				('SizeOfImage', ULONG),
+				('FullDllName', UNICODE_STRING),
+				('BaseDllName', UNICODE_STRING),
+				('Flags', ULONG),
+				('LoadCount', SHORT),
+				('TlsIndex', SHORT),
+				('HashTableEntry', LIST_ENTRY),
+				('TimeDateStamp', ULONG),]
 
-class IMAGE_DATA_DIRECTORY(ctypes.Structure):
+class IMAGE_DATA_DIRECTORY(MayhemStructure):
 	"""see:
 	http://msdn.microsoft.com/en-us/library/windows/desktop/ms680305%28v=vs.85%29.aspx
 	"""
-	_fields_ = [("VirtualAddress", DWORD),
-				("Size", DWORD),]
+	_fields_ = [('VirtualAddress', DWORD),
+				('Size', DWORD),]
 
-class IMAGE_DOS_HEADER(ctypes.Structure):
-	_fields_ = [("e_magic", WORD),
-				("e_cblp", WORD),
-				("e_cp", WORD),
-				("e_crlc", WORD),
-				("e_cparhdr", WORD),
-				("e_minalloc", WORD),
-				("e_maxalloc", WORD),
-				("e_ss", WORD),
-				("e_sp", WORD),
-				("e_csum", WORD),
-				("e_ip", WORD),
-				("e_cs", WORD),
-				("e_lfarlc", WORD),
-				("e_ovno", WORD),
-				("e_res", WORD * 4),
-				("e_oemid", WORD),
-				("e_oeminfo", WORD),
-				("e_res2", WORD * 10),
-				("e_lfanew", LONG),]
+class IMAGE_DOS_HEADER(MayhemStructure):
+	_fields_ = [('e_magic', WORD),
+				('e_cblp', WORD),
+				('e_cp', WORD),
+				('e_crlc', WORD),
+				('e_cparhdr', WORD),
+				('e_minalloc', WORD),
+				('e_maxalloc', WORD),
+				('e_ss', WORD),
+				('e_sp', WORD),
+				('e_csum', WORD),
+				('e_ip', WORD),
+				('e_cs', WORD),
+				('e_lfarlc', WORD),
+				('e_ovno', WORD),
+				('e_res', WORD * 4),
+				('e_oemid', WORD),
+				('e_oeminfo', WORD),
+				('e_res2', WORD * 10),
+				('e_lfanew', LONG),]
 
-class IMAGE_EXPORT_DIRECTORY(ctypes.Structure):
-	_fields_ = [("Characteristics", DWORD),
-				("TimeDateStamp", DWORD),
-				("MajorVersion", WORD),
-				("MinorVersion", WORD),
-				("Name", DWORD),
-				("Base", DWORD),
-				("NumberOfFunctions", DWORD),
-				("NumberOfNames", DWORD),
-				("AddressOfFunctions", DWORD),
-				("AddressOfNames", DWORD),
-				("AddressOfNameOrdinals", DWORD),]
+class IMAGE_EXPORT_DIRECTORY(MayhemStructure):
+	_fields_ = [('Characteristics', DWORD),
+				('TimeDateStamp', DWORD),
+				('MajorVersion', WORD),
+				('MinorVersion', WORD),
+				('Name', DWORD),
+				('Base', DWORD),
+				('NumberOfFunctions', DWORD),
+				('NumberOfNames', DWORD),
+				('AddressOfFunctions', DWORD),
+				('AddressOfNames', DWORD),
+				('AddressOfNameOrdinals', DWORD),]
 
-class IMAGE_FILE_HEADER(ctypes.Structure):
-	_fields_ = [("Machine", WORD),
-				("NumberOfSections", WORD),
-				("TimeDateStamp", DWORD),
-				("PointerToSymbolTable", DWORD),
-				("NumberOfSymbols", DWORD),
-				("SizeOfOptionalHeader", WORD),
-				("Characteristics", WORD),]
+class IMAGE_FILE_HEADER(MayhemStructure):
+	_fields_ = [('Machine', WORD),
+				('NumberOfSections', WORD),
+				('TimeDateStamp', DWORD),
+				('PointerToSymbolTable', DWORD),
+				('NumberOfSymbols', DWORD),
+				('SizeOfOptionalHeader', WORD),
+				('Characteristics', WORD),]
 
-class IMAGE_OPTIONAL_HEADER(ctypes.Structure):
-	_fields_ = [("Magic", WORD),
-				("MajorLinkerVersion", BYTE),
-				("MinorLinkerVersion", BYTE),
-				("SizeOfCode", DWORD),
-				("SizeOfInitializedData", DWORD),
-				("SizeOfUninitializedData", DWORD),
-				("AddressOfEntryPoint", DWORD),
-				("BaseOfCode", DWORD),
-				("BaseOfData", DWORD),
-				("ImageBase", DWORD),
-				("SectionAlignment", DWORD),
-				("FileAlignment", DWORD),
-				("MajorOperatingSystemVersion", WORD),
-				("MinorOperatingSystemVersion", WORD),
-				("MajorImageVersion", WORD),
-				("MinorImageVersion", WORD),
-				("MajorSubsystemVersion", WORD),
-				("MinorSubsystemVersion", WORD),
-				("Win32VersionValue", DWORD),
-				("SizeOfImage", DWORD),
-				("SizeOfHeaders", DWORD),
-				("CheckSum", DWORD),
-				("Subsystem", WORD),
-				("DllCharacteristics", WORD),
-				("SizeOfStackReserve", DWORD),
-				("SizeOfStackCommit", DWORD),
-				("SizeOfHeapReserve", DWORD),
-				("SizeOfHeapCommit", DWORD),
-				("LoaderFlags", DWORD),
-				("NumberOfRvaAndSizes", DWORD),
-				("DataDirectory", IMAGE_DATA_DIRECTORY * _IMAGE_NUMBEROF_DIRECTORY_ENTRIES),]
+class IMAGE_OPTIONAL_HEADER(MayhemStructure):
+	_fields_ = [('Magic', WORD),
+				('MajorLinkerVersion', BYTE),
+				('MinorLinkerVersion', BYTE),
+				('SizeOfCode', DWORD),
+				('SizeOfInitializedData', DWORD),
+				('SizeOfUninitializedData', DWORD),
+				('AddressOfEntryPoint', DWORD),
+				('BaseOfCode', DWORD),
+				('BaseOfData', DWORD),
+				('ImageBase', DWORD),
+				('SectionAlignment', DWORD),
+				('FileAlignment', DWORD),
+				('MajorOperatingSystemVersion', WORD),
+				('MinorOperatingSystemVersion', WORD),
+				('MajorImageVersion', WORD),
+				('MinorImageVersion', WORD),
+				('MajorSubsystemVersion', WORD),
+				('MinorSubsystemVersion', WORD),
+				('Win32VersionValue', DWORD),
+				('SizeOfImage', DWORD),
+				('SizeOfHeaders', DWORD),
+				('CheckSum', DWORD),
+				('Subsystem', WORD),
+				('DllCharacteristics', WORD),
+				('SizeOfStackReserve', DWORD),
+				('SizeOfStackCommit', DWORD),
+				('SizeOfHeapReserve', DWORD),
+				('SizeOfHeapCommit', DWORD),
+				('LoaderFlags', DWORD),
+				('NumberOfRvaAndSizes', DWORD),
+				('DataDirectory', IMAGE_DATA_DIRECTORY * _IMAGE_NUMBEROF_DIRECTORY_ENTRIES),]
 
-class IMAGE_IMPORT_BY_NAME(ctypes.Structure):
-	_fields_ = [("Hint", WORD),
-				("Name", BYTE),]
+class IMAGE_IMPORT_BY_NAME(MayhemStructure):
+	_fields_ = [('Hint', WORD),
+				('Name', BYTE),]
 
-class IMAGE_IMPORT_DESCRIPTOR(ctypes.Structure):
-	_fields_ = [("OriginalFirstThunk", DWORD), # import lookup table
-				("TimeDateStamp", DWORD),
-				("ForwarderChain", DWORD),
-				("Name", DWORD),
-				("FirstThunk", DWORD),] # import address table
+class IMAGE_IMPORT_DESCRIPTOR(MayhemStructure):
+	_fields_ = [('OriginalFirstThunk', DWORD), # import lookup table
+				('TimeDateStamp', DWORD),
+				('ForwarderChain', DWORD),
+				('Name', DWORD),
+				('FirstThunk', DWORD),] # import address table
 
-class IMAGE_THUNK_DATA32(ctypes.Structure):
-	_fields_ = [("ForwarderString", DWORD),
-				("Function", DWORD),
-				("Ordinal", DWORD),
-				("AddressOfData", DWORD),]
+class IMAGE_THUNK_DATA32(MayhemStructure):
+	_fields_ = [('ForwarderString', DWORD),
+				('Function', DWORD),
+				('Ordinal', DWORD),
+				('AddressOfData', DWORD),]
 
-class IMAGE_NT_HEADERS32(ctypes.Structure):
-	_fields_ = [("Signature", DWORD),
-				("FileHeader", IMAGE_FILE_HEADER),
-				("OptionalHeader", IMAGE_OPTIONAL_HEADER),]
+class IMAGE_NT_HEADERS32(MayhemStructure):
+	_fields_ = [('Signature', DWORD),
+				('FileHeader', IMAGE_FILE_HEADER),
+				('OptionalHeader', IMAGE_OPTIONAL_HEADER),]
 
-class PEB(ctypes.Structure):
+class PEB(MayhemStructure):
 	"""see:
 	http://msdn.microsoft.com/en-us/library/windows/desktop/aa813706%28v=vs.85%29.aspx
 	"""
-	_fields_ = [("Reserved1", BYTE * 2),
-				("BeingDebugged", BYTE),
-				("SpareBool", BYTE),
-				("Mutant", ctypes.c_void_p),
-				("ImageBaseAddress", ctypes.c_void_p),
-				("Ldr", ctypes.c_void_p),
-				("ProcessParameters", ctypes.c_void_p),
-				("SubSystemData", ctypes.c_void_p),
-				("ProcessHeap", ctypes.c_void_p),
-				("Reserved4", BYTE * 96),
-				("Reserved5", ctypes.c_void_p * 52),
-				("PostProcessInitRoutine", ctypes.c_void_p),
-				("Reserved6", BYTE * 128),
-				("Reserved7", ctypes.c_void_p),
-				("SessionId", ULONG),]
+	_fields_ = [('Reserved1', BYTE * 2),
+				('BeingDebugged', BYTE),
+				('SpareBool', BYTE),
+				('Mutant', ctypes.c_void_p),
+				('ImageBaseAddress', ctypes.c_void_p),
+				('Ldr', ctypes.c_void_p),
+				('ProcessParameters', ctypes.c_void_p),
+				('SubSystemData', ctypes.c_void_p),
+				('ProcessHeap', ctypes.c_void_p),
+				('Reserved4', BYTE * 96),
+				('Reserved5', ctypes.c_void_p * 52),
+				('PostProcessInitRoutine', ctypes.c_void_p),
+				('Reserved6', BYTE * 128),
+				('Reserved7', ctypes.c_void_p),
+				('SessionId', ULONG),]
 
-class PEB_LDR_DATA(ctypes.Structure):
-	_fields_ = [("Length", ULONG),
-				("Reserved", UCHAR * 4),
-				("SsHandle", HANDLE),
-				("InLoadOrderModuleList", LIST_ENTRY),
-				("InMemoryOrderModuleList", LIST_ENTRY),
-				("InInitializationOrderModuleList", LIST_ENTRY),]
+class PEB_LDR_DATA(MayhemStructure):
+	_fields_ = [('Length', ULONG),
+				('Reserved', UCHAR * 4),
+				('SsHandle', HANDLE),
+				('InLoadOrderModuleList', LIST_ENTRY),
+				('InMemoryOrderModuleList', LIST_ENTRY),
+				('InInitializationOrderModuleList', LIST_ENTRY),]
 
-class PROCESS_BASIC_INFORMATION(ctypes.Structure):
+class PROCESS_BASIC_INFORMATION(MayhemStructure):
 	"""see:
 	http://msdn.microsoft.com/en-us/library/windows/desktop/ms684280%28v=vs.85%29.aspx
 	"""
-	_fields_ = [("Reserved1", ctypes.c_void_p),
-				("PebBaseAddress", ctypes.c_void_p),
-				("Reserved2", ctypes.c_void_p * 2),
-				("UniqueProcessId", PULONG),
-				("Reserved3", ctypes.c_void_p),]
+	_fields_ = [('Reserved1', ctypes.c_void_p),
+				('PebBaseAddress', ctypes.c_void_p),
+				('Reserved2', ctypes.c_void_p * 2),
+				('UniqueProcessId', PULONG),
+				('Reserved3', ctypes.c_void_p),]
 
-class SECURITY_ATTRIBUTES(ctypes.Structure):
+class SECURITY_ATTRIBUTES(MayhemStructure):
 	"""see:
 	http://msdn.microsoft.com/en-us/library/windows/desktop/aa379560(v=vs.85).aspx
 	"""
-	_fields_ = [("nLength", DWORD),
-				("lpSecurityDescriptor", LPVOID),
-				("bInheritHandle", BOOL),]
+	_fields_ = [('nLength', DWORD),
+				('lpSecurityDescriptor', LPVOID),
+				('bInheritHandle', BOOL),]
 
-class SYSTEM_INFO(ctypes.Structure):
+class HANDLE_ENTRY(MayhemStructure):
+	_fields_ = [('phead', ctypes.c_void_p),
+				('pOwner', ctypes.c_void_p),
+				('bType', ctypes.c_uint8),
+				('bFlags', ctypes.c_uint8),
+				('wUniq', ctypes.c_uint16),]
+
+class WND_MSG(MayhemStructure):
+	_fields_ = [('maxMsgs', ctypes.c_uint32),
+				('abMsgs', ctypes.c_void_p),]
+
+class SHARED_INFO(MayhemStructure):
+	_fields_ = [('psi', ctypes.c_void_p),
+				('aheList', ctypes.c_void_p),
+				('HeEntrySize', ctypes.c_uint32),
+				('pDispInfo', ctypes.c_void_p),
+				('ulSharedDelta', ctypes.c_uint32),
+				('awmControl', WND_MSG * 31),
+				('DefWindowMsgs', WND_MSG),
+				('DefWindowSpecMsgs', WND_MSG),]
+
+class SYSTEM_INFO(MayhemStructure):
 	"""see:
 	http://msdn.microsoft.com/en-us/library/windows/desktop/ms724958(v=vs.85).aspx
 	"""
-	_fields_ = [("wProcessorArchitecture", WORD),
-				("wReserved", WORD),
-				("dwPageSize", DWORD),
-				("lpMinimumApplicationAddress", ctypes.c_void_p),
-				("lpMaximumApplicationAddress", ctypes.c_void_p),
-				("dwActiveProcessorMask", DWORD),
-				("dwNumberOfProcessors", DWORD),
-				("dwProcessorType", DWORD),
-				("dwAllocationGranularity", DWORD),
-				("wProcessorLevel", WORD),
-				("wProcessorRevision", WORD),]
+	_fields_ = [('wProcessorArchitecture', WORD),
+				('wReserved', WORD),
+				('dwPageSize', DWORD),
+				('lpMinimumApplicationAddress', ctypes.c_void_p),
+				('lpMaximumApplicationAddress', ctypes.c_void_p),
+				('dwActiveProcessorMask', DWORD),
+				('dwNumberOfProcessors', DWORD),
+				('dwProcessorType', DWORD),
+				('dwAllocationGranularity', DWORD),
+				('wProcessorLevel', WORD),
+				('wProcessorRevision', WORD),]
 
-class SYSTEM_PROCESS_INFORMATION(ctypes.Structure):
+class SYSTEM_PROCESS_INFORMATION(MayhemStructure):
 	"""see:
 	https://msdn.microsoft.com/en-us/library/windows/desktop/ms725506(v=vs.85).aspx
 	http://undocumented.ntinternals.net/index.html?page=UserMode%2FUndocumented%20Functions%2FSystem%20Information%2FStructures%2FSYSTEM_PROCESS_INFORMATION.html
 	"""
-	_fields_ = [("NextEntryOffset", ULONG),
-				("NumberOfThreads", ULONG),
-				("Reserved1", BYTE * 48),
-				("Reserved2", PVOID * 3),
-				("UniqueProcessId", HANDLE),
-				("Reserved3", PVOID),
-				("HandleCount", ULONG),
-				("Reserved4", BYTE * 4),
-				("Reserved5", PVOID * 11),
-				("PeakPagefileUsage", SIZE_T),
-				("PrivatePageCount", SIZE_T),
-				("Reserved6", LARGE_INTEGER * 6),]
+	_fields_ = [('NextEntryOffset', ULONG),
+				('NumberOfThreads', ULONG),
+				('Reserved1', BYTE * 48),
+				('Reserved2', PVOID * 3),
+				('UniqueProcessId', HANDLE),
+				('Reserved3', PVOID),
+				('HandleCount', ULONG),
+				('Reserved4', BYTE * 4),
+				('Reserved5', PVOID * 11),
+				('PeakPagefileUsage', SIZE_T),
+				('PrivatePageCount', SIZE_T),
+				('Reserved6', LARGE_INTEGER * 6),]
 
-class PROCESS_INFORMATION(ctypes.Structure):
+class PROCESS_INFORMATION(MayhemStructure):
 	"""see:
 	http://msdn.microsoft.com/en-us/library/windows/desktop/ms684873(v=vs.85).aspx
 	"""
-	_fields_ = [("hProcess", HANDLE),
-				("hThread", HANDLE),
-				("dwProcessId", DWORD),
-				("dwThreadId", DWORD),]
+	_fields_ = [('hProcess', HANDLE),
+				('hThread', HANDLE),
+				('dwProcessId', DWORD),
+				('dwThreadId', DWORD),]
 
-class MEMORY_BASIC_INFORMATION32(ctypes.Structure):
+class MEMORY_BASIC_INFORMATION32(MayhemStructure):
 	"""see:
 	http://msdn.microsoft.com/en-us/library/windows/desktop/aa366775(v=vs.85).aspx
 	"""
-	_fields_ = [("BaseAddress", ULONG),
-				("AllocationBase", PVOID),
-				("AllocationProtect", DWORD),
-				("RegionSize", ULONG),
-				("State", DWORD),
-				("Protect", DWORD),
-				("Type", DWORD),]
+	_fields_ = [('BaseAddress', ULONG),
+				('AllocationBase', PVOID),
+				('AllocationProtect', DWORD),
+				('RegionSize', ULONG),
+				('State', DWORD),
+				('Protect', DWORD),
+				('Type', DWORD),]
 
-class MEMORY_BASIC_INFORMATION64(ctypes.Structure):
+class MEMORY_BASIC_INFORMATION64(MayhemStructure):
 	"""see:
 	http://msdn.microsoft.com/en-us/library/windows/desktop/aa366775(v=vs.85).aspx
 	"""
-	_fields_ = [("BaseAddress", ULONGLONG),
-				("AllocationBase", PVOID),
-				("AllocationProtect", DWORD),
-				("__alignment1", DWORD),
-				("RegionSize", ULONGLONG),
-				("State", DWORD),
-				("Protect", DWORD),
-				("Type", DWORD),
-				("__alignment2", DWORD),]
+	_fields_ = [('BaseAddress', ULONGLONG),
+				('AllocationBase', PVOID),
+				('AllocationProtect', DWORD),
+				('__alignment1', DWORD),
+				('RegionSize', ULONGLONG),
+				('State', DWORD),
+				('Protect', DWORD),
+				('Type', DWORD),
+				('__alignment2', DWORD),]
 
 # platform specific structures
 if platform.architecture()[0] == '64bit':
