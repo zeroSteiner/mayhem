@@ -131,7 +131,7 @@ def flags(flags):
 			continue
 		else:
 			part = eval_number(part)
-		if last_operator == None:
+		if last_operator is None:
 			parsed_flags = part
 		else:
 			parsed_flags = eval(str(parsed_flags) + last_operator + str(part))
@@ -401,8 +401,8 @@ class WindowsProcess(Process):
 			ilt = self._get_ilt_for_image_import_descriptor(iid)
 			iat = self._get_iat_for_image_import_descriptor(iid)
 
-			for idx in xrange(len(ilt)):
-				if ilt[idx] == None:
+			for idx in range(len(ilt)):
+				if ilt[idx] is None:
 					continue
 				hook_it = False
 				if not is_ordinal(ilt[idx]) and name:

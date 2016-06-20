@@ -138,7 +138,7 @@ def parse_proc_maps(pid):
 			addr_low = long(memory_region[0].split('-')[0], 16)
 			addr_high = long(memory_region[0].split('-')[1], 16)
 			perms = memory_region[1]
-			if pathname == None and len(memory_region) == 6:
+			if pathname is None and len(memory_region) == 6:
 				pathname = memory_region[5]
 		except:
 			continue
@@ -173,7 +173,7 @@ def flags(flags):
 				part = int(part[2:], 16)
 			else:
 				raise ValueError('unknown token: ' + part)
-		if last_operator == None:
+		if last_operator is None:
 			parsed_flags = part
 		else:
 			parsed_flags = eval(str(parsed_flags) + last_operator + str(part))
@@ -619,7 +619,7 @@ class LinuxProcess(Process):
 				break
 			except ProcessError:
 				pass
-		if malloc_addr == None:
+		if malloc_addr is None:
 			raise ProcessError('unable to locate function')
 		address = self._call_function(malloc_addr, size)
 		self._update_maps()
@@ -634,7 +634,7 @@ class LinuxProcess(Process):
 				break
 			except ProcessError:
 				pass
-		if free_addr == None:
+		if free_addr is None:
 			raise ProcessError('unable to locate function')
 		self._call_function(free_addr, address)
 		self._update_maps()
@@ -645,7 +645,7 @@ class LinuxProcess(Process):
 		address = (address or 0)
 		permissions = (permissions or 'PROT_READ | PROT_WRITE | PROT_EXEC')
 		permissions = flags(permissions)
-		if mmap_flags == None:
+		if mmap_flags is None:
 			if address == 0:
 				mmap_flags = flags('MAP_ANONYMOUS | MAP_PRIVATE')
 			else:
