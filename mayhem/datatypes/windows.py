@@ -74,9 +74,9 @@ PULONG     = ctypes.POINTER(ULONG)
 ULONGLONG  = ctypes.c_uint64
 PULONGLONG = ctypes.POINTER(ULONGLONG)
 
-PSTR   = ctypes.POINTER(ctypes.c_char)
+PSTR   = ctypes.c_char_p
 LPSTR  = PSTR
-PWSTR  = ctypes.POINTER(ctypes.c_wchar)
+PWSTR  = ctypes.c_wchar_p
 LPWSTR = PWSTR
 
 UCHAR  = ctypes.c_ubyte
@@ -107,7 +107,15 @@ class LIST_ENTRY(MayhemStructure):
 class UNICODE_STRING(MayhemStructure):
 	_fields_ = [('Length', USHORT),
 				('MaximumLength', USHORT),
-				('Buffer', ctypes.c_void_p),]
+				('Buffer', PWSTR),]
+
+	@classmethod
+	def from_string(cls, string):
+		inst = cls()
+		inst.Length = len(string)
+		inst.MaximumLength = len(string) + 1
+		inst.Buffer = string
+		return inst
 
 class STARTUPINFO(MayhemStructure):
 	"""see:
