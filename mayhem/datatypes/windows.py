@@ -37,6 +37,7 @@ from .structure import MayhemStructure
 from .windows_ntstatus import NTSTATUS_CODES
 
 _IMAGE_NUMBEROF_DIRECTORY_ENTRIES = 16
+is_64bit = platform.architecture()[0] == '64bit'
 
 # http://msdn.microsoft.com/en-us/library/windows/desktop/aa383751(v=vs.85).aspx
 BOOLEAN = ctypes.c_byte
@@ -91,7 +92,7 @@ LPCVOID   = PVOID
 NTSTATUS  = ctypes.c_uint32
 
 # platform specific data primitives
-if platform.architecture()[0] == '64bit':
+if is_64bit:
 	SIZE_T = ctypes.c_uint64
 else:
 	SIZE_T = ctypes.c_uint32
@@ -347,7 +348,7 @@ class SHARED_INFO(MayhemStructure):
 				('aheList', ctypes.c_void_p),
 				('HeEntrySize', ctypes.c_uint32),
 				('pDispInfo', ctypes.c_void_p),
-				('ulSharedDelta', ctypes.c_uint32),
+				('ulSharedDelta', ctypes.c_uint64 if is_64bit else ctypes.c_uint32),
 				('awmControl', WND_MSG * 31),
 				('DefWindowMsgs', WND_MSG),
 				('DefWindowSpecMsgs', WND_MSG),]
@@ -428,7 +429,7 @@ class MEMORY_BASIC_INFORMATION64(MayhemStructure):
 				('__alignment2', DWORD),]
 
 # platform specific structures
-if platform.architecture()[0] == '64bit':
+if is_64bit:
 	MEMORY_BASIC_INFORMATION = MEMORY_BASIC_INFORMATION64
 else:
 	MEMORY_BASIC_INFORMATION = MEMORY_BASIC_INFORMATION32
