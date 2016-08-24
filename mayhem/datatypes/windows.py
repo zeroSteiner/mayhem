@@ -434,3 +434,20 @@ if is_64bit:
 else:
 	MEMORY_BASIC_INFORMATION = MEMORY_BASIC_INFORMATION32
 PMEMORY_BASIC_INFORMATION = ctypes.POINTER(MEMORY_BASIC_INFORMATION)
+
+class MENUITEMINFOW(MayhemStructure):
+	"""see:
+	https://msdn.microsoft.com/en-us/library/windows/desktop/ms647578(v=vs.85).aspx
+	"""
+	_fields_ = [('cbSize', ctypes.c_uint),
+				('fMask', ctypes.c_uint),
+				('fType', ctypes.c_uint),
+				('fState', ctypes.c_uint),
+				('wID', ctypes.c_uint),
+				('hSubMenu', wintypes.HANDLE),
+				('hbmpChecked', wintypes.HANDLE),
+				('hbmpUnchecked', wintypes.HANDLE),
+				('dwItemData', ctypes.POINTER(ctypes.c_ulong)),
+				('dwTypeData', ctypes.c_wchar_p),
+				('cch', ctypes.c_uint),
+				('hbmpItem', wintypes.HANDLE)]
