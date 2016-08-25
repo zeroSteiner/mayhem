@@ -444,10 +444,10 @@ class MENUITEMINFOW(MayhemStructure):
 				('fType', ctypes.c_uint),
 				('fState', ctypes.c_uint),
 				('wID', ctypes.c_uint),
-				('hSubMenu', wintypes.HANDLE),
-				('hbmpChecked', wintypes.HANDLE),
-				('hbmpUnchecked', wintypes.HANDLE),
+				('hSubMenu', HANDLE),
+				('hbmpChecked', HANDLE),
+				('hbmpUnchecked', HANDLE),
 				('dwItemData', ctypes.POINTER(ctypes.c_ulong)),
 				('dwTypeData', ctypes.c_wchar_p),
 				('cch', ctypes.c_uint),
-				('hbmpItem', wintypes.HANDLE)]
+				('hbmpItem', HANDLE)]
