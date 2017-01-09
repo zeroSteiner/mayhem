@@ -74,6 +74,7 @@ ULONG      = ctypes.c_uint32
 PULONG     = ctypes.POINTER(ULONG)
 ULONGLONG  = ctypes.c_uint64
 PULONGLONG = ctypes.POINTER(ULONGLONG)
+ULONG_PTR  = ctypes.c_uint64 if is_64bit else ctypes.c_ulong
 
 PSTR   = ctypes.c_char_p
 LPSTR  = PSTR
@@ -279,6 +280,15 @@ class IMAGE_NT_HEADERS32(MayhemStructure):
 	_fields_ = [('Signature', DWORD),
 				('FileHeader', IMAGE_FILE_HEADER),
 				('OptionalHeader', IMAGE_OPTIONAL_HEADER),]
+
+class _IO_STATUS_BLOCK_U0(ctypes.Union):
+	_fields_ = [('Status', NTSTATUS),
+				('Pointer', PVOID),]
+
+class IO_STATUS_BLOCK(MayhemStructure):
+	_anonymous_ = ('u0',)
+	_fields_ = [('u0', _IO_STATUS_BLOCK_U0),
+				('Information', ULONG_PTR)]
 
 class PEB(MayhemStructure):
 	"""see:
