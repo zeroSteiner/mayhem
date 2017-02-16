@@ -142,6 +142,21 @@ class STARTUPINFO(MayhemStructure):
 				('hStdOutput', HANDLE),
 				('hStdError', HANDLE),]
 
+class LDR_MODULE(MayhemStructure):
+	_fields_ = [('InLoadOrderModuleList', LIST_ENTRY),
+				('InMemoryOrderModuleList', LIST_ENTRY),
+				('InInitializationOrderModuleList', LIST_ENTRY),
+				('BaseAddress', ctypes.c_void_p),
+				('EntryPoint', ctypes.c_void_p),
+				('SizeOfImage', ULONG),
+				('FullDllName', UNICODE_STRING),
+				('BaseDllName', UNICODE_STRING),
+				('Flags', ULONG),
+				('LoadCount', SHORT),
+				('TlsIndex', SHORT),
+				('HashTableEntry', LIST_ENTRY),
+				('TimeDateStamp', ULONG),]
+
 class LOADED_IMAGE(MayhemStructure):
 	"""see:
 	http://msdn.microsoft.com/en-us/library/windows/desktop/ms680349%28v=vs.85%29.aspx
@@ -161,20 +176,12 @@ class LOADED_IMAGE(MayhemStructure):
 				('Links', ctypes.c_void_p),
 				('SizeOfImage', ULONG),]
 
-class LDR_MODULE(MayhemStructure):
-	_fields_ = [('InLoadOrderModuleList', LIST_ENTRY),
-				('InMemoryOrderModuleList', LIST_ENTRY),
-				('InInitializationOrderModuleList', LIST_ENTRY),
-				('BaseAddress', ctypes.c_void_p),
-				('EntryPoint', ctypes.c_void_p),
-				('SizeOfImage', ULONG),
-				('FullDllName', UNICODE_STRING),
-				('BaseDllName', UNICODE_STRING),
-				('Flags', ULONG),
-				('LoadCount', SHORT),
-				('TlsIndex', SHORT),
-				('HashTableEntry', LIST_ENTRY),
-				('TimeDateStamp', ULONG),]
+class LUID(MayhemStructure):
+	"""see:
+	https://msdn.microsoft.com/en-us/library/windows/desktop/aa379261(v=vs.85).aspx
+	"""
+	_fields_ = [('LowPart', DWORD),
+				('HighPart', LONG),]
 
 class IMAGE_DATA_DIRECTORY(MayhemStructure):
 	"""see:
