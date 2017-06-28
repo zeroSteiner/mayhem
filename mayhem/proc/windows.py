@@ -113,7 +113,7 @@ class WindowsProcessError(ProcessError):
 
 def flags(flags):
 	supported_operators = ['|', '+', '-', '^']
-	if isinstance(flags, (int, long)):
+	if isinstance(flags, int):
 		return flags
 	if flags[0] == '(' and flags[-1] == ')':
 		flags = flags[1:-1]
@@ -200,7 +200,7 @@ class WindowsProcess(Process):
 			self.psapi.GetModuleFileNameExA(self.handle, 0, name, ctypes.sizeof(name))
 		else:
 			self.k32.GetModuleFileNameExA(self.handle, 0, name, ctypes.sizeof(name))
-		self.exe_file = ''.join(name).rstrip('\x00')
+		self.exe_file = b''.join(name).rstrip(b'\x00').decode('utf-8')
 		self._installed_hooks = []
 		self._update_maps()
 
