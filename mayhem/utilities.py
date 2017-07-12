@@ -159,3 +159,28 @@ def struct_unpack(structure, raw_data):
 		structure = structure()
 	ctypes.memmove(ctypes.byref(structure), raw_data, ctypes.sizeof(structure))
 	return structure
+
+def bytes_to_ctarray(bytes_):
+	"""
+	Convert a bytes object into a ctypes array.
+
+	:param bytes bytes_: The bytes object to convert.
+	:return: The converted byte array.
+	"""
+	ctarray = (ctypes.c_byte * len(bytes_))()
+	ctypes.memmove(ctypes.byref(ctarray), bytes_, len(bytes_))
+	return ctarray
+
+def ctarray_to_bytes(ctarray):
+	"""
+	Convert ctypes array into a bytes object.
+
+	:param ctarray: The ctypes array to convert.
+	:return: The converted ctypes array.
+	:rtype: bytes
+	"""
+	if not len(ctarray):
+		# work around a bug in v3.1 & v3.2 that results in a segfault when len(ctarray) == 0
+		return bytes()
+	bytes_ = buffer(ctarray) if sys.version_info[0] < 3 else bytes(ctarray)
+	return bytes_[:]
