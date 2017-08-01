@@ -78,11 +78,11 @@ def main():
 			shellcode = shellcode.decode('base64')
 		elif arguments.decode == 'hex':
 			shellcode = shellcode.decode('hex')
-		stub = "" # no stub by default
+		stub = ''  # no stub by default
 		if architecture_is_32bit(process_h.arch):
-			stub = "\x8b\x44\x24\x04" # mov eax,[esp+4]
+			stub = b'\x8b\x44\x24\x04'      # mov eax,[esp+4]
 		elif architecture_is_64bit(process_h.arch):
-			stub = "\x48\x8b\x44\x24\x08" # mov rax,[rsp+8]
+			stub = b'\x48\x8b\x44\x24\x08'  # mov rax,[rsp+8]
 
 		shellcode_sz = align_up(len(stub + shellcode), 1024)
 		address = process_h.allocate(size=shellcode_sz, address=0)
