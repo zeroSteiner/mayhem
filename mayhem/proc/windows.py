@@ -340,6 +340,7 @@ class WindowsProcess(Process):
 		self.k32.CreateRemoteThread.argtypes = [wintypes.HANDLE, ctypes.POINTER(wintypes.SECURITY_ATTRIBUTES), wintypes.SIZE_T, ctypes.c_void_p, wintypes.LPVOID, wintypes.DWORD, wintypes.PDWORD]
 		self.k32.CreateRemoteThread.restype = wintypes.HANDLE
 		self.k32.GetExitCodeThread.argtypes = [wintypes.HANDLE, wintypes.PDWORD]
+		self.k32.GetModuleHandleA.argtypes = [wintypes.LPSTR]
 		self.k32.GetModuleHandleA.restype = wintypes.HANDLE
 		self.k32.GetProcAddress.argtypes = [wintypes.HMODULE, wintypes.LPSTR]
 		self.k32.GetProcAddress.restype = ctypes.c_void_p
@@ -451,19 +452,20 @@ class WindowsProcess(Process):
 	def load_library(self, libpath):
 		libpath = os.path.abspath(libpath)
 		libpath_len = align_up(len(libpath) + 1, 0x200)
-		LoadLibraryA = self.k32.GetProcAddress(self.k32.GetModuleHandleA("kernel32.dll"), "LoadLibraryA")
-		RemotePage = self.k32.VirtualAllocEx(self.handle, None, len(libpath) + 1, flags("MEM_COMMIT"), flags("PAGE_EXECUTE_READWRITE"))
-		if not RemotePage:
+		LoadLibraryA = self.k32.GetProcAddress(self.k32.GetModuleHandleA(b'kernel32.dll'), b'LoadLibraryA')
+		remote_page = self.k32.VirtualAllocEx(self.handle, None, len(libpath) + 1, flags("MEM_COMMIT"), flags("PAGE_EXECUTE_READWRITE"))
+		if not remote_page:
 			raise WindowsProcessError('Error: failed to allocate space for library name in the target process')
-		self.k32.WriteProcessMemory(self.handle, RemotePage, libpath, len(libpath), None)
-		RemoteThread = self.k32.CreateRemoteThread(self.handle, None, 0, LoadLibraryA, RemotePage, 0, None)
-		self.k32.WaitForSingleObject(RemoteThread, -1)
+		if not self.k32.WriteProcessMemory(self.handle, remote_page, libpath, len(libpath), None):
+			raise WindowsProcessError('Error: failed to copy the library name to the target process')
+		remote_thread = self.k32.CreateRemoteThread(self.handle, None, 0, LoadLibraryA, remote_page, 0, None)
+		self.k32.WaitForSingleObject(remote_thread, -1)
 
 		exitcode = wintypes.DWORD(0)
-		self.k32.GetExitCodeThread(RemoteThread, ctypes.byref(exitcode))
-		self.k32.VirtualFreeEx(self.handle, RemotePage, len(libpath), flags("MEM_RELEASE"))
+		self.k32.GetExitCodeThread(remote_thread, ctypes.byref(exitcode))
+		self.k32.VirtualFreeEx(self.handle, remote_page, len(libpath), flags("MEM_RELEASE"))
 		if exitcode.value == 0:
-			raise WindowsProcessError('Error: failed to load: ' + repr(libpath))
+			raise WindowsProcessError('Error: failed to load: \'' + libpath + '\'')
 		self._update_maps()
 		return exitcode.value
 
