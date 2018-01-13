@@ -36,7 +36,7 @@ import platform
 
 from mayhem.proc import Process, ProcessError, Hook, MemoryRegion
 from mayhem.datatypes import windows as wintypes
-from mayhem.utilities import align_up, eval_number
+from mayhem.utilities import align_up, ctarray_to_bytes, eval_number
 
 CONSTANTS = {
 	'GENERIC_READ': 0x80000000,
@@ -470,11 +470,11 @@ class WindowsProcess(Process):
 		return exitcode.value
 
 	def read_memory(self, address, size=0x400):
-		_data = (ctypes.c_char * size)
+		_data = (ctypes.c_byte * size)
 		data = _data()
 		if (self.k32.ReadProcessMemory(self.handle, address, ctypes.byref(data), ctypes.sizeof(data), 0) == 0):
 			raise WindowsProcessError('Error: ReadProcessMemory', get_last_error=self.k32.GetLastError())
-		return ''.join(data)
+		return ctarray_to_bytes(data)
 
 	def write_memory(self, address, data):
 		_wr_data = (ctypes.c_char * len(data))
