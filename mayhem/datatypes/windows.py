@@ -392,6 +392,13 @@ class SYSTEM_INFO(MayhemStructure):
 				('wProcessorLevel', WORD),
 				('wProcessorRevision', WORD),]
 
+	@classmethod
+	def from_kernel32(cls):
+		kernel32 = ctypes.windll.kernel32
+		system_info = cls()
+		kernel32.GetSystemInfo(ctypes.byref(system_info))
+		return system_info
+
 class SYSTEM_PROCESS_INFORMATION(MayhemStructure):
 	"""see:
 	https://msdn.microsoft.com/en-us/library/windows/desktop/ms725506(v=vs.85).aspx
