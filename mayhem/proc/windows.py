@@ -30,13 +30,15 @@
 #  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
+from __future__ import unicode_literals
+
 import ctypes
 import os
 import platform
 
 from mayhem.proc import Process, ProcessError, Hook, MemoryRegion
 from mayhem.datatypes import windows as wintypes
-from mayhem.utilities import align_up, ctarray_to_bytes, eval_number
+from mayhem.utilities import ctarray_to_bytes, eval_number
 
 CONSTANTS = {
 	'GENERIC_READ': 0x80000000,
@@ -451,9 +453,9 @@ class WindowsProcess(Process):
 
 	def load_library(self, libpath):
 		libpath = os.path.abspath(libpath)
-		libpath_len = align_up(len(libpath) + 1, 0x200)
+		libpath = libpath.encode('utf-8') + b'\x00'
 		LoadLibraryA = self.k32.GetProcAddress(self.k32.GetModuleHandleA(b'kernel32.dll'), b'LoadLibraryA')
-		remote_page = self.k32.VirtualAllocEx(self.handle, None, len(libpath) + 1, flags("MEM_COMMIT"), flags("PAGE_EXECUTE_READWRITE"))
+		remote_page = self.k32.VirtualAllocEx(self.handle, None, len(libpath), flags("MEM_COMMIT"), flags("PAGE_EXECUTE_READWRITE"))
 		if not remote_page:
 			raise WindowsProcessError('Error: failed to allocate space for library name in the target process')
 		if not self.k32.WriteProcessMemory(self.handle, remote_page, libpath, len(libpath), None):
@@ -465,7 +467,7 @@ class WindowsProcess(Process):
 		self.k32.GetExitCodeThread(remote_thread, ctypes.byref(exitcode))
 		self.k32.VirtualFreeEx(self.handle, remote_page, len(libpath), flags("MEM_RELEASE"))
 		if exitcode.value == 0:
-			raise WindowsProcessError('Error: failed to load: \'' + libpath + '\'')
+			raise WindowsProcessError("Error: failed to load: {0}, thread exited with status: 0x{1:x}".format(libpath, exitcode.value))
 		self._update_maps()
 		return exitcode.value
 
@@ -477,11 +479,13 @@ class WindowsProcess(Process):
 		return ctarray_to_bytes(data)
 
 	def write_memory(self, address, data):
+		if isinstance(data, str):
+			data = data.encode('utf-8')
 		_wr_data = (ctypes.c_char * len(data))
 		wr_data = _wr_data()
 		wr_data.value = data
 		written = wintypes.SIZE_T()
-		if (self.k32.WriteProcessMemory(self.handle, address, ctypes.byref(wr_data), ctypes.sizeof(wr_data), ctypes.byref(written)) == 0):
+		if not self.k32.WriteProcessMemory(self.handle, address, ctypes.byref(wr_data), ctypes.sizeof(wr_data), ctypes.byref(written)):
 			raise WindowsProcessError('Error: WriteProcessMemory', get_last_error=self.k32.GetLastError())
 		return
 
