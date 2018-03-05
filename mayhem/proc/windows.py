@@ -121,7 +121,6 @@ def flags(flags):
 		flags = flags[1:-1]
 	for sop in supported_operators:
 		flags = flags.replace(sop, ' ' + sop + ' ')
-	flags
 	flags = flags.split()
 	parsed_flags = 0
 	last_operator = None

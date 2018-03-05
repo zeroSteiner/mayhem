@@ -30,21 +30,90 @@
 #  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
+from __future__ import print_function
+from __future__ import unicode_literals
+
+import argparse
 import ctypes
 import ctypes.util
 import os
 import sys
 sys.path.insert(1, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from argparse import ArgumentParser
 
+from mayhem import utilities
+from mayhem.datatypes import windows as wintypes
 from mayhem.proc import ProcessError
-from mayhem.proc.native import NativeProcess
-from mayhem.utilities import align_up, architecture_is_32bit, architecture_is_64bit
+from mayhem.proc.windows import WindowsProcess
+
+kernel32 = ctypes.windll.kernel32
+
+INVALID_HANDLE_VALUE =  -1
+PIPE_ACCESS_DUPLEX =    0x00000003
+PIPE_TYPE_MESSAGE =     0x00000004
+PIPE_READMODE_MESSAGE = 0x00000002
+PIPE_NAME = 'mayhem'
+
+INJECTION_STUB_TEMPLATE = r"""
+import codecs
+import runpy
+import sys
+import traceback
+
+pipe = open(r'\\.\\pipe\{pipe_name}', 'w+b', 0)
+sys.argv = ['']
+sys.stderr = sys.stdout = codecs.getwriter('utf-8')(pipe)
+try:
+    runpy.run_path('{path}')
+except:
+    traceback.print_exc()
+pipe.close()
+"""
+
+def _escape(path):
+	escaped_path = path.replace('\\', '\\\\')
+	return escaped_path.replace('\'', '\\\'')
+
+class NamedPipeClient(object):
+	def __init__(self, handle, buffer_size=4096):
+		self.handle = handle
+		self.buffer_size = buffer_size
+
+	def read(self):
+		ctarray = (ctypes.c_byte * self.buffer_size)()
+		bytes_read = wintypes.DWORD(0)
+		if not kernel32.ReadFile(self.handle, ctarray, self.buffer_size, ctypes.byref(bytes_read), 0):
+			return None
+		return utilities.ctarray_to_bytes(ctarray)[:bytes_read.value]
+
+	def close(self):
+		kernel32.CloseHandle(self.handle)
+
+	@classmethod
+	def from_named_pipe(cls, name, buffer_size=4096, default_timeout=100, max_instances=5):
+		handle = kernel32.CreateNamedPipeW(
+			'\\\\.\\pipe\\' + name,                     # _In_     LPCTSTR               lpName
+			PIPE_ACCESS_DUPLEX,                         # _In_     DWORD                 dwOpenMode
+			PIPE_TYPE_MESSAGE | PIPE_READMODE_MESSAGE,  # _In_     DWORD                 dwPipeMode
+			max_instances,                              # _In_     DWORD                 nMaxInstances
+			buffer_size,                                # _In_     DWORD                 nInBufferSize
+			buffer_size,                                # _In_     DWORD                 nOutBufferSize
+			default_timeout,                            # _In_     DWORD                 nDefaultTimeout
+			None                                        # _In_opt_ LPSECURITY_ATTRIBUTES lpSecurityAttributes
+		)
+		if handle == INVALID_HANDLE_VALUE:
+			raise ctypes.WinError()
+
+		result = kernel32.ConnectNamedPipe(handle, 0)
+		if result == 0:
+			kernel32.CloseHandle(handle)
+			raise ctypes.WinError()
+		return cls(handle, buffer_size=buffer_size)
 
 def main():
-	parser = ArgumentParser(description='python_injector: inject python code into a process', conflict_handler='resolve')
-	parser.add_argument('shellcode', action='store', help='python code to inject into the process')
+	parser = argparse.ArgumentParser(description='python_injector: inject python code into a process', conflict_handler='resolve')
+	parser.add_argument('script_path', action='store', help='python script to inject into the process')
 	parser.add_argument('pid', action='store', type=int, help='process to inject into')
+	parser.epilog = 'the __name__ variable will be set to __mayhem__'
 	arguments = parser.parse_args()
 
 	if not sys.platform.startswith('win'):
@@ -53,7 +122,7 @@ def main():
 
 	# get a handle the the process
 	try:
-		process_h = NativeProcess(pid=arguments.pid)
+		process_h = WindowsProcess(pid=arguments.pid)
 	except ProcessError as error:
 		print("[-] {0}".format(error.msg))
 		return
@@ -78,11 +147,10 @@ def main():
 		print("[+] Loaded {0} with handle 0x{1:08x}".format(python_lib, python_lib_h))
 
 	# resolve the necessary functions
-	k32 = ctypes.windll.kernel32
-	local_handle = k32.GetModuleHandleA(python_lib)
-	py_initialize_ex = python_lib_h + (k32.GetProcAddress(local_handle, 'Py_InitializeEx') - local_handle)
-	py_run_simple_string = python_lib_h + (k32.GetProcAddress(local_handle, 'PyRun_SimpleString') - local_handle)
-	print('[*] Resolved address:')
+	local_handle = kernel32.GetModuleHandleW(python_lib)
+	py_initialize_ex = python_lib_h + (kernel32.GetProcAddress(local_handle, b'Py_InitializeEx\x00') - local_handle)
+	py_run_simple_string = python_lib_h + (kernel32.GetProcAddress(local_handle, b'PyRun_SimpleString\x00') - local_handle)
+	print('[*] Resolved addresses:')
 	print("  - Py_InitializeEx:    0x{0:08x}".format(py_initialize_ex))
 	print("  - PyRun_SimpleString: 0x{0:08x}".format(py_run_simple_string))
 
@@ -90,12 +158,22 @@ def main():
 	thread_h = process_h.start_thread(py_initialize_ex, 0)
 	process_h.join_thread(thread_h)
 
-	shellcode = arguments.shellcode
-	shellcode_addr = process_h.allocate(size=align_up(len(shellcode)), permissions='PAGE_READWRITE')
-	process_h.write_memory(shellcode_addr, shellcode)
-	thread_h = process_h.start_thread(py_run_simple_string, shellcode_addr)
-	process_h.join_thread(thread_h)
+	print("[*] Waiting for client to connect on \\\\.\\pipe\\{0}".format(PIPE_NAME))
+	injection_stub = INJECTION_STUB_TEMPLATE
+	injection_stub = injection_stub.format(path=_escape(os.path.abspath(arguments.script_path)), pipe_name=PIPE_NAME)
+	injection_stub = injection_stub.encode('utf-8') + b'\x00'
 
+	shellcode_addr = process_h.allocate(size=utilities.align_up(len(injection_stub)), permissions='PAGE_READWRITE')
+	process_h.write_memory(shellcode_addr, injection_stub)
+	thread_h = process_h.start_thread(py_run_simple_string, shellcode_addr)
+	client = NamedPipeClient.from_named_pipe(PIPE_NAME)
+	while True:
+		message = client.read()
+		if message is None:
+			break
+		sys.stdout.write(message.decode('utf-8'))
+	client.close()
+	process_h.join_thread(thread_h)
 	process_h.close()
 
 if __name__ == '__main__':
