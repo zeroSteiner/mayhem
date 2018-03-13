@@ -92,6 +92,9 @@ class MemoryRegion(object):
 		self.addr_high = addr_high
 		self.perms = perms
 
+	def __hash__(self):
+		return hash(self.addr_low, self.addr_high, self.perms)
+
 	def __repr__(self):
 		return "{0:08x}-{1:08x} {2}".format(self.addr_low, self.addr_high, self.perms)
 
@@ -125,8 +128,14 @@ class MemoryRegion(object):
 		"""Whether or not the memory region is marked as shared."""
 		return bool(self.perms[3] == 's')
 
-class Process(object):
+class ProcessBase(object):
 	__arch__ = None
+	def __enter__(self):
+		return self
+
+	def __exit__(self, exc_type, exc_value, traceback):
+		self.close()
+
 	def __repr__(self):
 		return "{0}(pid={1}, exe='{2}')".format(self.__class__.__name__, self.pid, os.path.basename(self.exe_file))
 

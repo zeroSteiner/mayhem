@@ -31,6 +31,7 @@
 #
 
 import os
+import collections
 import ctypes
 import ctypes.util
 import select
@@ -39,7 +40,7 @@ import signal
 import platform
 import subprocess
 
-from mayhem.proc import Process, ProcessError, Hook, MemoryRegion
+from mayhem.proc import ProcessBase, ProcessError, Hook, MemoryRegion
 from mayhem.datatypes import elf
 from mayhem.utilities import architecture_is_32bit, architecture_is_64bit, struct_pack, struct_unpack
 
@@ -126,7 +127,7 @@ def parse_proc_maps(pid):
 	:return: The parsed memory regions for *pid*.
 	:rtype: dict
 	"""
-	maps = {}
+	_maps = collections.deque()
 	maps_h = open('/proc/' + str(pid) + '/maps', 'r')
 	for memory_region in maps_h:
 		memory_region = memory_region[:-1]
@@ -134,16 +135,14 @@ def parse_proc_maps(pid):
 		if memory_region.find('/') != -1:
 			pathname = memory_region[memory_region.find('/'):]
 		memory_region = memory_region.split()
-		try:
-			addr_low = long(memory_region[0].split('-')[0], 16)
-			addr_high = long(memory_region[0].split('-')[1], 16)
-			perms = memory_region[1]
-			if pathname is None and len(memory_region) == 6:
-				pathname = memory_region[5]
-		except:
-			continue
-		maps[addr_low] = LinuxMemoryRegion(addr_low, addr_high, perms, pathname)
-	return maps
+		addr_low, _, addr_high = memory_region[0].partition('-')
+		addr_low = int(addr_low, 16)
+		addr_high = int(addr_high, 16)
+		perms = memory_region[1]
+		if pathname is None and len(memory_region) == 6:
+			pathname = memory_region[5]
+		_maps.append(LinuxMemoryRegion(addr_low, addr_high, perms, pathname))
+	return collections.OrderedDict((mr.addr_low, mr) for mr in sorted(_maps, key=lambda mr: mr.addr_low))
 
 def architecture_is_supported(arch):
 	return architecture_is_32bit(arch) or architecture_is_64bit(arch)
@@ -179,7 +178,7 @@ def flags(flags):
 			parsed_flags = eval(str(parsed_flags) + last_operator + str(part))
 	return parsed_flags
 
-class LinuxProcess(Process):
+class LinuxProcess(ProcessBase):
 	"""This class represents a process in a POSIX Linux environment."""
 	def __init__(self, pid=None, exe=None):
 		if platform.system() != 'Linux':
@@ -220,13 +219,13 @@ class LinuxProcess(Process):
 			Exception('could not open PID')
 		os.waitpid(pid, 0)
 		self._installed_hooks = []
-		self._update_maps()
 
 	def _signal_sigchld(self, signum, frame):
 		status = os.waitpid(self.pid, os.WNOHANG)
 
-	def _update_maps(self):
-		self.maps = parse_proc_maps(self.pid)
+	@property
+	def maps(self):
+		return parse_proc_maps(self.pid)
 
 	def get_proc_attribute(self, attribute):
 		requested_attribute = attribute
@@ -621,9 +620,7 @@ class LinuxProcess(Process):
 				pass
 		if malloc_addr is None:
 			raise ProcessError('unable to locate function')
-		address = self._call_function(malloc_addr, size)
-		self._update_maps()
-		return address
+		return self._call_function(malloc_addr, size)
 
 	def _free_free(self, address):
 		free_addr = None
@@ -637,7 +634,6 @@ class LinuxProcess(Process):
 		if free_addr is None:
 			raise ProcessError('unable to locate function')
 		self._call_function(free_addr, address)
-		self._update_maps()
 		return
 
 	def _allocate_mmap(self, size, address, permissions, mmap_flags=None):
@@ -652,16 +648,13 @@ class LinuxProcess(Process):
 				mmap_flags = flags('MAP_ANONYMOUS | MAP_PRIVATE | MAP_FIXED')
 		else:
 			mmap_flags = flags(mmap_flags)
-		address = self._call_function(mmap_addr, address, size, permissions, mmap_flags, -1, 0)
-		self._update_maps()
-		return address
+		return self._call_function(mmap_addr, address, size, permissions, mmap_flags, -1, 0)
 
 	def _free_munmap(self, address, size):
 		munmap_addr = self._get_function_address('libc-', 'munmap')
 		result = self._call_function(munmap_addr, address, size)
-		if (result != 0):
+		if result != 0:
 			raise LinuxProcessError('Error: munmap')
-		self._update_maps()
 		return
 
 	def install_hook(self, mod_name, new_address, name=None, ordinal=None):
@@ -729,8 +722,8 @@ class LinuxProcess(Process):
 			return self._allocate_mmap(size, address, permissions)
 
 	def free(self, address):
-		if address in self.maps:
-			memregion = self.maps[address]
+		memregion = self.maps.get(address)
+		if memregion:
 			self._free_munmap(address, (memregion.addr_high - memregion.addr_low))
 		else:
 			self._free_free(address)
@@ -742,7 +735,6 @@ class LinuxProcess(Process):
 		result = self._call_function(mprotect_addr, address, size, permissions)
 		if result != 0:
 			raise LinuxProcessError('Error: mprotect')
-		self._update_maps()
 		return
 
 	def start_thread(self, address, targ=None):
@@ -782,7 +774,6 @@ class LinuxProcess(Process):
 		if result == 0:
 			raise LinuxProcessError('Error: failed to load: ' + repr(libpath))
 		self._free_free(readable_address)
-		self._update_maps()
 		return result
 
 	def read_memory(self, address, size=0x400):

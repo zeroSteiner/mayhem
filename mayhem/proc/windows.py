@@ -37,7 +37,7 @@ import ctypes
 import os
 import platform
 
-from mayhem.proc import Process, ProcessError, Hook, MemoryRegion
+from mayhem.proc import ProcessBase, ProcessError, Hook, MemoryRegion
 from mayhem.datatypes import windows as wintypes
 from mayhem.utilities import ctarray_to_bytes, eval_number
 
@@ -158,7 +158,7 @@ def process_is_wow64(handle=None):
 		raise WindowsProcessError('Error: IsWow64Process', get_last_error=ctypes.windll.kernel32.GetLastError())
 	return is_wow64.value
 
-class WindowsProcess(Process):
+class WindowsProcess(ProcessBase):
 	"""This class represents a process in a Windows environment."""
 	def __init__(self, pid=None, exe=None, handle=None, arch='x86', access=None):
 		if platform.system() != 'Windows':
