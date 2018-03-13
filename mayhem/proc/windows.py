@@ -32,6 +32,7 @@
 
 from __future__ import unicode_literals
 
+import collections
 import ctypes
 import os
 import platform
@@ -203,7 +204,6 @@ class WindowsProcess(Process):
 			self.k32.GetModuleFileNameExA(self.handle, 0, name, ctypes.sizeof(name))
 		self.exe_file = b''.join(name).rstrip(b'\x00').decode('utf-8')
 		self._installed_hooks = []
-		self._update_maps()
 
 	def __del__(self):
 		if self.handle:
@@ -364,30 +364,28 @@ class WindowsProcess(Process):
 			self.k32.GetModuleFileNameExA.argtypes = [wintypes.HANDLE, wintypes.HMODULE, wintypes.LPSTR, wintypes.DWORD]
 			self.k32.GetModuleFileNameExA.restype = wintypes.DWORD
 
-	def _update_maps(self):
+	@property
+	def maps(self):
 		sys_info = self.get_proc_attribute('system_info')
-		self.maps = {}
+		_maps = collections.deque()
 		address_cursor = 0
 		VirtualQueryEx = self.k32.VirtualQueryEx
 		meminfo = wintypes.MEMORY_BASIC_INFORMATION()
 		MEM_COMMIT = flags('MEM_COMMIT')
 		MEM_PRIVATE = flags('MEM_PRIVATE')
-		PROTECT_FLAGS = {0x10: '--x', 0x20: 'r-x', 0x40: 'rwx', 0x80: 'r-x', 0x01: '---', 0x02: 'r--', 0x04: 'rw-', 0x08: 'r--'}
+		PROTECT_FLAGS = {0x01: '---', 0x02: 'r--', 0x04: 'rw-', 0x08: 'r--', 0x10: '--x', 0x20: 'r-x', 0x40: 'rwx', 0x80: 'r-x'}
 		while address_cursor < sys_info.lpMaximumApplicationAddress:
 			if VirtualQueryEx(self.handle, address_cursor, ctypes.byref(meminfo), ctypes.sizeof(meminfo)) == 0:
 				break
 			address_cursor = meminfo.BaseAddress + meminfo.RegionSize
-			if (meminfo.State & MEM_COMMIT) == 0:
+			if not meminfo.State & MEM_COMMIT:
 				continue
 			addr_low = meminfo.BaseAddress
 			addr_high = address_cursor
-			perms = PROTECT_FLAGS[(meminfo.Protect & 0xff)]
-			if (meminfo.Type & MEM_PRIVATE) == 0:
-				perms += 's'
-			else:
-				perms += 'p'
-			self.maps[addr_low] = MemoryRegion(addr_low, addr_high, perms)
-		return
+			perms = PROTECT_FLAGS[meminfo.Protect & 0xff]
+			perms += 'p' if meminfo.Type & MEM_PRIVATE else 's'
+			_maps.append(MemoryRegion(addr_low, addr_high, perms))
+		return collections.OrderedDict((mr.addr_low, mr) for mr in sorted(_maps, key=lambda mr: mr.addr_low))
 
 	def install_hook(self, mod_name, new_address, name=None, ordinal=None):
 		if not (bool(name) ^ bool(ordinal)):
@@ -467,7 +465,6 @@ class WindowsProcess(Process):
 		self.k32.VirtualFreeEx(self.handle, remote_page, len(libpath), flags("MEM_RELEASE"))
 		if exitcode.value == 0:
 			raise WindowsProcessError("Error: failed to load: {0}, thread exited with status: 0x{1:x}".format(libpath, exitcode.value))
-		self._update_maps()
 		return exitcode.value
 
 	def read_memory(self, address, size=0x400):
@@ -492,14 +489,12 @@ class WindowsProcess(Process):
 		alloc_type = flags('MEM_COMMIT')
 		permissions = flags(permissions or 'PAGE_EXECUTE_READWRITE')
 		result = self.k32.VirtualAllocEx(self.handle, address, size, alloc_type, permissions)
-		self._update_maps()
 		return result
 
 	def free(self, address):
 		free_type = flags('MEM_RELEASE')
 		if (self.k32.VirtualFreeEx(self.handle, address, 0, free_type) == 0):
 			raise WindowsProcessError('Error: VirtualFreeEx', get_last_error=self.k32.GetLastError())
-		self._update_maps()
 		return
 
 	def protect(self, address, permissions=None, size=0x400):
