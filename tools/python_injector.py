@@ -63,7 +63,7 @@ pipe = open(r'\\.\\pipe\{pipe_name}', 'w+b', 0)
 sys.argv = ['']
 sys.stderr = sys.stdout = codecs.getwriter('utf-8')(pipe)
 try:
-    runpy.run_path('{path}')
+    runpy.run_path('{path}', run_name='__mayhem__')
 except:
     traceback.print_exc()
 pipe.close()
