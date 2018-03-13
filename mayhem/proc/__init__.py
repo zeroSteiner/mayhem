@@ -148,11 +148,11 @@ class ProcessBase(object):
 		:return: The string residing at *address*.
 		:rtype: str
 		"""
-		string = ''
-		while string.find('\x00') == -1:
+		string = b''
+		while string.find(b'\x00') == -1:
 			string += self.read_memory(address, 16)
 			address += 16
-		return string.split('\x00', 1)[0]
+		return string.split(b'\x00', 1)[0]
 
 	def read_region(self, region):
 		"""
@@ -166,7 +166,7 @@ class ProcessBase(object):
 		:return: The contents of the memory region.
 		:rtype: str
 		"""
-		if isinstance(region, (int, long)):
+		if isinstance(region, int):
 			region = self.maps.get(region)
 		return self.read_memory(region.addr_low, region.size)
 
