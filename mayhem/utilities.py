@@ -33,7 +33,8 @@
 import ctypes
 import os
 import sys
-from struct import pack, unpack
+
+import boltons.iterutils
 
 def architecture_is_32bit(arch):
 	"""
@@ -42,7 +43,7 @@ def architecture_is_32bit(arch):
 	:param str arch: The value to check.
 	:rtype: bool
 	"""
-	return bool(arch.lower() in ['i386', 'i686', 'x86'])
+	return bool(arch.lower() in ('i386', 'i686', 'x86'))
 
 def architecture_is_64bit(arch):
 	"""
@@ -51,7 +52,7 @@ def architecture_is_64bit(arch):
 	:param str arch: The value to check.
 	:rtype: bool
 	"""
-	return bool(arch.lower() in ['amd64', 'x86_64'])
+	return bool(arch.lower() in ('amd64', 'x86_64'))
 
 def align_down(number, alignment=16):
 	"""
@@ -98,41 +99,39 @@ def eval_number(number):
 	else:
 		raise ValueError('unknown numerical value: \'' + number + '\'')
 
-def print_hexdump(data, address=0):
+def print_hexdump(data, address=0, stream=None):
 	"""
 	Print data to stdout in a visually pleasant hex format.
 
 	:param str data: The data to print.
 	:param int address: The base address to display for *data*.
+	:param stream: The object to write the data to be displayed to.
 	"""
-	x = str(data)
-	l = len(x)
-	i = 0
-	address_format_string = "{0:04x}    "
-	if (address + len(data)) > 0xffff:
-		address_format_string = "{0:08x}    "
-		if (address + len(data)) > 0xffffffff:
-			address_format_string = "{0:016x}    "
-	while i < l:
-		sys.stdout.write(address_format_string.format(address + i))
-		for j in range(16):
-			if i + j < l:
-				sys.stdout.write("{0:02X} ".format(ord(x[i + j])))
+	stream = stream or sys.stdout
+	data = bytearray(data)
+	divider = 8
+	chunk_size = 16
+	for row, chunk in enumerate(boltons.iterutils.chunked(data, chunk_size, fill=-1)):
+		offset_col = "{0:04x}".format((row * chunk_size) + address)
+		ascii_col = ''
+		hex_col = ''
+		pos = 0
+		for pos, byte in enumerate(chunk):
+			hex_col += '   ' if byte == -1 else "{0:02x} ".format(byte)
+			if divider and pos and (pos + 1) % divider == 0:
+				hex_col += ' '
+
+			if byte == -1:
+				ascii_col += ' '
+			elif byte < 32 or byte > 126:
+				ascii_col += '.'
 			else:
-				sys.stdout.write("   ")
-			if j % 16 == 7:
-				sys.stdout.write(" ")
-		sys.stdout.write("  ")
-		r = ""
-		for j in x[i:i + 16]:
-			j = ord(j)
-			if (j < 32) or (j >= 127):
-				r = r + "."
-			else:
-				r = r + chr(j)
-		sys.stdout.write(r + os.linesep)
-		i += 16
-	sys.stdout.flush()
+				ascii_col += chr(byte)
+			if divider and pos and (pos + 1) % divider == 0:
+				ascii_col += ' '
+		hex_col = hex_col[:-2 if pos and (pos + 1) % divider == 0 else -1]
+		stream.write('  '.join((offset_col, hex_col, ascii_col)) + os.linesep)
+	stream.flush()
 
 def struct_pack(structure):
 	"""

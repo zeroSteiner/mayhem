@@ -1,3 +1,4 @@
-pefile>=1.2.10
-tabulate>=0.7.3
+boltons>=17.1.0
+pefile==1.2.10
+tabulate==0.7.3
 
