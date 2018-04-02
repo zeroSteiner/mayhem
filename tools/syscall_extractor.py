@@ -32,6 +32,7 @@
 #  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
+import argparse
 import collections
 import copy
 import json
@@ -42,12 +43,6 @@ sys.path.insert(1, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')
 
 import pefile
 import tabulate
-
-try:
-	import jarvis
-except ImportError:
-	print('missing requirement jarvis, https://gist.github.com/zeroSteiner/7920683')
-	os._exit(0)
 
 __version__ = '1.0'
 
@@ -69,46 +64,48 @@ def pe_format_version_str(pe):
 	return '.'.join(version_info)
 
 def get_i386_syscall(stub):
-	if len(stub) != 15:
+	if len(stub) < 18:
 		return None
-	if not stub.startswith('\xb8'):
+	if not stub.startswith(b'\xb8'):
 		return None
-	if stub[5:12] != '\xba\x00\x03\xfe\x7f\xff\x12':
-		return None
-	if not stub[12] in ('\xc2', '\xc3'):
-		return None
-	return struct.unpack('I', stub[1:5])[0]
+	if stub[5:12] == b'\xba\x00\x03\xfe\x7f\xff\x12' and stub[12] in (b'\xc2', b'\xc3'):
+		return struct.unpack('I', stub[1:5])[0]
+	if stub[5:18] == b'\xe8\x03\x00\x00\x00\xc2\x08\x00\x8b\xd4\x0f\x34\xc3':
+		return struct.unpack('I', stub[1:5])[0]
+	return None
 
 def get_x86_64_syscall(stub):
 	if len(stub) != 11:
 		return None
-	if not stub.startswith('\x4c\x8b\xd1\xb8'):
+	if not stub.startswith(b'\x4c\x8b\xd1\xb8'):
 		return None
-	if not stub.endswith('\x0f\x05\xc3'):
+	if not stub.endswith(b'\x0f\x05\xc3'):
 		return None
 	return struct.unpack('I', stub[4:8])[0]
 
-def extract_syscalls(jar, file_name):
+def extract_syscalls(file_name):
 	pe = pefile.PE(file_name)
 	file_version = pe_format_version_str(pe)
-	jar.print_status("scanning {0} ({1})".format(file_name, file_version))
+	print("[*] Scanning {0} ({1})".format(file_name, file_version))
 	if not pe.is_dll:
-		jar.print_status('file is not a dll')
+		print('[-] File is not a DLL')
 		return
 	machine = pe.NT_HEADERS.FILE_HEADER.Machine
 	if machine == IMAGE_FILE_MACHINE_I386:
 		extractor = get_i386_syscall
-		stub_length = 15
+		stub_length = 18
 	elif machine == IMAGE_FILE_MACHINE_X86_64:
 		extractor = get_x86_64_syscall
 		stub_length = 11
 	else:
-		jar.print_status("not a supported machine type (0x{0:02x})".format(machine))
+		print("[-] Not a supported machine type (0x{0:02x})".format(machine))
 		return
 	arch_name = ('i386' if machine == IMAGE_FILE_MACHINE_I386 else 'x86-64')
-	jar.vprint_status('detected file as: ' + arch_name)
+	print('[*] Detected file as: ' + arch_name)
 	syscalls = []
 	pe.parse_data_directories()
+	if not hasattr(pe, 'DIRECTORY_ENTRY_EXPORT'):
+		return
 	for exp in pe.DIRECTORY_ENTRY_EXPORT.symbols:
 		stub = pe.get_data(exp.address, stub_length)
 		syscall_number = extractor(stub)
@@ -121,17 +118,16 @@ def extract_syscalls(jar, file_name):
 def main():
 	output_formats = copy.copy(tabulate.tabulate_formats)
 	output_formats.append('json')
-	jar = jarvis.Jarvis(stream=sys.stderr)
-	parser = jar.build_argparser('PE File Syscall Extractor', version=__version__)
+	parser = argparse.ArgumentParser(description='syscall_extractor: Extract syscalls from a Windows PE file', conflict_handler='resolve')
 	parser.add_argument('-f', '--format', dest='output_format', default='simple', choices=output_formats, help='output format')
 	parser.add_argument('pe_files', nargs='+', help='pe files to extract syscall numbers from')
 	args = parser.parse_args()
 
 	parsed_files = []
 	for pe_file in args.pe_files:
-		parsed_files.append(extract_syscalls(jar, os.path.abspath(pe_file)))
+		parsed_files.append(extract_syscalls(os.path.abspath(pe_file)))
 	parsed_files = list(pe_file for pe_file in parsed_files if pe_file)
-	jar.print_good("found {0:,} syscalls".format(sum(len(pe_file['syscalls']) for pe_file in parsed_files)))
+	print("[+] Found {0:,} syscalls".format(sum(len(pe_file['syscalls']) for pe_file in parsed_files)))
 
 	if args.output_format == 'json':
 		print(json.dumps(parsed_files, sort_keys=True, indent=2, separators=(',', ': ')))

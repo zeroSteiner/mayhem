@@ -1,4 +1,4 @@
 boltons>=17.1.0
-pefile==1.2.10
+pefile==2017.11.5
 tabulate==0.7.3
 

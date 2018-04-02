@@ -31,16 +31,14 @@
 #
 
 import argparse
-import binascii
 import code
-import ctypes
 import json
 import os
 import platform
 import sys
 sys.path.insert(1, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from mayhem.exploits.windows import WindowsX86Syscall
+import mayhem.exploit.windows as windows
 
 def main():
 	parser = argparse.ArgumentParser(description='win_syscall: Windows native system call utility', conflict_handler='resolve')
@@ -60,7 +58,7 @@ def main():
 			return
 		syscall_map = [arguments.os_name]
 		print("[+] Loaded {0} syscall symbols".format(len(syscall_map)))
-	syscall = WindowsX86Syscall(syscall_map)
+	syscall = windows.WindowsX86Syscall(syscall_map)
 	print("[+] Allocated syscall stub at 0x{0:08x}".format(syscall.address))
 
 	console = code.InteractiveConsole(dict(syscall=syscall))

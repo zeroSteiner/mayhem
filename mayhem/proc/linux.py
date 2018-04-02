@@ -147,7 +147,7 @@ def architecture_is_supported(arch):
 
 def flags(flags):
 	supported_operators = ['|', '+', '-', '^']
-	if isinstance(flags, int) or isinstance(flags, long):
+	if isinstance(flags, int):
 		return flags
 	if flags[0] == '(' and flags[-1] == ')':
 		flags = flags[1:-1]
@@ -204,7 +204,6 @@ class LinuxProcess(mayhem.proc.ProcessBase):
 		self.pid = pid
 		self.exe_file = os.readlink('/proc/' + str(self.pid) + '/exe')
 		ei_ident = open(self.exe_file, 'rb').read(elf.constants.EI_NIDENT)
-		ei_ident = map(ord, ei_ident)
 		if ei_ident[elf.constants.EI_CLASS] == elf.constants.ELFCLASS32:
 			self.__arch__ = 'x86'
 		elif ei_ident[elf.constants.EI_CLASS] == elf.constants.ELFCLASS64:
@@ -776,7 +775,7 @@ class LinuxProcess(mayhem.proc.ProcessBase):
 		return result
 
 	def read_memory(self, address, size=0x400):
-		data = ''
+		data = b''
 		address_cursor = address
 		size_of_long = ctypes.sizeof(ctypes.c_long)
 		while len(data) < size:

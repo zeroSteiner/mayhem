@@ -30,9 +30,6 @@
 #  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-from __future__ import print_function
-from __future__ import unicode_literals
-
 import argparse
 import ctypes
 import ctypes.util
@@ -157,6 +154,7 @@ def main():
 	# call remote functions to initialize and run via remote threads
 	thread_h = process_h.start_thread(py_initialize_ex, 0)
 	process_h.join_thread(thread_h)
+	print('[*] Initialized Python in the host process')
 
 	print("[*] Waiting for client to connect on \\\\.\\pipe\\{0}".format(PIPE_NAME))
 	injection_stub = INJECTION_STUB_TEMPLATE
@@ -167,6 +165,7 @@ def main():
 	process_h.write_memory(shellcode_addr, injection_stub)
 	thread_h = process_h.start_thread(py_run_simple_string, shellcode_addr)
 	client = NamedPipeClient.from_named_pipe(PIPE_NAME)
+	print('[*] Client connected on named pipe')
 	while True:
 		message = client.read()
 		if message is None:

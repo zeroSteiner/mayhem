@@ -30,22 +30,23 @@
 #  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
+import argparse
 import os
 import sys
 sys.path.insert(1, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from argparse import ArgumentParser
 
 from mayhem.proc import ProcessError
 from mayhem.proc.native import NativeProcess
 from mayhem.utilities import align_down, align_up, print_hexdump
 
 def main():
-	parser = ArgumentParser(description='memgrep: memory search utility', conflict_handler='resolve')
+	parser = argparse.ArgumentParser(description='memgrep: memory search utility', conflict_handler='resolve')
 	parser.add_argument('pid', action='store', type=int, help='process to control')
 	parser.add_argument('search_data', action='store', help='data to search for')
+	parser.add_argument('-e', '--encoding', default='utf-8', help='the encoding of search_data')
 	arguments = parser.parse_args()
 
-	search_data = arguments.search_data
+	search_data = arguments.search_data.encode(arguments.encoding)
 	if len(search_data) < 4:
 		print('[-] searching for less than 4 bytes will yield too many results')
 		return 0
@@ -57,19 +58,16 @@ def main():
 	num_skips = 0
 	num_errors = 0
 
-	mem_region_keys = process_h.maps.keys()
-	mem_region_keys.sort()
-	for mr in mem_region_keys:
-		mem_region = process_h.maps[mr]
-		print("[*] searching 0x{0:04x} bytes at 0x{1:08x}".format(mem_region.size, mem_region.addr_low))
+	for mem_region in process_h.maps.values():
+		print("[*] searching 0x{0:08x} - 0x{1:08x} (0x{2:08x} bytes)".format(mem_region.addr_low, mem_region.addr_high, mem_region.size))
 		if not mem_region.is_readable:
 			print("[-] skipped unreadable region at 0x{0:08x}".format(mem_region.addr_low))
 			num_skips += 1
 			continue
 		try:
 			data = process_h.read_memory(mem_region.addr_low, mem_region.size)
-		except ProcessError as err:
-			print("[-] encountered {0} while reading at 0x{1:08x}".format(err.__class__.__name__, mem_region.addr_low))
+		except ProcessError as error:
+			print("[-] encountered {0} while reading at 0x{1:08x}".format(error.__class__.__name__, mem_region.addr_low))
 			num_errors += 1
 			continue
 		cursor = data.find(search_data)
