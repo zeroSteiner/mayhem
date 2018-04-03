@@ -1,0 +1,508 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>mayhem.proc &mdash; Mayhem 0.2 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="../../genindex.html"/>
+        <link rel="search" title="Search" href="../../search.html"/>
+    <link rel="top" title="Mayhem 0.2 documentation" href="../../index.html"/>
+        <link rel="up" title="Module code" href="../index.html"/> 
+
+  
+  <script src="../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> Mayhem
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../mayhem/index.html"><code class="docutils literal notranslate"><span class="pre">mayhem</span></code></a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Mayhem</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>mayhem.proc</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for mayhem.proc</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="c1">#</span>
+<span class="c1">#  mayhem/proc/__init__.py</span>
+<span class="c1">#</span>
+<span class="c1">#  Redistribution and use in source and binary forms, with or without</span>
+<span class="c1">#  modification, are permitted provided that the following conditions are</span>
+<span class="c1">#  met:</span>
+<span class="c1">#</span>
+<span class="c1">#  * Redistributions of source code must retain the above copyright</span>
+<span class="c1">#    notice, this list of conditions and the following disclaimer.</span>
+<span class="c1">#  * Redistributions in binary form must reproduce the above</span>
+<span class="c1">#    copyright notice, this list of conditions and the following disclaimer</span>
+<span class="c1">#    in the documentation and/or other materials provided with the</span>
+<span class="c1">#    distribution.</span>
+<span class="c1">#  * Neither the name of the project nor the names of its</span>
+<span class="c1">#    contributors may be used to endorse or promote products derived from</span>
+<span class="c1">#    this software without specific prior written permission.</span>
+<span class="c1">#</span>
+<span class="c1">#  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS</span>
+<span class="c1">#  &quot;AS IS&quot; AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT</span>
+<span class="c1">#  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR</span>
+<span class="c1">#  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT</span>
+<span class="c1">#  OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,</span>
+<span class="c1">#  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT</span>
+<span class="c1">#  LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,</span>
+<span class="c1">#  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY</span>
+<span class="c1">#  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT</span>
+<span class="c1">#  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE</span>
+<span class="c1">#  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</span>
+<span class="c1">#</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">uuid</span>
+
+<div class="viewcode-block" id="ProcessError"><a class="viewcode-back" href="../../mayhem/proc/index.html#mayhem.proc.ProcessError">[docs]</a><span class="k">class</span> <span class="nc">ProcessError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+	<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">	This base exception describes process related errors and are raised</span>
+<span class="sd">	by :py:class:`mayhem.proc.Process` classes.</span>
+<span class="sd">	&quot;&quot;&quot;</span>
+	<span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">msg</span> <span class="o">=</span> <span class="n">msg</span>
+
+	<span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="k">return</span> <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">msg</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Hook"><a class="viewcode-back" href="../../mayhem/proc/index.html#mayhem.proc.Hook">[docs]</a><span class="k">class</span> <span class="nc">Hook</span><span class="p">:</span>
+	<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">	This object describes a hook which has been installed to modify the</span>
+<span class="sd">	behavior of native code. This is generally used for hijacking functions</span>
+<span class="sd">	to force them to execute different instructions when they are called.</span>
+<span class="sd">	The *Hook* specifically referes to the data which has been modified</span>
+<span class="sd">	to alter the flow of execution. This is generally a modified funciton</span>
+<span class="sd">	pointer or an assembly stub which redirects code to the *new_handler*.</span>
+<span class="sd">	&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="Hook.__init__"><a class="viewcode-back" href="../../mayhem/proc/index.html#mayhem.proc.Hook.__init__">[docs]</a>	<span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hook_type</span><span class="p">,</span> <span class="n">hook_location</span><span class="p">,</span> <span class="n">old_address</span><span class="p">,</span> <span class="n">new_address</span><span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">		:param str hook_type: The type of hook (iat or eat).</span>
+<span class="sd">		:param int hook_location: The address of where the hook has been installed.</span>
+<span class="sd">		:param int old_address: The original address of the hooked function.</span>
+<span class="sd">		:param int new_address: The new modified address of the hooked function.</span>
+<span class="sd">		&quot;&quot;&quot;</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">hook_type</span> <span class="o">=</span> <span class="n">hook_type</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">hook_location</span> <span class="o">=</span> <span class="n">hook_location</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">old_handler_address</span> <span class="o">=</span> <span class="n">old_address</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">new_handler_address</span> <span class="o">=</span> <span class="n">new_address</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">uid</span> <span class="o">=</span> <span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">()</span></div>
+
+	<span class="k">def</span> <span class="nf">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+		<span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">Hook</span><span class="p">):</span>
+			<span class="k">return</span> <span class="kc">False</span>
+		<span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="s1">&#39;uid&#39;</span><span class="p">):</span>
+			<span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">uid</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">uid</span><span class="p">:</span>
+				<span class="k">return</span> <span class="kc">True</span>
+		<span class="k">return</span> <span class="kc">False</span></div>
+
+<div class="viewcode-block" id="MemoryRegion"><a class="viewcode-back" href="../../mayhem/proc/index.html#mayhem.proc.MemoryRegion">[docs]</a><span class="k">class</span> <span class="nc">MemoryRegion</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+	<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">	This describes a memory region in a platform independant way. Permissions</span>
+<span class="sd">	are described with a string using &#39;rwx&#39; for full read, write and execute</span>
+<span class="sd">	permissions and substituting &#39;-&#39; for missing permissions. For example</span>
+<span class="sd">	a page with only read and execute permissions would have permissions</span>
+<span class="sd">	of &#39;r-x&#39;.</span>
+<span class="sd">	&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="MemoryRegion.__init__"><a class="viewcode-back" href="../../mayhem/proc/index.html#mayhem.proc.MemoryRegion.__init__">[docs]</a>	<span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">addr_low</span><span class="p">,</span> <span class="n">addr_high</span><span class="p">,</span> <span class="n">perms</span><span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">		:param int addr_low: The address of where this memory region starts.</span>
+<span class="sd">		:param int addr_high: The address of where this memory region ends.</span>
+<span class="sd">		:param str perms: The permissions that this memory region has.</span>
+<span class="sd">		&quot;&quot;&quot;</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">addr_low</span> <span class="o">=</span> <span class="n">addr_low</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">addr_high</span> <span class="o">=</span> <span class="n">addr_high</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">perms</span> <span class="o">=</span> <span class="n">perms</span></div>
+
+	<span class="k">def</span> <span class="nf">__hash__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="k">return</span> <span class="nb">hash</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">addr_low</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">addr_high</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">perms</span><span class="p">)</span>
+
+	<span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="k">return</span> <span class="s2">&quot;</span><span class="si">{0:08x}</span><span class="s2">-</span><span class="si">{1:08x}</span><span class="s2"> </span><span class="si">{2}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">addr_low</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">addr_high</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">perms</span><span class="p">)</span>
+
+	<span class="nd">@property</span>
+	<span class="k">def</span> <span class="nf">size</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot;The size of the memory region.&quot;&quot;&quot;</span>
+		<span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">addr_high</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">addr_low</span><span class="p">)</span>
+
+	<span class="nd">@property</span>
+	<span class="k">def</span> <span class="nf">is_readable</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot;Whether or not the memory region contains the read permission.&quot;&quot;&quot;</span>
+		<span class="k">return</span> <span class="nb">bool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">perms</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span>
+
+	<span class="nd">@property</span>
+	<span class="k">def</span> <span class="nf">is_writeable</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot;Whether or not the memory region contains the write permission.&quot;&quot;&quot;</span>
+		<span class="k">return</span> <span class="nb">bool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">perms</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span>
+
+	<span class="nd">@property</span>
+	<span class="k">def</span> <span class="nf">is_executable</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot;Whether or not the memory region contains the execute permission.&quot;&quot;&quot;</span>
+		<span class="k">return</span> <span class="nb">bool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">perms</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;x&#39;</span><span class="p">)</span>
+
+	<span class="nd">@property</span>
+	<span class="k">def</span> <span class="nf">is_private</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot;Whether or not the memory region is marked as private.&quot;&quot;&quot;</span>
+		<span class="k">return</span> <span class="nb">bool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">perms</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;p&#39;</span><span class="p">)</span>
+
+	<span class="nd">@property</span>
+	<span class="k">def</span> <span class="nf">is_shared</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot;Whether or not the memory region is marked as shared.&quot;&quot;&quot;</span>
+		<span class="k">return</span> <span class="nb">bool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">perms</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;s&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ProcessBase"><a class="viewcode-back" href="../../mayhem/proc/index.html#mayhem.proc.ProcessBase">[docs]</a><span class="k">class</span> <span class="nc">ProcessBase</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+	<span class="n">__arch__</span> <span class="o">=</span> <span class="kc">None</span>
+	<span class="k">def</span> <span class="nf">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="k">return</span> <span class="bp">self</span>
+
+	<span class="k">def</span> <span class="nf">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exc_type</span><span class="p">,</span> <span class="n">exc_value</span><span class="p">,</span> <span class="n">traceback</span><span class="p">):</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+	<span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="k">return</span> <span class="s2">&quot;</span><span class="si">{0}</span><span class="s2">(pid=</span><span class="si">{1}</span><span class="s2">, exe=&#39;</span><span class="si">{2}</span><span class="s2">&#39;)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">pid</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">exe_file</span><span class="p">))</span>
+
+<div class="viewcode-block" id="ProcessBase.read_memory_string"><a class="viewcode-back" href="../../mayhem/proc/index.html#mayhem.proc.ProcessBase.read_memory_string">[docs]</a>	<span class="k">def</span> <span class="nf">read_memory_string</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">address</span><span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">		Read bytes from *address* until a NULL termination character is</span>
+<span class="sd">		encountered.</span>
+
+<span class="sd">		:param int address: The address to start reading from.</span>
+<span class="sd">		:return: The string residing at *address*.</span>
+<span class="sd">		:rtype: str</span>
+<span class="sd">		&quot;&quot;&quot;</span>
+		<span class="n">string</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;&#39;</span>
+		<span class="k">while</span> <span class="n">string</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x00</span><span class="s1">&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+			<span class="n">string</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_memory</span><span class="p">(</span><span class="n">address</span><span class="p">,</span> <span class="mi">16</span><span class="p">)</span>
+			<span class="n">address</span> <span class="o">+=</span> <span class="mi">16</span>
+		<span class="k">return</span> <span class="n">string</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x00</span><span class="s1">&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="ProcessBase.read_region"><a class="viewcode-back" href="../../mayhem/proc/index.html#mayhem.proc.ProcessBase.read_region">[docs]</a>	<span class="k">def</span> <span class="nf">read_region</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">region</span><span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">		Read an entire region from memory. If *region* is a</span>
+<span class="sd">		:py:class:`.MemoryRegion` instance, it is returned. If *region*</span>
+<span class="sd">		is an int, it must be the starting address of a memory region in</span>
+<span class="sd">		the :py:attr:`.maps` attribute.</span>
+
+<span class="sd">		:param region: The region to read from.</span>
+<span class="sd">		:type region: int, :py:class:`.MemoryRegion`</span>
+<span class="sd">		:return: The contents of the memory region.</span>
+<span class="sd">		:rtype: str</span>
+<span class="sd">		&quot;&quot;&quot;</span>
+		<span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">region</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+			<span class="n">region</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">maps</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">region</span><span class="p">)</span>
+		<span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_memory</span><span class="p">(</span><span class="n">region</span><span class="o">.</span><span class="n">addr_low</span><span class="p">,</span> <span class="n">region</span><span class="o">.</span><span class="n">size</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ProcessBase.allocate"><a class="viewcode-back" href="../../mayhem/proc/index.html#mayhem.proc.ProcessBase.allocate">[docs]</a>	<span class="k">def</span> <span class="nf">allocate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mh">0x400</span><span class="p">,</span> <span class="n">address</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">permissions</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">		Allocate memory in the attached process. If *permissions* is not</span>
+<span class="sd">		specified it will be the platform specific version of read, write</span>
+<span class="sd">		and execute.</span>
+
+<span class="sd">		:param int size: The size of the space to allocate.</span>
+<span class="sd">		:param int address: The preferred address to allocate space at.</span>
+<span class="sd">		:param str permissions: The permissions to set in the newly allocated space.</span>
+<span class="sd">		&quot;&quot;&quot;</span>
+		<span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="ProcessBase.close"><a class="viewcode-back" href="../../mayhem/proc/index.html#mayhem.proc.ProcessBase.close">[docs]</a>	<span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">		Close the handle to the process and perform any necessary clean</span>
+<span class="sd">		up operations. No further calls should be made to the object after</span>
+<span class="sd">		this function is called.</span>
+<span class="sd">		&quot;&quot;&quot;</span>
+		<span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="ProcessBase.free"><a class="viewcode-back" href="../../mayhem/proc/index.html#mayhem.proc.ProcessBase.free">[docs]</a>	<span class="k">def</span> <span class="nf">free</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">address</span><span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">		Unallocate the memory at *address*.</span>
+
+<span class="sd">		:param int address: The address to unallocate.</span>
+<span class="sd">		&quot;&quot;&quot;</span>
+		<span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="ProcessBase.get_proc_attribute"><a class="viewcode-back" href="../../mayhem/proc/index.html#mayhem.proc.ProcessBase.get_proc_attribute">[docs]</a>	<span class="k">def</span> <span class="nf">get_proc_attribute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attribute</span><span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">		Look up a platform specific attribute of the process. Valid values</span>
+<span class="sd">		for *attribute* will be different depending on the class.</span>
+
+<span class="sd">		:param str attribute: The attribute to look up.</span>
+<span class="sd">		&quot;&quot;&quot;</span>
+		<span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="ProcessBase.install_hook"><a class="viewcode-back" href="../../mayhem/proc/index.html#mayhem.proc.ProcessBase.install_hook">[docs]</a>	<span class="k">def</span> <span class="nf">install_hook</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mod_name</span><span class="p">,</span> <span class="n">new_address</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ordinal</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">		Install a hook to redirect execution from the specified function</span>
+<span class="sd">		to *new_address*. Different platform implemenations of this function</span>
+<span class="sd">		may not support both the *name* and *ordinal* parameters.</span>
+
+<span class="sd">		:param str mod_name: The module where the target function to hook resides.</span>
+<span class="sd">		:param int new_address: The address of the new code to be executed.</span>
+<span class="sd">		:param str name: The name of the function to hook.</span>
+<span class="sd">		:param int ordinal: The ordinal of the function to hook.</span>
+<span class="sd">		&quot;&quot;&quot;</span>
+		<span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="ProcessBase.join_thread"><a class="viewcode-back" href="../../mayhem/proc/index.html#mayhem.proc.ProcessBase.join_thread">[docs]</a>	<span class="k">def</span> <span class="nf">join_thread</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">thread_id</span><span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">		Wait for the thread described in *thread_id* to finish execution.</span>
+
+<span class="sd">		:param int thread_id: The ID of the thread to wait for.</span>
+<span class="sd">		&quot;&quot;&quot;</span>
+		<span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="ProcessBase.kill"><a class="viewcode-back" href="../../mayhem/proc/index.html#mayhem.proc.ProcessBase.kill">[docs]</a>	<span class="k">def</span> <span class="nf">kill</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot;Kill the process which is currently being manipulated.&quot;&quot;&quot;</span>
+		<span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="ProcessBase.load_library"><a class="viewcode-back" href="../../mayhem/proc/index.html#mayhem.proc.ProcessBase.load_library">[docs]</a>	<span class="k">def</span> <span class="nf">load_library</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">libpath</span><span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">		Load the library specified by *libpath* into the address space</span>
+<span class="sd">		of the attached process.</span>
+
+<span class="sd">		:param str libpath: The path to the library to load.</span>
+<span class="sd">		&quot;&quot;&quot;</span>
+		<span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="ProcessBase.protect"><a class="viewcode-back" href="../../mayhem/proc/index.html#mayhem.proc.ProcessBase.protect">[docs]</a>	<span class="k">def</span> <span class="nf">protect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">address</span><span class="p">,</span> <span class="n">permissions</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mh">0x400</span><span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">		Change the access permissions to the memory residing at *address*.</span>
+<span class="sd">		If *permissions* is not specified it will be the platform specific</span>
+<span class="sd">		version of read, write and execute.</span>
+
+<span class="sd">		:param int address: The address to change the permissions of.</span>
+<span class="sd">		:param str permissions: The permissions to set for *address*.</span>
+<span class="sd">		:param int size: The size of the space starting at *address* to change the permissions of.</span>
+<span class="sd">		&quot;&quot;&quot;</span>
+		<span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="ProcessBase.read_memory"><a class="viewcode-back" href="../../mayhem/proc/index.html#mayhem.proc.ProcessBase.read_memory">[docs]</a>	<span class="k">def</span> <span class="nf">read_memory</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">address</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mh">0x400</span><span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">		Return the contents of memory at *address*.</span>
+
+<span class="sd">		:param int address: The location from which to read memory.</span>
+<span class="sd">		:param int size: The number of bytes to read.</span>
+<span class="sd">		:return: The contents of memory at *address*.</span>
+<span class="sd">		:rtype: str</span>
+<span class="sd">		&quot;&quot;&quot;</span>
+		<span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="ProcessBase.start_thread"><a class="viewcode-back" href="../../mayhem/proc/index.html#mayhem.proc.ProcessBase.start_thread">[docs]</a>	<span class="k">def</span> <span class="nf">start_thread</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">address</span><span class="p">,</span> <span class="n">targ</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">		Execute *address* in the context of a new thread.</span>
+
+<span class="sd">		:param int address: The entry point of the thread.</span>
+<span class="sd">		:param targ: The arguments to supply for the thread.</span>
+<span class="sd">		:return: A platform specific thread identifier.</span>
+<span class="sd">		&quot;&quot;&quot;</span>
+		<span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="ProcessBase.write_memory"><a class="viewcode-back" href="../../mayhem/proc/index.html#mayhem.proc.ProcessBase.write_memory">[docs]</a>	<span class="k">def</span> <span class="nf">write_memory</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">address</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">		Write arbitrary data to the processes memory.</span>
+
+<span class="sd">		:param int address: The location to start writing to.</span>
+<span class="sd">		:param str data: The data to write into memory.</span>
+<span class="sd">		&quot;&quot;&quot;</span>
+		<span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span></div>
+
+	<span class="nd">@property</span>
+	<span class="k">def</span> <span class="nf">arch</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot;The architecture of the process.&quot;&quot;&quot;</span>
+		<span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__arch__</span></div>
+</pre></div>
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Spencer McIntyre.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../',
+            VERSION:'0.2',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

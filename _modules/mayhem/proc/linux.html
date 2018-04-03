@@ -1,0 +1,1016 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>mayhem.proc.linux &mdash; Mayhem 0.2 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="../../../genindex.html"/>
+        <link rel="search" title="Search" href="../../../search.html"/>
+    <link rel="top" title="Mayhem 0.2 documentation" href="../../../index.html"/>
+        <link rel="up" title="mayhem.proc" href="../proc.html"/> 
+
+  
+  <script src="../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> Mayhem
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../mayhem/index.html"><code class="docutils literal notranslate"><span class="pre">mayhem</span></code></a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Mayhem</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+          <li><a href="../proc.html">mayhem.proc</a> &raquo;</li>
+        
+      <li>mayhem.proc.linux</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for mayhem.proc.linux</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="c1">#</span>
+<span class="c1">#  mayhem/proc/linux.py</span>
+<span class="c1">#</span>
+<span class="c1">#  Redistribution and use in source and binary forms, with or without</span>
+<span class="c1">#  modification, are permitted provided that the following conditions are</span>
+<span class="c1">#  met:</span>
+<span class="c1">#</span>
+<span class="c1">#  * Redistributions of source code must retain the above copyright</span>
+<span class="c1">#    notice, this list of conditions and the following disclaimer.</span>
+<span class="c1">#  * Redistributions in binary form must reproduce the above</span>
+<span class="c1">#    copyright notice, this list of conditions and the following disclaimer</span>
+<span class="c1">#    in the documentation and/or other materials provided with the</span>
+<span class="c1">#    distribution.</span>
+<span class="c1">#  * Neither the name of the project nor the names of its</span>
+<span class="c1">#    contributors may be used to endorse or promote products derived from</span>
+<span class="c1">#    this software without specific prior written permission.</span>
+<span class="c1">#</span>
+<span class="c1">#  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS</span>
+<span class="c1">#  &quot;AS IS&quot; AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT</span>
+<span class="c1">#  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR</span>
+<span class="c1">#  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT</span>
+<span class="c1">#  OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,</span>
+<span class="c1">#  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT</span>
+<span class="c1">#  LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,</span>
+<span class="c1">#  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY</span>
+<span class="c1">#  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT</span>
+<span class="c1">#  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE</span>
+<span class="c1">#  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</span>
+<span class="c1">#</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">collections</span>
+<span class="kn">import</span> <span class="nn">ctypes</span>
+<span class="kn">import</span> <span class="nn">ctypes.util</span>
+<span class="kn">import</span> <span class="nn">select</span>
+<span class="kn">import</span> <span class="nn">struct</span>
+<span class="kn">import</span> <span class="nn">signal</span>
+<span class="kn">import</span> <span class="nn">platform</span>
+<span class="kn">import</span> <span class="nn">subprocess</span>
+
+<span class="kn">import</span> <span class="nn">mayhem.datatypes.elf</span>
+<span class="kn">import</span> <span class="nn">mayhem.proc</span>
+<span class="kn">import</span> <span class="nn">mayhem.utilities</span>
+
+<span class="n">elf</span> <span class="o">=</span> <span class="n">mayhem</span><span class="o">.</span><span class="n">datatypes</span><span class="o">.</span><span class="n">elf</span>
+<span class="n">libc</span> <span class="o">=</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">cdll</span><span class="o">.</span><span class="n">LoadLibrary</span><span class="p">(</span><span class="n">ctypes</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">find_library</span><span class="p">(</span><span class="s1">&#39;c&#39;</span><span class="p">))</span>
+<span class="n">ptrace</span> <span class="o">=</span> <span class="n">libc</span><span class="o">.</span><span class="n">ptrace</span>
+<span class="n">ptrace</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[</span><span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint</span><span class="p">,</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">c_int</span><span class="p">,</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">c_void_p</span><span class="p">,</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">c_void_p</span><span class="p">]</span>
+<span class="n">ptrace</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">c_long</span>
+
+<span class="n">CONSTANTS</span> <span class="o">=</span> <span class="p">{</span>
+	<span class="s1">&#39;PROT_NONE&#39;</span><span class="p">:</span> <span class="mh">0x00</span><span class="p">,</span>
+	<span class="s1">&#39;PROT_READ&#39;</span><span class="p">:</span> <span class="mh">0x01</span><span class="p">,</span>
+	<span class="s1">&#39;PROT_WRITE&#39;</span><span class="p">:</span> <span class="mh">0x02</span><span class="p">,</span>
+	<span class="s1">&#39;PROT_EXEC&#39;</span><span class="p">:</span> <span class="mh">0x04</span><span class="p">,</span>
+	<span class="s1">&#39;PROT_SEM&#39;</span><span class="p">:</span> <span class="mh">0x08</span><span class="p">,</span>
+
+	<span class="s1">&#39;MAP_SHARED&#39;</span><span class="p">:</span> <span class="mh">0x01</span><span class="p">,</span>
+	<span class="s1">&#39;MAP_PRIVATE&#39;</span><span class="p">:</span> <span class="mh">0x02</span><span class="p">,</span>
+	<span class="s1">&#39;MAP_FIXED&#39;</span><span class="p">:</span> <span class="mh">0x10</span><span class="p">,</span>
+	<span class="s1">&#39;MAP_ANONYMOUS&#39;</span><span class="p">:</span> <span class="mh">0x20</span><span class="p">,</span>
+
+	<span class="s1">&#39;RTLD_LOCAL&#39;</span><span class="p">:</span> <span class="mh">0x00</span><span class="p">,</span>
+	<span class="s1">&#39;RTLD_LAZY&#39;</span><span class="p">:</span> <span class="mh">0x01</span><span class="p">,</span>
+	<span class="s1">&#39;RTLD_NOW&#39;</span><span class="p">:</span> <span class="mh">0x02</span><span class="p">,</span>
+	<span class="s1">&#39;RTLD_DEEPBIND&#39;</span><span class="p">:</span> <span class="mh">0x0008</span><span class="p">,</span>
+	<span class="s1">&#39;RTLD_GLOBAL&#39;</span><span class="p">:</span> <span class="mh">0x0100</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="n">PTRACE_TRACEME</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">PTRACE_PEEKTEXT</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">PTRACE_PEEKDATA</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="n">PTRACE_PEEKUSR</span> <span class="o">=</span> <span class="mi">3</span>
+<span class="n">PTRACE_POKETEXT</span> <span class="o">=</span> <span class="mi">4</span>
+<span class="n">PTRACE_POKEDATA</span> <span class="o">=</span> <span class="mi">5</span>
+<span class="n">PTRACE_POKEUSR</span> <span class="o">=</span> <span class="mi">6</span>
+<span class="n">PTRACE_CONT</span> <span class="o">=</span> <span class="mi">7</span>
+<span class="n">PTRACE_KILL</span> <span class="o">=</span> <span class="mi">8</span>
+<span class="n">PTRACE_SINGLESTEP</span> <span class="o">=</span> <span class="mi">9</span>
+<span class="n">PTRACE_GETREGS</span> <span class="o">=</span> <span class="mi">12</span>
+<span class="n">PTRACE_SETREGS</span> <span class="o">=</span> <span class="mi">13</span>
+<span class="n">PTRACE_ATTACH</span> <span class="o">=</span> <span class="mi">16</span>
+<span class="n">PTRACE_DETACH</span> <span class="o">=</span> <span class="mi">17</span>
+<span class="n">PTRACE_SYSCALL</span> <span class="o">=</span> <span class="mi">24</span>
+
+<div class="viewcode-block" id="LinuxMemoryRegion"><a class="viewcode-back" href="../../../mayhem/proc/linux.html#mayhem.proc.linux.LinuxMemoryRegion">[docs]</a><span class="k">class</span> <span class="nc">LinuxMemoryRegion</span><span class="p">(</span><span class="n">mayhem</span><span class="o">.</span><span class="n">proc</span><span class="o">.</span><span class="n">MemoryRegion</span><span class="p">):</span>
+	<span class="sd">&quot;&quot;&quot;Describe a memory region on Linux.&quot;&quot;&quot;</span>
+	<span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">addr_low</span><span class="p">,</span> <span class="n">addr_high</span><span class="p">,</span> <span class="n">perms</span><span class="p">,</span> <span class="n">pathname</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">pathname</span> <span class="o">=</span> <span class="n">pathname</span>
+		<span class="sd">&quot;&quot;&quot;The file which mapped the region, if known.&quot;&quot;&quot;</span>
+		<span class="nb">super</span><span class="p">(</span><span class="n">LinuxMemoryRegion</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">addr_low</span><span class="p">,</span> <span class="n">addr_high</span><span class="p">,</span> <span class="n">perms</span><span class="p">)</span>
+
+	<span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">pathname</span><span class="p">:</span>
+			<span class="k">return</span> <span class="s2">&quot;</span><span class="si">{0:08x}</span><span class="s2">-</span><span class="si">{1:08x}</span><span class="s2"> </span><span class="si">{2}</span><span class="s2"> </span><span class="si">{3}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">addr_low</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">addr_high</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">perms</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">pathname</span><span class="p">)</span>
+		<span class="k">else</span><span class="p">:</span>
+			<span class="k">return</span> <span class="s2">&quot;</span><span class="si">{0:08x}</span><span class="s2">-</span><span class="si">{1:08x}</span><span class="s2"> </span><span class="si">{2}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">addr_low</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">addr_high</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">perms</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="LinuxProcessError"><a class="viewcode-back" href="../../../mayhem/proc/linux.html#mayhem.proc.linux.LinuxProcessError">[docs]</a><span class="k">class</span> <span class="nc">LinuxProcessError</span><span class="p">(</span><span class="n">mayhem</span><span class="o">.</span><span class="n">proc</span><span class="o">.</span><span class="n">ProcessError</span><span class="p">):</span>
+	<span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">errno</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;errno&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+		<span class="sd">&quot;&quot;&quot;The libc error number at the time the exception was raised.&quot;&quot;&quot;</span>
+		<span class="nb">super</span><span class="p">(</span><span class="n">LinuxProcessError</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="get_errno"><a class="viewcode-back" href="../../../mayhem/proc/linux.html#mayhem.proc.linux.get_errno">[docs]</a><span class="k">def</span> <span class="nf">get_errno</span><span class="p">():</span>
+	<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">	Get the value of the error from the last function call.</span>
+
+<span class="sd">	:return: The error number from libc.</span>
+<span class="sd">	:rtype: int</span>
+<span class="sd">	&quot;&quot;&quot;</span>
+	<span class="n">get_errno_loc</span> <span class="o">=</span> <span class="n">libc</span><span class="o">.</span><span class="n">__errno_location</span>
+	<span class="n">get_errno_loc</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">POINTER</span><span class="p">(</span><span class="n">ctypes</span><span class="o">.</span><span class="n">c_int</span><span class="p">)</span>
+	<span class="k">return</span> <span class="n">get_errno_loc</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="parse_proc_maps"><a class="viewcode-back" href="../../../mayhem/proc/linux.html#mayhem.proc.linux.parse_proc_maps">[docs]</a><span class="k">def</span> <span class="nf">parse_proc_maps</span><span class="p">(</span><span class="n">pid</span><span class="p">):</span>
+	<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">	Parse the memory maps file for *pid* into a dictionary of</span>
+<span class="sd">	:py:class:`.LinuxMemoryRegion` objects with keys of their starting</span>
+<span class="sd">	address.</span>
+
+<span class="sd">	:param int pid: The pid to parse the maps file from /proc for.</span>
+<span class="sd">	:return: The parsed memory regions for *pid*.</span>
+<span class="sd">	:rtype: dict</span>
+<span class="sd">	&quot;&quot;&quot;</span>
+	<span class="n">_maps</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">deque</span><span class="p">()</span>
+	<span class="n">maps_h</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;/proc/&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">pid</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;/maps&#39;</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span>
+	<span class="k">for</span> <span class="n">memory_region</span> <span class="ow">in</span> <span class="n">maps_h</span><span class="p">:</span>
+		<span class="n">memory_region</span> <span class="o">=</span> <span class="n">memory_region</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+		<span class="n">pathname</span> <span class="o">=</span> <span class="kc">None</span>
+		<span class="k">if</span> <span class="n">memory_region</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+			<span class="n">pathname</span> <span class="o">=</span> <span class="n">memory_region</span><span class="p">[</span><span class="n">memory_region</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">):]</span>
+		<span class="n">memory_region</span> <span class="o">=</span> <span class="n">memory_region</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+		<span class="n">addr_low</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">addr_high</span> <span class="o">=</span> <span class="n">memory_region</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">partition</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="p">)</span>
+		<span class="n">addr_low</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">addr_low</span><span class="p">,</span> <span class="mi">16</span><span class="p">)</span>
+		<span class="n">addr_high</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">addr_high</span><span class="p">,</span> <span class="mi">16</span><span class="p">)</span>
+		<span class="n">perms</span> <span class="o">=</span> <span class="n">memory_region</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+		<span class="k">if</span> <span class="n">pathname</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">memory_region</span><span class="p">)</span> <span class="o">==</span> <span class="mi">6</span><span class="p">:</span>
+			<span class="n">pathname</span> <span class="o">=</span> <span class="n">memory_region</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span>
+		<span class="n">_maps</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">LinuxMemoryRegion</span><span class="p">(</span><span class="n">addr_low</span><span class="p">,</span> <span class="n">addr_high</span><span class="p">,</span> <span class="n">perms</span><span class="p">,</span> <span class="n">pathname</span><span class="p">))</span>
+	<span class="k">return</span> <span class="n">collections</span><span class="o">.</span><span class="n">OrderedDict</span><span class="p">((</span><span class="n">mr</span><span class="o">.</span><span class="n">addr_low</span><span class="p">,</span> <span class="n">mr</span><span class="p">)</span> <span class="k">for</span> <span class="n">mr</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">_maps</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">mr</span><span class="p">:</span> <span class="n">mr</span><span class="o">.</span><span class="n">addr_low</span><span class="p">))</span></div>
+
+<span class="k">def</span> <span class="nf">architecture_is_supported</span><span class="p">(</span><span class="n">arch</span><span class="p">):</span>
+	<span class="k">return</span> <span class="n">mayhem</span><span class="o">.</span><span class="n">utilities</span><span class="o">.</span><span class="n">architecture_is_32bit</span><span class="p">(</span><span class="n">arch</span><span class="p">)</span> <span class="ow">or</span> <span class="n">mayhem</span><span class="o">.</span><span class="n">utilities</span><span class="o">.</span><span class="n">architecture_is_64bit</span><span class="p">(</span><span class="n">arch</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">flags</span><span class="p">(</span><span class="n">flags</span><span class="p">):</span>
+	<span class="n">supported_operators</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;|&#39;</span><span class="p">,</span> <span class="s1">&#39;+&#39;</span><span class="p">,</span> <span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="s1">&#39;^&#39;</span><span class="p">]</span>
+	<span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">flags</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+		<span class="k">return</span> <span class="n">flags</span>
+	<span class="k">if</span> <span class="n">flags</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;(&#39;</span> <span class="ow">and</span> <span class="n">flags</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;)&#39;</span><span class="p">:</span>
+		<span class="n">flags</span> <span class="o">=</span> <span class="n">flags</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+	<span class="k">for</span> <span class="n">sop</span> <span class="ow">in</span> <span class="n">supported_operators</span><span class="p">:</span>
+		<span class="n">flags</span> <span class="o">=</span> <span class="n">flags</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">sop</span><span class="p">,</span> <span class="s1">&#39; &#39;</span> <span class="o">+</span> <span class="n">sop</span> <span class="o">+</span> <span class="s1">&#39; &#39;</span><span class="p">)</span>
+	<span class="n">flags</span>
+	<span class="n">flags</span> <span class="o">=</span> <span class="n">flags</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+	<span class="n">parsed_flags</span> <span class="o">=</span> <span class="mi">0</span>
+	<span class="n">last_operator</span> <span class="o">=</span> <span class="kc">None</span>
+	<span class="k">for</span> <span class="n">part</span> <span class="ow">in</span> <span class="n">flags</span><span class="p">:</span>
+		<span class="k">if</span> <span class="n">part</span> <span class="ow">in</span> <span class="n">CONSTANTS</span><span class="p">:</span>
+			<span class="n">part</span> <span class="o">=</span> <span class="n">CONSTANTS</span><span class="p">[</span><span class="n">part</span><span class="p">]</span>
+		<span class="k">elif</span> <span class="n">part</span> <span class="ow">in</span> <span class="n">supported_operators</span><span class="p">:</span>
+			<span class="n">last_operator</span> <span class="o">=</span> <span class="n">part</span>
+			<span class="k">continue</span>
+		<span class="k">else</span><span class="p">:</span>
+			<span class="k">if</span> <span class="n">part</span><span class="o">.</span><span class="n">isdigit</span><span class="p">():</span>
+				<span class="n">part</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">part</span><span class="p">)</span>
+			<span class="k">elif</span> <span class="n">part</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;0x&#39;</span><span class="p">):</span>
+				<span class="n">part</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">part</span><span class="p">[</span><span class="mi">2</span><span class="p">:],</span> <span class="mi">16</span><span class="p">)</span>
+			<span class="k">else</span><span class="p">:</span>
+				<span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;unknown token: &#39;</span> <span class="o">+</span> <span class="n">part</span><span class="p">)</span>
+		<span class="k">if</span> <span class="n">last_operator</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+			<span class="n">parsed_flags</span> <span class="o">=</span> <span class="n">part</span>
+		<span class="k">else</span><span class="p">:</span>
+			<span class="n">parsed_flags</span> <span class="o">=</span> <span class="nb">eval</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">parsed_flags</span><span class="p">)</span> <span class="o">+</span> <span class="n">last_operator</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">part</span><span class="p">))</span>
+	<span class="k">return</span> <span class="n">parsed_flags</span>
+
+<div class="viewcode-block" id="LinuxProcess"><a class="viewcode-back" href="../../../mayhem/proc/linux.html#mayhem.proc.linux.LinuxProcess">[docs]</a><span class="k">class</span> <span class="nc">LinuxProcess</span><span class="p">(</span><span class="n">mayhem</span><span class="o">.</span><span class="n">proc</span><span class="o">.</span><span class="n">ProcessBase</span><span class="p">):</span>
+	<span class="sd">&quot;&quot;&quot;This class represents a process in a POSIX Linux environment.&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="LinuxProcess.__init__"><a class="viewcode-back" href="../../../mayhem/proc/linux.html#mayhem.proc.linux.LinuxProcess.__init__">[docs]</a>	<span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pid</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">exe</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+		<span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">system</span><span class="p">()</span> <span class="o">!=</span> <span class="s1">&#39;Linux&#39;</span><span class="p">:</span>
+			<span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;incompatible platform&#39;</span><span class="p">)</span>
+		<span class="c1"># Ensure that we are running in a version of python that matches the native architecture of the system.</span>
+		<span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">architecture</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;32bit&#39;</span><span class="p">:</span>
+			<span class="k">if</span> <span class="ow">not</span> <span class="n">mayhem</span><span class="o">.</span><span class="n">utilities</span><span class="o">.</span><span class="n">architecture_is_32bit</span><span class="p">(</span><span class="n">platform</span><span class="o">.</span><span class="n">machine</span><span class="p">()):</span>
+				<span class="k">raise</span> <span class="n">LinuxProcessError</span><span class="p">(</span><span class="s1">&#39;Running a 32-bit version of Python on a non x86 system is not supported&#39;</span><span class="p">)</span>
+		<span class="k">elif</span> <span class="n">platform</span><span class="o">.</span><span class="n">architecture</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;64bit&#39;</span><span class="p">:</span>
+			<span class="k">if</span> <span class="ow">not</span> <span class="n">mayhem</span><span class="o">.</span><span class="n">utilities</span><span class="o">.</span><span class="n">architecture_is_64bit</span><span class="p">(</span><span class="n">platform</span><span class="o">.</span><span class="n">machine</span><span class="p">()):</span>
+				<span class="k">raise</span> <span class="n">LinuxProcessError</span><span class="p">(</span><span class="s1">&#39;Running a 64-bit version of Python on a non x86-64 system is not supported&#39;</span><span class="p">)</span>
+		<span class="k">else</span><span class="p">:</span>
+			<span class="k">raise</span> <span class="n">LinuxProcessError</span><span class="p">(</span><span class="s1">&#39;Could not determine the Python version&#39;</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">_proc_h</span> <span class="o">=</span> <span class="kc">None</span>
+		<span class="n">signal</span><span class="o">.</span><span class="n">signal</span><span class="p">(</span><span class="n">signal</span><span class="o">.</span><span class="n">SIGCHLD</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_signal_sigchld</span><span class="p">)</span>
+		<span class="k">if</span> <span class="n">exe</span><span class="p">:</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">_proc_h</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">([</span><span class="n">exe</span><span class="p">],</span> <span class="n">stdin</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span> <span class="n">stdout</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span> <span class="n">close_fds</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+			<span class="n">pid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_proc_h</span><span class="o">.</span><span class="n">pid</span>
+		<span class="k">if</span> <span class="n">pid</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+			<span class="n">pid</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">fork</span><span class="p">()</span>
+			<span class="k">if</span> <span class="n">pid</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+				<span class="n">select</span><span class="o">.</span><span class="n">select</span><span class="p">([],</span> <span class="p">[],</span> <span class="p">[],</span> <span class="kc">None</span><span class="p">)</span>
+			<span class="n">select</span><span class="o">.</span><span class="n">select</span><span class="p">([],</span> <span class="p">[],</span> <span class="p">[],</span> <span class="mf">0.50</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">handle</span> <span class="o">=</span> <span class="n">pid</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">pid</span> <span class="o">=</span> <span class="n">pid</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">exe_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">readlink</span><span class="p">(</span><span class="s1">&#39;/proc/&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pid</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;/exe&#39;</span><span class="p">)</span>
+		<span class="n">ei_ident</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">exe_file</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">elf</span><span class="o">.</span><span class="n">constants</span><span class="o">.</span><span class="n">EI_NIDENT</span><span class="p">)</span>
+		<span class="k">if</span> <span class="n">ei_ident</span><span class="p">[</span><span class="n">elf</span><span class="o">.</span><span class="n">constants</span><span class="o">.</span><span class="n">EI_CLASS</span><span class="p">]</span> <span class="o">==</span> <span class="n">elf</span><span class="o">.</span><span class="n">constants</span><span class="o">.</span><span class="n">ELFCLASS32</span><span class="p">:</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">__arch__</span> <span class="o">=</span> <span class="s1">&#39;x86&#39;</span>
+		<span class="k">elif</span> <span class="n">ei_ident</span><span class="p">[</span><span class="n">elf</span><span class="o">.</span><span class="n">constants</span><span class="o">.</span><span class="n">EI_CLASS</span><span class="p">]</span> <span class="o">==</span> <span class="n">elf</span><span class="o">.</span><span class="n">constants</span><span class="o">.</span><span class="n">ELFCLASS64</span><span class="p">:</span>
+			<span class="k">if</span> <span class="n">mayhem</span><span class="o">.</span><span class="n">utilities</span><span class="o">.</span><span class="n">architecture_is_32bit</span><span class="p">(</span><span class="n">platform</span><span class="o">.</span><span class="n">machine</span><span class="p">()):</span>
+				<span class="k">raise</span> <span class="n">LinuxProcessError</span><span class="p">(</span><span class="s1">&#39;Controlling a 64-bit process from a 32-bit process is not supported&#39;</span><span class="p">)</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">__arch__</span> <span class="o">=</span> <span class="s1">&#39;x86_64&#39;</span>
+		<span class="k">else</span><span class="p">:</span>
+			<span class="k">raise</span> <span class="n">LinuxProcessError</span><span class="p">(</span><span class="s1">&#39;Unsupported EI_CLASS &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">ei_ident</span><span class="p">[</span><span class="n">elf</span><span class="o">.</span><span class="n">constants</span><span class="o">.</span><span class="n">EI_CLASS</span><span class="p">]))</span>
+		<span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ptrace</span><span class="p">(</span><span class="n">PTRACE_ATTACH</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+			<span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;could not open PID&#39;</span><span class="p">)</span>
+		<span class="n">os</span><span class="o">.</span><span class="n">waitpid</span><span class="p">(</span><span class="n">pid</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">_installed_hooks</span> <span class="o">=</span> <span class="p">[]</span></div>
+
+	<span class="k">def</span> <span class="nf">_signal_sigchld</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">signum</span><span class="p">,</span> <span class="n">frame</span><span class="p">):</span>
+		<span class="n">os</span><span class="o">.</span><span class="n">waitpid</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pid</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">WNOHANG</span><span class="p">)</span>
+
+	<span class="nd">@property</span>
+	<span class="k">def</span> <span class="nf">maps</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="k">return</span> <span class="n">parse_proc_maps</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pid</span><span class="p">)</span>
+
+<div class="viewcode-block" id="LinuxProcess.get_proc_attribute"><a class="viewcode-back" href="../../../mayhem/proc/linux.html#mayhem.proc.linux.LinuxProcess.get_proc_attribute">[docs]</a>	<span class="k">def</span> <span class="nf">get_proc_attribute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attribute</span><span class="p">):</span>
+		<span class="n">requested_attribute</span> <span class="o">=</span> <span class="n">attribute</span>
+		<span class="k">if</span> <span class="n">attribute</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;&amp;&#39;</span><span class="p">):</span>
+			<span class="n">attribute</span> <span class="o">=</span> <span class="n">attribute</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">+</span> <span class="s1">&#39;_addr&#39;</span>
+		<span class="k">if</span> <span class="n">attribute</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;elf_&#39;</span><span class="p">):</span>
+			<span class="k">if</span> <span class="n">mayhem</span><span class="o">.</span><span class="n">utilities</span><span class="o">.</span><span class="n">architecture_is_32bit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__arch__</span><span class="p">):</span>
+				<span class="n">attribute</span> <span class="o">=</span> <span class="s1">&#39;elf32_&#39;</span> <span class="o">+</span> <span class="n">attribute</span><span class="p">[</span><span class="mi">4</span><span class="p">:]</span>
+			<span class="k">elif</span> <span class="n">mayhem</span><span class="o">.</span><span class="n">utilities</span><span class="o">.</span><span class="n">architecture_is_64bit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__arch__</span><span class="p">):</span>
+				<span class="n">attribute</span> <span class="o">=</span> <span class="s1">&#39;elf64_&#39;</span> <span class="o">+</span> <span class="n">attribute</span><span class="p">[</span><span class="mi">4</span><span class="p">:]</span>
+		<span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_get_attr_&#39;</span> <span class="o">+</span> <span class="n">attribute</span><span class="p">):</span>
+			<span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_get_attr_&#39;</span> <span class="o">+</span> <span class="n">attribute</span><span class="p">)()</span>
+		<span class="k">elif</span> <span class="ow">not</span> <span class="n">attribute</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;_addr&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">attribute</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;elf32_&#39;</span><span class="p">):</span>
+			<span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_get_attr_&#39;</span> <span class="o">+</span> <span class="n">attribute</span> <span class="o">+</span> <span class="s1">&#39;_addr&#39;</span><span class="p">):</span>
+				<span class="n">address</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_get_attr_&#39;</span> <span class="o">+</span> <span class="n">attribute</span> <span class="o">+</span> <span class="s1">&#39;_addr&#39;</span><span class="p">)()</span>
+				<span class="n">attribute</span> <span class="o">=</span> <span class="s1">&#39;Elf32_&#39;</span> <span class="o">+</span> <span class="n">attribute</span><span class="p">[</span><span class="mi">6</span><span class="p">:]</span><span class="o">.</span><span class="n">title</span><span class="p">()</span>
+				<span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">elf</span><span class="p">,</span> <span class="n">attribute</span><span class="p">):</span>
+					<span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_structure_from_memory</span><span class="p">(</span><span class="n">address</span><span class="p">,</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">elf</span><span class="p">,</span> <span class="n">attribute</span><span class="p">))</span>
+		<span class="k">elif</span> <span class="ow">not</span> <span class="n">attribute</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;_addr&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">attribute</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;elf64_&#39;</span><span class="p">):</span>
+			<span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_get_attr_&#39;</span> <span class="o">+</span> <span class="n">attribute</span> <span class="o">+</span> <span class="s1">&#39;_addr&#39;</span><span class="p">):</span>
+				<span class="n">address</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_get_attr_&#39;</span> <span class="o">+</span> <span class="n">attribute</span> <span class="o">+</span> <span class="s1">&#39;_addr&#39;</span><span class="p">)()</span>
+				<span class="n">attribute</span> <span class="o">=</span> <span class="s1">&#39;Elf64_&#39;</span> <span class="o">+</span> <span class="n">attribute</span><span class="p">[</span><span class="mi">6</span><span class="p">:]</span><span class="o">.</span><span class="n">title</span><span class="p">()</span>
+				<span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">elf</span><span class="p">,</span> <span class="n">attribute</span><span class="p">):</span>
+					<span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_structure_from_memory</span><span class="p">(</span><span class="n">address</span><span class="p">,</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">elf</span><span class="p">,</span> <span class="n">attribute</span><span class="p">))</span>
+		<span class="k">raise</span> <span class="n">mayhem</span><span class="o">.</span><span class="n">proc</span><span class="o">.</span><span class="n">ProcessError</span><span class="p">(</span><span class="s1">&#39;Unknown Attribute: &#39;</span> <span class="o">+</span> <span class="n">requested_attribute</span><span class="p">)</span></div>
+
+	<span class="k">def</span> <span class="nf">_get_attr_elf32_ehdr_addr</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="k">for</span> <span class="n">mem_region</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">maps</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+			<span class="k">if</span> <span class="n">mem_region</span><span class="o">.</span><span class="n">pathname</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">exe_file</span><span class="p">:</span>
+				<span class="k">continue</span>
+			<span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_memory</span><span class="p">(</span><span class="n">mem_region</span><span class="o">.</span><span class="n">addr_low</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span> <span class="o">==</span> <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x7f</span><span class="s1">ELF&#39;</span><span class="p">:</span>
+				<span class="k">return</span> <span class="n">mem_region</span><span class="o">.</span><span class="n">addr_low</span>
+		<span class="k">raise</span> <span class="n">LinuxProcessError</span><span class="p">(</span><span class="s1">&#39;could not locate ehdr&#39;</span><span class="p">)</span>
+
+	<span class="k">def</span> <span class="nf">_get_attr_elf32_phdr_addr</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="n">ehdr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_proc_attribute</span><span class="p">(</span><span class="s1">&#39;elf32_ehdr&#39;</span><span class="p">)</span>
+		<span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_proc_attribute</span><span class="p">(</span><span class="s1">&#39;elf32_ehdr_addr&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="n">ehdr</span><span class="o">.</span><span class="n">e_phoff</span>
+
+	<span class="k">def</span> <span class="nf">_get_attr_elf32_shdr</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="n">ehdr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_proc_attribute</span><span class="p">(</span><span class="s1">&#39;elf32_ehdr&#39;</span><span class="p">)</span>
+		<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;/proc/&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pid</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;/exe&#39;</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">handle</span><span class="p">:</span>
+			<span class="n">handle</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="n">ehdr</span><span class="o">.</span><span class="n">e_shoff</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">SEEK_SET</span><span class="p">)</span>
+			<span class="n">data</span> <span class="o">=</span> <span class="n">handle</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">ehdr</span><span class="o">.</span><span class="n">e_shnum</span> <span class="o">*</span> <span class="n">ehdr</span><span class="o">.</span><span class="n">e_shentsize</span><span class="p">)</span>
+		<span class="n">_shdr</span> <span class="o">=</span> <span class="p">(</span><span class="n">elf</span><span class="o">.</span><span class="n">Elf32_Shdr</span> <span class="o">*</span> <span class="n">ehdr</span><span class="o">.</span><span class="n">e_shnum</span><span class="p">)</span>
+		<span class="n">shdr</span> <span class="o">=</span> <span class="n">_shdr</span><span class="p">()</span>
+		<span class="n">ctypes</span><span class="o">.</span><span class="n">memmove</span><span class="p">(</span><span class="n">ctypes</span><span class="o">.</span><span class="n">byref</span><span class="p">(</span><span class="n">shdr</span><span class="p">),</span> <span class="n">data</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">))</span>
+		<span class="k">return</span> <span class="n">shdr</span>
+
+	<span class="k">def</span> <span class="nf">_get_attr_elf32_dyn_addr</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="n">phdr_addr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_proc_attribute</span><span class="p">(</span><span class="s1">&#39;elf32_phdr_addr&#39;</span><span class="p">)</span>
+		<span class="n">phdr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_structure_from_memory</span><span class="p">(</span><span class="n">phdr_addr</span><span class="p">,</span> <span class="n">elf</span><span class="o">.</span><span class="n">Elf32_Phdr</span><span class="p">)</span>
+		<span class="n">idx</span> <span class="o">=</span> <span class="mi">0</span>
+		<span class="k">while</span> <span class="n">phdr</span><span class="o">.</span><span class="n">p_type</span> <span class="o">!=</span> <span class="n">elf</span><span class="o">.</span><span class="n">constants</span><span class="o">.</span><span class="n">PT_DYNAMIC</span><span class="p">:</span>
+			<span class="n">idx</span> <span class="o">+=</span> <span class="mi">1</span>
+			<span class="n">next_phdr_addr</span> <span class="o">=</span> <span class="n">phdr_addr</span> <span class="o">+</span> <span class="p">(</span><span class="n">ctypes</span><span class="o">.</span><span class="n">sizeof</span><span class="p">(</span><span class="n">elf</span><span class="o">.</span><span class="n">Elf32_Phdr</span><span class="p">)</span> <span class="o">*</span> <span class="n">idx</span><span class="p">)</span>
+			<span class="n">phdr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_structure_from_memory</span><span class="p">(</span><span class="n">next_phdr_addr</span><span class="p">,</span> <span class="n">elf</span><span class="o">.</span><span class="n">Elf32_Phdr</span><span class="p">)</span>
+		<span class="k">return</span> <span class="n">phdr</span><span class="o">.</span><span class="n">p_vaddr</span>
+
+	<span class="k">def</span> <span class="nf">_get_attr_elf64_ehdr_addr</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="k">for</span> <span class="n">mem_region</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">maps</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+			<span class="k">if</span> <span class="n">mem_region</span><span class="o">.</span><span class="n">pathname</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">exe_file</span><span class="p">:</span>
+				<span class="k">continue</span>
+			<span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_memory</span><span class="p">(</span><span class="n">mem_region</span><span class="o">.</span><span class="n">addr_low</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span> <span class="o">==</span> <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x7f</span><span class="s1">ELF&#39;</span><span class="p">:</span>
+				<span class="k">return</span> <span class="n">mem_region</span><span class="o">.</span><span class="n">addr_low</span>
+		<span class="k">raise</span> <span class="n">LinuxProcessError</span><span class="p">(</span><span class="s1">&#39;could not locate ehdr&#39;</span><span class="p">)</span>
+
+	<span class="k">def</span> <span class="nf">_get_attr_elf64_phdr_addr</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="n">ehdr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_proc_attribute</span><span class="p">(</span><span class="s1">&#39;elf64_ehdr&#39;</span><span class="p">)</span>
+		<span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_proc_attribute</span><span class="p">(</span><span class="s1">&#39;elf64_ehdr_addr&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="n">ehdr</span><span class="o">.</span><span class="n">e_phoff</span>
+
+	<span class="k">def</span> <span class="nf">_get_attr_elf64_shdr</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="n">ehdr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_proc_attribute</span><span class="p">(</span><span class="s1">&#39;elf64_ehdr&#39;</span><span class="p">)</span>
+		<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;/proc/&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pid</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;/exe&#39;</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">handle</span><span class="p">:</span>
+			<span class="n">handle</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="n">ehdr</span><span class="o">.</span><span class="n">e_shoff</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">SEEK_SET</span><span class="p">)</span>
+			<span class="n">data</span> <span class="o">=</span> <span class="n">handle</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">ehdr</span><span class="o">.</span><span class="n">e_shnum</span> <span class="o">*</span> <span class="n">ehdr</span><span class="o">.</span><span class="n">e_shentsize</span><span class="p">)</span>
+		<span class="n">_shdr</span> <span class="o">=</span> <span class="p">(</span><span class="n">elf</span><span class="o">.</span><span class="n">Elf64_Shdr</span> <span class="o">*</span> <span class="n">ehdr</span><span class="o">.</span><span class="n">e_shnum</span><span class="p">)</span>
+		<span class="n">shdr</span> <span class="o">=</span> <span class="n">_shdr</span><span class="p">()</span>
+		<span class="n">ctypes</span><span class="o">.</span><span class="n">memmove</span><span class="p">(</span><span class="n">ctypes</span><span class="o">.</span><span class="n">byref</span><span class="p">(</span><span class="n">shdr</span><span class="p">),</span> <span class="n">data</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">))</span>
+		<span class="k">return</span> <span class="n">shdr</span>
+
+	<span class="k">def</span> <span class="nf">_get_attr_elf64_dyn_addr</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="n">phdr_addr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_proc_attribute</span><span class="p">(</span><span class="s1">&#39;elf64_phdr_addr&#39;</span><span class="p">)</span>
+		<span class="n">phdr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_structure_from_memory</span><span class="p">(</span><span class="n">phdr_addr</span><span class="p">,</span> <span class="n">elf</span><span class="o">.</span><span class="n">Elf64_Phdr</span><span class="p">)</span>
+		<span class="n">idx</span> <span class="o">=</span> <span class="mi">0</span>
+		<span class="k">while</span> <span class="n">phdr</span><span class="o">.</span><span class="n">p_type</span> <span class="o">!=</span> <span class="n">elf</span><span class="o">.</span><span class="n">constants</span><span class="o">.</span><span class="n">PT_DYNAMIC</span><span class="p">:</span>
+			<span class="n">idx</span> <span class="o">+=</span> <span class="mi">1</span>
+			<span class="n">next_phdr_addr</span> <span class="o">=</span> <span class="n">phdr_addr</span> <span class="o">+</span> <span class="p">(</span><span class="n">ctypes</span><span class="o">.</span><span class="n">sizeof</span><span class="p">(</span><span class="n">elf</span><span class="o">.</span><span class="n">Elf64_Phdr</span><span class="p">)</span> <span class="o">*</span> <span class="n">idx</span><span class="p">)</span>
+			<span class="n">phdr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_structure_from_memory</span><span class="p">(</span><span class="n">next_phdr_addr</span><span class="p">,</span> <span class="n">elf</span><span class="o">.</span><span class="n">Elf64_Phdr</span><span class="p">)</span>
+		<span class="k">return</span> <span class="n">phdr</span><span class="o">.</span><span class="n">p_vaddr</span>
+
+	<span class="k">def</span> <span class="nf">_get_attr_got_addr</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="k">if</span> <span class="n">mayhem</span><span class="o">.</span><span class="n">utilities</span><span class="o">.</span><span class="n">architecture_is_32bit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__arch__</span><span class="p">):</span>
+			<span class="n">dyn_struct</span> <span class="o">=</span> <span class="n">elf</span><span class="o">.</span><span class="n">Elf32_Dyn</span>
+		<span class="k">elif</span> <span class="n">mayhem</span><span class="o">.</span><span class="n">utilities</span><span class="o">.</span><span class="n">architecture_is_64bit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__arch__</span><span class="p">):</span>
+			<span class="n">dyn_struct</span> <span class="o">=</span> <span class="n">elf</span><span class="o">.</span><span class="n">Elf64_Dyn</span>
+		<span class="k">else</span><span class="p">:</span>
+			<span class="k">raise</span> <span class="n">LinuxProcessError</span><span class="p">(</span><span class="s1">&#39;unsupported architecture: &#39;</span> <span class="o">+</span> <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__arch__</span><span class="p">))</span>
+		<span class="n">dyn_addr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_proc_attribute</span><span class="p">(</span><span class="s1">&#39;elf_dyn_addr&#39;</span><span class="p">)</span>
+		<span class="n">dyn</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_structure_from_memory</span><span class="p">(</span><span class="n">dyn_addr</span><span class="p">,</span> <span class="n">dyn_struct</span><span class="p">)</span>
+		<span class="n">idx</span> <span class="o">=</span> <span class="mi">0</span>
+		<span class="k">while</span> <span class="n">dyn</span><span class="o">.</span><span class="n">d_tag</span> <span class="o">!=</span> <span class="n">elf</span><span class="o">.</span><span class="n">constants</span><span class="o">.</span><span class="n">DT_PLTGOT</span><span class="p">:</span>
+			<span class="n">idx</span> <span class="o">+=</span> <span class="mi">1</span>
+			<span class="n">next_dyn_addr</span> <span class="o">=</span> <span class="n">dyn_addr</span> <span class="o">+</span> <span class="p">(</span><span class="n">ctypes</span><span class="o">.</span><span class="n">sizeof</span><span class="p">(</span><span class="n">dyn_struct</span><span class="p">)</span> <span class="o">*</span> <span class="n">idx</span><span class="p">)</span>
+			<span class="n">dyn</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_structure_from_memory</span><span class="p">(</span><span class="n">next_dyn_addr</span><span class="p">,</span> <span class="n">dyn_struct</span><span class="p">)</span>
+		<span class="k">return</span> <span class="n">dyn</span><span class="o">.</span><span class="n">d_un</span><span class="o">.</span><span class="n">d_ptr</span>
+
+	<span class="k">def</span> <span class="nf">_get_attr_link_map_addr</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="n">got_addr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_proc_attribute</span><span class="p">(</span><span class="s1">&#39;got_addr&#39;</span><span class="p">)</span>
+		<span class="k">if</span> <span class="n">mayhem</span><span class="o">.</span><span class="n">utilities</span><span class="o">.</span><span class="n">architecture_is_32bit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__arch__</span><span class="p">):</span>
+			<span class="k">return</span> <span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="s1">&#39;II&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_memory</span><span class="p">(</span><span class="n">got_addr</span><span class="p">,</span> <span class="mi">8</span><span class="p">))[</span><span class="mi">1</span><span class="p">]</span>
+		<span class="k">elif</span> <span class="n">mayhem</span><span class="o">.</span><span class="n">utilities</span><span class="o">.</span><span class="n">architecture_is_64bit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__arch__</span><span class="p">):</span>
+			<span class="k">return</span> <span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="s1">&#39;QQ&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_memory</span><span class="p">(</span><span class="n">got_addr</span><span class="p">,</span> <span class="mi">16</span><span class="p">))[</span><span class="mi">1</span><span class="p">]</span>
+		<span class="k">else</span><span class="p">:</span>
+			<span class="k">raise</span> <span class="n">LinuxProcessError</span><span class="p">(</span><span class="s1">&#39;unsupported architecture: &#39;</span> <span class="o">+</span> <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__arch__</span><span class="p">))</span>
+
+	<span class="k">def</span> <span class="nf">_get_function_address</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mod_name</span><span class="p">,</span> <span class="n">func_name</span><span class="p">):</span>
+		<span class="k">if</span> <span class="n">mayhem</span><span class="o">.</span><span class="n">utilities</span><span class="o">.</span><span class="n">architecture_is_32bit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__arch__</span><span class="p">):</span>
+			<span class="n">ehdr_struct</span> <span class="o">=</span> <span class="n">elf</span><span class="o">.</span><span class="n">Elf32_Ehdr</span>
+			<span class="n">shdr_struct</span> <span class="o">=</span> <span class="n">elf</span><span class="o">.</span><span class="n">Elf32_Shdr</span>
+			<span class="n">sym_struct</span> <span class="o">=</span> <span class="n">elf</span><span class="o">.</span><span class="n">Elf32_Sym</span>
+		<span class="k">elif</span> <span class="n">mayhem</span><span class="o">.</span><span class="n">utilities</span><span class="o">.</span><span class="n">architecture_is_64bit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__arch__</span><span class="p">):</span>
+			<span class="n">ehdr_struct</span> <span class="o">=</span> <span class="n">elf</span><span class="o">.</span><span class="n">Elf64_Ehdr</span>
+			<span class="n">shdr_struct</span> <span class="o">=</span> <span class="n">elf</span><span class="o">.</span><span class="n">Elf64_Shdr</span>
+			<span class="n">sym_struct</span> <span class="o">=</span> <span class="n">elf</span><span class="o">.</span><span class="n">Elf64_Sym</span>
+		<span class="k">else</span><span class="p">:</span>
+			<span class="k">raise</span> <span class="n">LinuxProcessError</span><span class="p">(</span><span class="s1">&#39;unsupported architecture: &#39;</span> <span class="o">+</span> <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__arch__</span><span class="p">))</span>
+
+		<span class="n">func_name</span> <span class="o">=</span> <span class="n">func_name</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x00</span><span class="s1">&#39;</span>
+		<span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isabs</span><span class="p">(</span><span class="n">mod_name</span><span class="p">):</span>
+			<span class="n">exe_maps</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">mr</span> <span class="k">for</span> <span class="n">mr</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">maps</span><span class="o">.</span><span class="n">values</span><span class="p">()</span> <span class="k">if</span> <span class="n">mr</span><span class="o">.</span><span class="n">pathname</span> <span class="o">==</span> <span class="n">mod_name</span><span class="p">)</span>
+			<span class="n">filename</span> <span class="o">=</span> <span class="n">mod_name</span>
+		<span class="k">else</span><span class="p">:</span>
+			<span class="n">exe_maps</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">mr</span> <span class="k">for</span> <span class="n">mr</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">maps</span><span class="o">.</span><span class="n">values</span><span class="p">()</span> <span class="k">if</span> <span class="n">mr</span><span class="o">.</span><span class="n">pathname</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">mr</span><span class="o">.</span><span class="n">pathname</span><span class="p">)</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">mod_name</span><span class="p">))</span>
+			<span class="n">filename</span> <span class="o">=</span> <span class="n">exe_maps</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">pathname</span>
+		<span class="n">handle</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span>
+		<span class="n">ehdr</span> <span class="o">=</span> <span class="n">mayhem</span><span class="o">.</span><span class="n">utilities</span><span class="o">.</span><span class="n">struct_unpack</span><span class="p">(</span><span class="n">ehdr_struct</span><span class="p">,</span> <span class="n">handle</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">ctypes</span><span class="o">.</span><span class="n">sizeof</span><span class="p">(</span><span class="n">ehdr_struct</span><span class="p">)))</span>
+
+		<span class="c1"># get the shdrs</span>
+		<span class="n">handle</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="n">ehdr</span><span class="o">.</span><span class="n">e_shoff</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">SEEK_SET</span><span class="p">)</span>
+		<span class="n">data</span> <span class="o">=</span> <span class="n">handle</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">ehdr</span><span class="o">.</span><span class="n">e_shnum</span> <span class="o">*</span> <span class="n">ehdr</span><span class="o">.</span><span class="n">e_shentsize</span><span class="p">)</span>
+		<span class="n">_shdrs</span> <span class="o">=</span> <span class="p">(</span><span class="n">shdr_struct</span> <span class="o">*</span> <span class="n">ehdr</span><span class="o">.</span><span class="n">e_shnum</span><span class="p">)</span>
+		<span class="n">shdrs</span> <span class="o">=</span> <span class="n">_shdrs</span><span class="p">()</span>
+		<span class="n">ctypes</span><span class="o">.</span><span class="n">memmove</span><span class="p">(</span><span class="n">ctypes</span><span class="o">.</span><span class="n">byref</span><span class="p">(</span><span class="n">shdrs</span><span class="p">),</span> <span class="n">data</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">))</span>
+
+		<span class="n">symtab</span> <span class="o">=</span> <span class="n">strtab</span> <span class="o">=</span> <span class="mi">0</span>
+		<span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">shdr</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">shdrs</span><span class="p">):</span>
+			<span class="k">if</span> <span class="n">shdr</span><span class="o">.</span><span class="n">sh_type</span> <span class="o">==</span> <span class="n">elf</span><span class="o">.</span><span class="n">constants</span><span class="o">.</span><span class="n">SHT_SYMTAB</span> <span class="ow">or</span> <span class="n">shdr</span><span class="o">.</span><span class="n">sh_type</span> <span class="o">==</span> <span class="n">elf</span><span class="o">.</span><span class="n">constants</span><span class="o">.</span><span class="n">SHT_DYNSYM</span><span class="p">:</span>
+				<span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">shdr</span><span class="o">.</span><span class="n">sh_entsize</span> <span class="ow">and</span> <span class="n">shdr</span><span class="o">.</span><span class="n">sh_size</span><span class="p">):</span>
+					<span class="k">continue</span>
+				<span class="n">symtab</span> <span class="o">=</span> <span class="n">idx</span>
+			<span class="k">elif</span> <span class="n">shdr</span><span class="o">.</span><span class="n">sh_type</span> <span class="o">==</span> <span class="n">elf</span><span class="o">.</span><span class="n">constants</span><span class="o">.</span><span class="n">SHT_STRTAB</span><span class="p">:</span>
+				<span class="k">if</span> <span class="n">idx</span> <span class="o">!=</span> <span class="n">ehdr</span><span class="o">.</span><span class="n">e_shstrndx</span><span class="p">:</span>
+					<span class="n">strtab</span> <span class="o">=</span> <span class="n">idx</span>
+			<span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">symtab</span> <span class="ow">and</span> <span class="n">strtab</span><span class="p">):</span>
+				<span class="k">continue</span>
+			<span class="n">symh</span> <span class="o">=</span> <span class="n">shdrs</span><span class="p">[</span><span class="n">symtab</span><span class="p">]</span>
+			<span class="n">strh</span> <span class="o">=</span> <span class="n">shdrs</span><span class="p">[</span><span class="n">strtab</span><span class="p">]</span>
+			<span class="n">handle</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="n">strh</span><span class="o">.</span><span class="n">sh_offset</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">SEEK_SET</span><span class="p">)</span>
+			<span class="n">strsymtbl</span> <span class="o">=</span> <span class="n">handle</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">strh</span><span class="o">.</span><span class="n">sh_size</span><span class="p">)</span>
+			<span class="n">sym_num</span> <span class="o">=</span> <span class="n">symh</span><span class="o">.</span><span class="n">sh_size</span> <span class="o">//</span> <span class="n">symh</span><span class="o">.</span><span class="n">sh_entsize</span>
+			<span class="n">_syms</span> <span class="o">=</span> <span class="p">(</span><span class="n">sym_struct</span> <span class="o">*</span> <span class="n">sym_num</span><span class="p">)</span>
+			<span class="n">syms</span> <span class="o">=</span> <span class="n">_syms</span><span class="p">()</span>
+			<span class="n">handle</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="n">symh</span><span class="o">.</span><span class="n">sh_offset</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">SEEK_SET</span><span class="p">)</span>
+			<span class="n">ctypes</span><span class="o">.</span><span class="n">memmove</span><span class="p">(</span><span class="n">ctypes</span><span class="o">.</span><span class="n">byref</span><span class="p">(</span><span class="n">syms</span><span class="p">),</span> <span class="n">handle</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">ctypes</span><span class="o">.</span><span class="n">sizeof</span><span class="p">(</span><span class="n">syms</span><span class="p">)),</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">sizeof</span><span class="p">(</span><span class="n">syms</span><span class="p">))</span>
+			<span class="k">for</span> <span class="n">sym</span> <span class="ow">in</span> <span class="n">syms</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span>
+				<span class="k">if</span> <span class="n">sym</span><span class="o">.</span><span class="n">st_name</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+					<span class="k">continue</span>
+				<span class="k">if</span> <span class="n">strsymtbl</span><span class="p">[</span><span class="n">sym</span><span class="o">.</span><span class="n">st_name</span><span class="p">:(</span><span class="n">sym</span><span class="o">.</span><span class="n">st_name</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">func_name</span><span class="p">))]</span> <span class="o">!=</span> <span class="n">func_name</span><span class="p">:</span>
+					<span class="k">continue</span>
+				<span class="k">return</span> <span class="n">sym</span><span class="o">.</span><span class="n">st_value</span>
+			<span class="n">symtab</span> <span class="o">=</span> <span class="n">strtab</span> <span class="o">=</span> <span class="mi">0</span>
+		<span class="k">raise</span> <span class="n">LinuxProcessError</span><span class="p">(</span><span class="s1">&#39;unable to locate function&#39;</span><span class="p">)</span>
+
+	<span class="k">def</span> <span class="nf">_call_function</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">function_address</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+		<span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">6</span><span class="p">:</span>
+			<span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;can not pass more than 6 arguments&#39;</span><span class="p">)</span>
+		<span class="n">registers_backup</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_registers</span><span class="p">()</span>
+		<span class="k">if</span> <span class="n">mayhem</span><span class="o">.</span><span class="n">utilities</span><span class="o">.</span><span class="n">architecture_is_32bit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__arch__</span><span class="p">):</span>
+			<span class="n">registers</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;eip&#39;</span><span class="p">:</span> <span class="n">function_address</span><span class="p">,</span> <span class="s1">&#39;eax&#39;</span><span class="p">:</span> <span class="n">function_address</span><span class="p">}</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">_set_registers</span><span class="p">(</span><span class="n">registers</span><span class="p">)</span>
+			<span class="n">backup_sp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_memory</span><span class="p">(</span><span class="n">registers_backup</span><span class="p">[</span><span class="s1">&#39;esp&#39;</span><span class="p">],</span> <span class="mi">4</span><span class="p">)</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">write_memory</span><span class="p">(</span><span class="n">registers_backup</span><span class="p">[</span><span class="s1">&#39;esp&#39;</span><span class="p">],</span> <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x00\x00\x00\x00</span><span class="s1">&#39;</span><span class="p">)</span>
+			<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)):</span>
+				<span class="n">stack_cursor</span> <span class="o">=</span> <span class="n">registers_backup</span><span class="p">[</span><span class="s1">&#39;esp&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="p">((</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="mi">4</span><span class="p">)</span>
+				<span class="n">backup_sp</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_memory</span><span class="p">(</span><span class="n">stack_cursor</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+				<span class="k">if</span> <span class="n">args</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+					<span class="bp">self</span><span class="o">.</span><span class="n">write_memory</span><span class="p">(</span><span class="n">stack_cursor</span><span class="p">,</span> <span class="n">struct</span><span class="o">.</span><span class="n">pack</span><span class="p">(</span><span class="s1">&#39;i&#39;</span><span class="p">,</span> <span class="n">args</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span>
+				<span class="k">else</span><span class="p">:</span>
+					<span class="bp">self</span><span class="o">.</span><span class="n">write_memory</span><span class="p">(</span><span class="n">stack_cursor</span><span class="p">,</span> <span class="n">struct</span><span class="o">.</span><span class="n">pack</span><span class="p">(</span><span class="s1">&#39;I&#39;</span><span class="p">,</span> <span class="n">args</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">_ptrace</span><span class="p">(</span><span class="n">PTRACE_CONT</span><span class="p">)</span>
+			<span class="n">wait_result</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">waitpid</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pid</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">write_memory</span><span class="p">(</span><span class="n">registers_backup</span><span class="p">[</span><span class="s1">&#39;esp&#39;</span><span class="p">],</span> <span class="n">backup_sp</span><span class="p">)</span>
+			<span class="n">ending_ip</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_registers</span><span class="p">()[</span><span class="s1">&#39;eip&#39;</span><span class="p">]</span>
+			<span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_registers</span><span class="p">()[</span><span class="s1">&#39;eax&#39;</span><span class="p">]</span>
+		<span class="k">elif</span> <span class="n">mayhem</span><span class="o">.</span><span class="n">utilities</span><span class="o">.</span><span class="n">architecture_is_64bit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__arch__</span><span class="p">):</span>
+			<span class="n">registers</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;rip&#39;</span><span class="p">:</span> <span class="n">function_address</span><span class="p">,</span> <span class="s1">&#39;rax&#39;</span><span class="p">:</span> <span class="n">function_address</span><span class="p">}</span>
+			<span class="n">arg_registers</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;rdi&#39;</span><span class="p">,</span> <span class="s1">&#39;rsi&#39;</span><span class="p">,</span> <span class="s1">&#39;rdx&#39;</span><span class="p">,</span> <span class="s1">&#39;rcx&#39;</span><span class="p">,</span> <span class="s1">&#39;r8&#39;</span><span class="p">,</span> <span class="s1">&#39;r9&#39;</span><span class="p">]</span>
+			<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)):</span>
+				<span class="n">registers</span><span class="p">[</span><span class="n">arg_registers</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">_set_registers</span><span class="p">(</span><span class="n">registers</span><span class="p">)</span>
+			<span class="n">backup_sp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_memory</span><span class="p">(</span><span class="n">registers_backup</span><span class="p">[</span><span class="s1">&#39;rsp&#39;</span><span class="p">],</span> <span class="mi">8</span><span class="p">)</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">write_memory</span><span class="p">(</span><span class="n">registers_backup</span><span class="p">[</span><span class="s1">&#39;rsp&#39;</span><span class="p">],</span> <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x00\x00\x00\x00\x00\x00\x00\x00</span><span class="s1">&#39;</span><span class="p">)</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">_ptrace</span><span class="p">(</span><span class="n">PTRACE_CONT</span><span class="p">)</span>
+			<span class="n">wait_result</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">waitpid</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pid</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">write_memory</span><span class="p">(</span><span class="n">registers_backup</span><span class="p">[</span><span class="s1">&#39;rsp&#39;</span><span class="p">],</span> <span class="n">backup_sp</span><span class="p">)</span>
+			<span class="n">ending_ip</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_registers</span><span class="p">()[</span><span class="s1">&#39;rip&#39;</span><span class="p">]</span>
+			<span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_registers</span><span class="p">()[</span><span class="s1">&#39;rax&#39;</span><span class="p">]</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">_set_registers</span><span class="p">(</span><span class="n">registers_backup</span><span class="p">)</span>
+		<span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">WSTOPSIG</span><span class="p">(</span><span class="n">wait_result</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">==</span> <span class="n">signal</span><span class="o">.</span><span class="n">SIGSEGV</span> <span class="ow">and</span> <span class="n">ending_ip</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+			<span class="k">raise</span> <span class="n">LinuxProcessError</span><span class="p">(</span><span class="s1">&#39;segmentation fault&#39;</span><span class="p">)</span>
+		<span class="k">return</span> <span class="n">result</span>
+
+	<span class="k">def</span> <span class="nf">_read_structure_from_memory</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">address</span><span class="p">,</span> <span class="n">structure</span><span class="p">):</span>
+		<span class="n">structure_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_memory</span><span class="p">(</span><span class="n">address</span><span class="p">,</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">sizeof</span><span class="p">(</span><span class="n">structure</span><span class="p">))</span>
+		<span class="k">return</span> <span class="n">mayhem</span><span class="o">.</span><span class="n">utilities</span><span class="o">.</span><span class="n">struct_unpack</span><span class="p">(</span><span class="n">structure</span><span class="p">,</span> <span class="n">structure_data</span><span class="p">)</span>
+
+	<span class="k">def</span> <span class="nf">_ptrace</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">command</span><span class="p">,</span> <span class="n">arg1</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">arg2</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">check_error</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+		<span class="k">return</span> <span class="n">ptrace</span><span class="p">(</span><span class="n">command</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">pid</span><span class="p">,</span> <span class="n">arg1</span><span class="p">,</span> <span class="n">arg2</span><span class="p">,</span> <span class="n">check_error</span><span class="o">=</span><span class="n">check_error</span><span class="p">)</span>
+
+	<span class="k">def</span> <span class="nf">_get_registers</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="k">if</span> <span class="ow">not</span> <span class="n">architecture_is_supported</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__arch__</span><span class="p">):</span>
+			<span class="k">raise</span> <span class="n">LinuxProcessError</span><span class="p">(</span><span class="s1">&#39;unsupported architecture: &#39;</span> <span class="o">+</span> <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__arch__</span><span class="p">))</span>
+		<span class="n">_raw_registers</span> <span class="o">=</span> <span class="p">(</span><span class="n">ctypes</span><span class="o">.</span><span class="n">c_ulong</span> <span class="o">*</span> <span class="mi">32</span><span class="p">)</span>
+		<span class="n">raw_registers</span> <span class="o">=</span> <span class="n">_raw_registers</span><span class="p">()</span>
+		<span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ptrace</span><span class="p">(</span><span class="n">PTRACE_GETREGS</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">byref</span><span class="p">(</span><span class="n">raw_registers</span><span class="p">))</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+			<span class="k">raise</span> <span class="n">LinuxProcessError</span><span class="p">(</span><span class="s1">&#39;Error: PTRACE_GETREGS&#39;</span><span class="p">,</span> <span class="n">errno</span><span class="o">=</span><span class="n">get_errno</span><span class="p">())</span>
+		<span class="n">registers</span> <span class="o">=</span> <span class="p">{}</span>
+		<span class="c1"># constants from sys/reg.h</span>
+		<span class="k">if</span> <span class="n">mayhem</span><span class="o">.</span><span class="n">utilities</span><span class="o">.</span><span class="n">architecture_is_32bit</span><span class="p">(</span><span class="n">platform</span><span class="o">.</span><span class="n">machine</span><span class="p">()):</span>
+			<span class="n">registers</span><span class="p">[</span><span class="s1">&#39;ebx&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">raw_registers</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+			<span class="n">registers</span><span class="p">[</span><span class="s1">&#39;ecx&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">raw_registers</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+			<span class="n">registers</span><span class="p">[</span><span class="s1">&#39;edx&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">raw_registers</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+			<span class="n">registers</span><span class="p">[</span><span class="s1">&#39;esi&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">raw_registers</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
+			<span class="n">registers</span><span class="p">[</span><span class="s1">&#39;edi&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">raw_registers</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span>
+			<span class="n">registers</span><span class="p">[</span><span class="s1">&#39;ebp&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">raw_registers</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span>
+			<span class="n">registers</span><span class="p">[</span><span class="s1">&#39;eax&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">raw_registers</span><span class="p">[</span><span class="mi">6</span><span class="p">]</span>
+			<span class="n">registers</span><span class="p">[</span><span class="s1">&#39;ds&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">raw_registers</span><span class="p">[</span><span class="mi">7</span><span class="p">]</span>
+			<span class="n">registers</span><span class="p">[</span><span class="s1">&#39;es&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">raw_registers</span><span class="p">[</span><span class="mi">8</span><span class="p">]</span>
+			<span class="n">registers</span><span class="p">[</span><span class="s1">&#39;fs&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">raw_registers</span><span class="p">[</span><span class="mi">9</span><span class="p">]</span>
+			<span class="n">registers</span><span class="p">[</span><span class="s1">&#39;gs&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">raw_registers</span><span class="p">[</span><span class="mi">10</span><span class="p">]</span>
+			<span class="n">registers</span><span class="p">[</span><span class="s1">&#39;orig_eax&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">raw_registers</span><span class="p">[</span><span class="mi">11</span><span class="p">]</span>
+			<span class="n">registers</span><span class="p">[</span><span class="s1">&#39;eip&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">raw_registers</span><span class="p">[</span><span class="mi">12</span><span class="p">]</span>
+			<span class="n">registers</span><span class="p">[</span><span class="s1">&#39;cs&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">raw_registers</span><span class="p">[</span><span class="mi">13</span><span class="p">]</span>
+			<span class="n">registers</span><span class="p">[</span><span class="s1">&#39;eflags&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">raw_registers</span><span class="p">[</span><span class="mi">14</span><span class="p">]</span>
+			<span class="n">registers</span><span class="p">[</span><span class="s1">&#39;esp&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">raw_registers</span><span class="p">[</span><span class="mi">15</span><span class="p">]</span>
+			<span class="n">registers</span><span class="p">[</span><span class="s1">&#39;ss&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">raw_registers</span><span class="p">[</span><span class="mi">16</span><span class="p">]</span>
+		<span class="k">elif</span> <span class="n">mayhem</span><span class="o">.</span><span class="n">utilities</span><span class="o">.</span><span class="n">architecture_is_64bit</span><span class="p">(</span><span class="n">platform</span><span class="o">.</span><span class="n">machine</span><span class="p">()):</span>
+			<span class="n">registers</span><span class="p">[</span><span class="s1">&#39;r15&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">raw_registers</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+			<span class="n">registers</span><span class="p">[</span><span class="s1">&#39;r14&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">raw_registers</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+			<span class="n">registers</span><span class="p">[</span><span class="s1">&#39;r13&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">raw_registers</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+			<span class="n">registers</span><span class="p">[</span><span class="s1">&#39;r12&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">raw_registers</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
+			<span class="n">registers</span><span class="p">[</span><span class="s1">&#39;rbp&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">raw_registers</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span>
+			<span class="n">registers</span><span class="p">[</span><span class="s1">&#39;rbx&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">raw_registers</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span>
+			<span class="n">registers</span><span class="p">[</span><span class="s1">&#39;r11&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">raw_registers</span><span class="p">[</span><span class="mi">6</span><span class="p">]</span>
+			<span class="n">registers</span><span class="p">[</span><span class="s1">&#39;r10&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">raw_registers</span><span class="p">[</span><span class="mi">7</span><span class="p">]</span>
+			<span class="n">registers</span><span class="p">[</span><span class="s1">&#39;r9&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">raw_registers</span><span class="p">[</span><span class="mi">8</span><span class="p">]</span>
+			<span class="n">registers</span><span class="p">[</span><span class="s1">&#39;r8&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">raw_registers</span><span class="p">[</span><span class="mi">9</span><span class="p">]</span>
+			<span class="n">registers</span><span class="p">[</span><span class="s1">&#39;rax&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">raw_registers</span><span class="p">[</span><span class="mi">10</span><span class="p">]</span>
+			<span class="n">registers</span><span class="p">[</span><span class="s1">&#39;rcx&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">raw_registers</span><span class="p">[</span><span class="mi">11</span><span class="p">]</span>
+			<span class="n">registers</span><span class="p">[</span><span class="s1">&#39;rdx&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">raw_registers</span><span class="p">[</span><span class="mi">12</span><span class="p">]</span>
+			<span class="n">registers</span><span class="p">[</span><span class="s1">&#39;rsi&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">raw_registers</span><span class="p">[</span><span class="mi">13</span><span class="p">]</span>
+			<span class="n">registers</span><span class="p">[</span><span class="s1">&#39;rdi&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">raw_registers</span><span class="p">[</span><span class="mi">14</span><span class="p">]</span>
+			<span class="n">registers</span><span class="p">[</span><span class="s1">&#39;orig_rax&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">raw_registers</span><span class="p">[</span><span class="mi">15</span><span class="p">]</span>
+			<span class="n">registers</span><span class="p">[</span><span class="s1">&#39;rip&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">raw_registers</span><span class="p">[</span><span class="mi">16</span><span class="p">]</span>
+			<span class="n">registers</span><span class="p">[</span><span class="s1">&#39;cs&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">raw_registers</span><span class="p">[</span><span class="mi">17</span><span class="p">]</span>
+			<span class="n">registers</span><span class="p">[</span><span class="s1">&#39;eflags&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">raw_registers</span><span class="p">[</span><span class="mi">18</span><span class="p">]</span>
+			<span class="n">registers</span><span class="p">[</span><span class="s1">&#39;rsp&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">raw_registers</span><span class="p">[</span><span class="mi">19</span><span class="p">]</span>
+			<span class="n">registers</span><span class="p">[</span><span class="s1">&#39;ss&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">raw_registers</span><span class="p">[</span><span class="mi">20</span><span class="p">]</span>
+			<span class="n">registers</span><span class="p">[</span><span class="s1">&#39;fs_base&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">raw_registers</span><span class="p">[</span><span class="mi">21</span><span class="p">]</span>
+			<span class="n">registers</span><span class="p">[</span><span class="s1">&#39;gs_base&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">raw_registers</span><span class="p">[</span><span class="mi">22</span><span class="p">]</span>
+			<span class="n">registers</span><span class="p">[</span><span class="s1">&#39;ds&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">raw_registers</span><span class="p">[</span><span class="mi">23</span><span class="p">]</span>
+			<span class="n">registers</span><span class="p">[</span><span class="s1">&#39;es&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">raw_registers</span><span class="p">[</span><span class="mi">24</span><span class="p">]</span>
+			<span class="n">registers</span><span class="p">[</span><span class="s1">&#39;fs&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">raw_registers</span><span class="p">[</span><span class="mi">25</span><span class="p">]</span>
+			<span class="n">registers</span><span class="p">[</span><span class="s1">&#39;gs&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">raw_registers</span><span class="p">[</span><span class="mi">26</span><span class="p">]</span>
+			<span class="k">if</span> <span class="n">mayhem</span><span class="o">.</span><span class="n">utilities</span><span class="o">.</span><span class="n">architecture_is_32bit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__arch__</span><span class="p">):</span>
+				<span class="n">converted_registers</span> <span class="o">=</span> <span class="p">{}</span>
+				<span class="n">converted_registers</span><span class="p">[</span><span class="s1">&#39;ebx&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">registers</span><span class="p">[</span><span class="s1">&#39;rbx&#39;</span><span class="p">]</span>
+				<span class="n">converted_registers</span><span class="p">[</span><span class="s1">&#39;ecx&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">registers</span><span class="p">[</span><span class="s1">&#39;rcx&#39;</span><span class="p">]</span>
+				<span class="n">converted_registers</span><span class="p">[</span><span class="s1">&#39;edx&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">registers</span><span class="p">[</span><span class="s1">&#39;rdx&#39;</span><span class="p">]</span>
+				<span class="n">converted_registers</span><span class="p">[</span><span class="s1">&#39;esi&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">registers</span><span class="p">[</span><span class="s1">&#39;rsi&#39;</span><span class="p">]</span>
+				<span class="n">converted_registers</span><span class="p">[</span><span class="s1">&#39;edi&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">registers</span><span class="p">[</span><span class="s1">&#39;rdi&#39;</span><span class="p">]</span>
+				<span class="n">converted_registers</span><span class="p">[</span><span class="s1">&#39;ebp&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">registers</span><span class="p">[</span><span class="s1">&#39;rbp&#39;</span><span class="p">]</span>
+				<span class="n">converted_registers</span><span class="p">[</span><span class="s1">&#39;eax&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">registers</span><span class="p">[</span><span class="s1">&#39;rax&#39;</span><span class="p">]</span>
+				<span class="n">converted_registers</span><span class="p">[</span><span class="s1">&#39;ds&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">registers</span><span class="p">[</span><span class="s1">&#39;ds&#39;</span><span class="p">]</span>
+				<span class="n">converted_registers</span><span class="p">[</span><span class="s1">&#39;es&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">registers</span><span class="p">[</span><span class="s1">&#39;es&#39;</span><span class="p">]</span>
+				<span class="n">converted_registers</span><span class="p">[</span><span class="s1">&#39;fs&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">registers</span><span class="p">[</span><span class="s1">&#39;fs&#39;</span><span class="p">]</span>
+				<span class="n">converted_registers</span><span class="p">[</span><span class="s1">&#39;gs&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">registers</span><span class="p">[</span><span class="s1">&#39;gs&#39;</span><span class="p">]</span>
+				<span class="n">converted_registers</span><span class="p">[</span><span class="s1">&#39;orig_eax&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">registers</span><span class="p">[</span><span class="s1">&#39;orig_rax&#39;</span><span class="p">]</span>
+				<span class="n">converted_registers</span><span class="p">[</span><span class="s1">&#39;eip&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">registers</span><span class="p">[</span><span class="s1">&#39;rip&#39;</span><span class="p">]</span>
+				<span class="n">converted_registers</span><span class="p">[</span><span class="s1">&#39;cs&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">registers</span><span class="p">[</span><span class="s1">&#39;cs&#39;</span><span class="p">]</span>
+				<span class="n">converted_registers</span><span class="p">[</span><span class="s1">&#39;eflags&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">registers</span><span class="p">[</span><span class="s1">&#39;eflags&#39;</span><span class="p">]</span>
+				<span class="n">converted_registers</span><span class="p">[</span><span class="s1">&#39;esp&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">registers</span><span class="p">[</span><span class="s1">&#39;rsp&#39;</span><span class="p">]</span>
+				<span class="n">converted_registers</span><span class="p">[</span><span class="s1">&#39;ss&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">registers</span><span class="p">[</span><span class="s1">&#39;ss&#39;</span><span class="p">]</span>
+				<span class="n">registers</span> <span class="o">=</span> <span class="n">converted_registers</span>
+		<span class="k">return</span> <span class="n">registers</span>
+
+	<span class="k">def</span> <span class="nf">_set_registers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">registers</span><span class="o">=</span><span class="p">{}):</span>
+		<span class="k">if</span> <span class="ow">not</span> <span class="n">architecture_is_supported</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__arch__</span><span class="p">):</span>
+			<span class="k">raise</span> <span class="n">LinuxProcessError</span><span class="p">(</span><span class="s1">&#39;unsupported architecture: &#39;</span> <span class="o">+</span> <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__arch__</span><span class="p">))</span>
+		<span class="n">old_registers</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_registers</span><span class="p">()</span>
+		<span class="n">old_registers</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">registers</span><span class="p">)</span>
+		<span class="n">_raw_registers</span> <span class="o">=</span> <span class="p">(</span><span class="n">ctypes</span><span class="o">.</span><span class="n">c_ulong</span> <span class="o">*</span> <span class="mi">32</span><span class="p">)</span>
+		<span class="n">raw_registers</span> <span class="o">=</span> <span class="n">_raw_registers</span><span class="p">()</span>
+		<span class="c1"># constants from sys/reg.h</span>
+		<span class="k">if</span> <span class="n">mayhem</span><span class="o">.</span><span class="n">utilities</span><span class="o">.</span><span class="n">architecture_is_32bit</span><span class="p">(</span><span class="n">platform</span><span class="o">.</span><span class="n">machine</span><span class="p">()):</span>
+			<span class="n">raw_registers</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">old_registers</span><span class="p">[</span><span class="s1">&#39;ebx&#39;</span><span class="p">]</span>
+			<span class="n">raw_registers</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">old_registers</span><span class="p">[</span><span class="s1">&#39;ecx&#39;</span><span class="p">]</span>
+			<span class="n">raw_registers</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">old_registers</span><span class="p">[</span><span class="s1">&#39;edx&#39;</span><span class="p">]</span>
+			<span class="n">raw_registers</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">old_registers</span><span class="p">[</span><span class="s1">&#39;esi&#39;</span><span class="p">]</span>
+			<span class="n">raw_registers</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span> <span class="o">=</span> <span class="n">old_registers</span><span class="p">[</span><span class="s1">&#39;edi&#39;</span><span class="p">]</span>
+			<span class="n">raw_registers</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span> <span class="o">=</span> <span class="n">old_registers</span><span class="p">[</span><span class="s1">&#39;ebp&#39;</span><span class="p">]</span>
+			<span class="n">raw_registers</span><span class="p">[</span><span class="mi">6</span><span class="p">]</span> <span class="o">=</span> <span class="n">old_registers</span><span class="p">[</span><span class="s1">&#39;eax&#39;</span><span class="p">]</span>
+			<span class="n">raw_registers</span><span class="p">[</span><span class="mi">7</span><span class="p">]</span> <span class="o">=</span> <span class="n">old_registers</span><span class="p">[</span><span class="s1">&#39;ds&#39;</span><span class="p">]</span>
+			<span class="n">raw_registers</span><span class="p">[</span><span class="mi">8</span><span class="p">]</span> <span class="o">=</span> <span class="n">old_registers</span><span class="p">[</span><span class="s1">&#39;es&#39;</span><span class="p">]</span>
+			<span class="n">raw_registers</span><span class="p">[</span><span class="mi">9</span><span class="p">]</span> <span class="o">=</span> <span class="n">old_registers</span><span class="p">[</span><span class="s1">&#39;fs&#39;</span><span class="p">]</span>
+			<span class="n">raw_registers</span><span class="p">[</span><span class="mi">10</span><span class="p">]</span> <span class="o">=</span> <span class="n">old_registers</span><span class="p">[</span><span class="s1">&#39;gs&#39;</span><span class="p">]</span>
+			<span class="n">raw_registers</span><span class="p">[</span><span class="mi">11</span><span class="p">]</span> <span class="o">=</span> <span class="n">old_registers</span><span class="p">[</span><span class="s1">&#39;orig_eax&#39;</span><span class="p">]</span>
+			<span class="n">raw_registers</span><span class="p">[</span><span class="mi">12</span><span class="p">]</span> <span class="o">=</span> <span class="n">old_registers</span><span class="p">[</span><span class="s1">&#39;eip&#39;</span><span class="p">]</span>
+			<span class="n">raw_registers</span><span class="p">[</span><span class="mi">13</span><span class="p">]</span> <span class="o">=</span> <span class="n">old_registers</span><span class="p">[</span><span class="s1">&#39;cs&#39;</span><span class="p">]</span>
+			<span class="n">raw_registers</span><span class="p">[</span><span class="mi">14</span><span class="p">]</span> <span class="o">=</span> <span class="n">old_registers</span><span class="p">[</span><span class="s1">&#39;eflags&#39;</span><span class="p">]</span>
+			<span class="n">raw_registers</span><span class="p">[</span><span class="mi">15</span><span class="p">]</span> <span class="o">=</span> <span class="n">old_registers</span><span class="p">[</span><span class="s1">&#39;esp&#39;</span><span class="p">]</span>
+			<span class="n">raw_registers</span><span class="p">[</span><span class="mi">16</span><span class="p">]</span> <span class="o">=</span> <span class="n">old_registers</span><span class="p">[</span><span class="s1">&#39;ss&#39;</span><span class="p">]</span>
+		<span class="k">elif</span> <span class="n">mayhem</span><span class="o">.</span><span class="n">utilities</span><span class="o">.</span><span class="n">architecture_is_64bit</span><span class="p">(</span><span class="n">platform</span><span class="o">.</span><span class="n">machine</span><span class="p">()):</span>
+			<span class="k">if</span> <span class="n">mayhem</span><span class="o">.</span><span class="n">utilities</span><span class="o">.</span><span class="n">architecture_is_32bit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__arch__</span><span class="p">):</span>
+				<span class="n">_raw_registers</span> <span class="o">=</span> <span class="p">(</span><span class="n">ctypes</span><span class="o">.</span><span class="n">c_ulong</span> <span class="o">*</span> <span class="mi">32</span><span class="p">)</span>
+				<span class="n">raw_registers</span> <span class="o">=</span> <span class="n">_raw_registers</span><span class="p">()</span>
+				<span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ptrace</span><span class="p">(</span><span class="n">PTRACE_GETREGS</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">byref</span><span class="p">(</span><span class="n">raw_registers</span><span class="p">))</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+					<span class="k">raise</span> <span class="n">LinuxProcessError</span><span class="p">(</span><span class="s1">&#39;Error: PTRACE_GETREGS&#39;</span><span class="p">,</span> <span class="n">errno</span><span class="o">=</span><span class="n">get_errno</span><span class="p">())</span>
+				<span class="n">raw_registers</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span> <span class="o">=</span> <span class="n">old_registers</span><span class="p">[</span><span class="s1">&#39;ebp&#39;</span><span class="p">]</span>
+				<span class="n">raw_registers</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span> <span class="o">=</span> <span class="n">old_registers</span><span class="p">[</span><span class="s1">&#39;ebx&#39;</span><span class="p">]</span>
+				<span class="n">raw_registers</span><span class="p">[</span><span class="mi">10</span><span class="p">]</span> <span class="o">=</span> <span class="n">old_registers</span><span class="p">[</span><span class="s1">&#39;eax&#39;</span><span class="p">]</span>
+				<span class="n">raw_registers</span><span class="p">[</span><span class="mi">11</span><span class="p">]</span> <span class="o">=</span> <span class="n">old_registers</span><span class="p">[</span><span class="s1">&#39;ecx&#39;</span><span class="p">]</span>
+				<span class="n">raw_registers</span><span class="p">[</span><span class="mi">12</span><span class="p">]</span> <span class="o">=</span> <span class="n">old_registers</span><span class="p">[</span><span class="s1">&#39;edx&#39;</span><span class="p">]</span>
+				<span class="n">raw_registers</span><span class="p">[</span><span class="mi">13</span><span class="p">]</span> <span class="o">=</span> <span class="n">old_registers</span><span class="p">[</span><span class="s1">&#39;esi&#39;</span><span class="p">]</span>
+				<span class="n">raw_registers</span><span class="p">[</span><span class="mi">14</span><span class="p">]</span> <span class="o">=</span> <span class="n">old_registers</span><span class="p">[</span><span class="s1">&#39;edi&#39;</span><span class="p">]</span>
+				<span class="n">raw_registers</span><span class="p">[</span><span class="mi">15</span><span class="p">]</span> <span class="o">=</span> <span class="n">old_registers</span><span class="p">[</span><span class="s1">&#39;orig_eax&#39;</span><span class="p">]</span>
+				<span class="n">raw_registers</span><span class="p">[</span><span class="mi">16</span><span class="p">]</span> <span class="o">=</span> <span class="n">old_registers</span><span class="p">[</span><span class="s1">&#39;eip&#39;</span><span class="p">]</span>
+				<span class="n">raw_registers</span><span class="p">[</span><span class="mi">17</span><span class="p">]</span> <span class="o">=</span> <span class="n">old_registers</span><span class="p">[</span><span class="s1">&#39;cs&#39;</span><span class="p">]</span>
+				<span class="n">raw_registers</span><span class="p">[</span><span class="mi">18</span><span class="p">]</span> <span class="o">=</span> <span class="n">old_registers</span><span class="p">[</span><span class="s1">&#39;eflags&#39;</span><span class="p">]</span>
+				<span class="n">raw_registers</span><span class="p">[</span><span class="mi">19</span><span class="p">]</span> <span class="o">=</span> <span class="n">old_registers</span><span class="p">[</span><span class="s1">&#39;esp&#39;</span><span class="p">]</span>
+				<span class="n">raw_registers</span><span class="p">[</span><span class="mi">20</span><span class="p">]</span> <span class="o">=</span> <span class="n">old_registers</span><span class="p">[</span><span class="s1">&#39;ss&#39;</span><span class="p">]</span>
+				<span class="n">raw_registers</span><span class="p">[</span><span class="mi">23</span><span class="p">]</span> <span class="o">=</span> <span class="n">old_registers</span><span class="p">[</span><span class="s1">&#39;ds&#39;</span><span class="p">]</span>
+				<span class="n">raw_registers</span><span class="p">[</span><span class="mi">24</span><span class="p">]</span> <span class="o">=</span> <span class="n">old_registers</span><span class="p">[</span><span class="s1">&#39;es&#39;</span><span class="p">]</span>
+				<span class="n">raw_registers</span><span class="p">[</span><span class="mi">25</span><span class="p">]</span> <span class="o">=</span> <span class="n">old_registers</span><span class="p">[</span><span class="s1">&#39;fs&#39;</span><span class="p">]</span>
+				<span class="n">raw_registers</span><span class="p">[</span><span class="mi">26</span><span class="p">]</span> <span class="o">=</span> <span class="n">old_registers</span><span class="p">[</span><span class="s1">&#39;gs&#39;</span><span class="p">]</span>
+			<span class="k">else</span><span class="p">:</span>
+				<span class="n">raw_registers</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">old_registers</span><span class="p">[</span><span class="s1">&#39;r15&#39;</span><span class="p">]</span>
+				<span class="n">raw_registers</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">old_registers</span><span class="p">[</span><span class="s1">&#39;r14&#39;</span><span class="p">]</span>
+				<span class="n">raw_registers</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">old_registers</span><span class="p">[</span><span class="s1">&#39;r13&#39;</span><span class="p">]</span>
+				<span class="n">raw_registers</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">old_registers</span><span class="p">[</span><span class="s1">&#39;r12&#39;</span><span class="p">]</span>
+				<span class="n">raw_registers</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span> <span class="o">=</span> <span class="n">old_registers</span><span class="p">[</span><span class="s1">&#39;rbp&#39;</span><span class="p">]</span>
+				<span class="n">raw_registers</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span> <span class="o">=</span> <span class="n">old_registers</span><span class="p">[</span><span class="s1">&#39;rbx&#39;</span><span class="p">]</span>
+				<span class="n">raw_registers</span><span class="p">[</span><span class="mi">6</span><span class="p">]</span> <span class="o">=</span> <span class="n">old_registers</span><span class="p">[</span><span class="s1">&#39;r11&#39;</span><span class="p">]</span>
+				<span class="n">raw_registers</span><span class="p">[</span><span class="mi">7</span><span class="p">]</span> <span class="o">=</span> <span class="n">old_registers</span><span class="p">[</span><span class="s1">&#39;r10&#39;</span><span class="p">]</span>
+				<span class="n">raw_registers</span><span class="p">[</span><span class="mi">8</span><span class="p">]</span> <span class="o">=</span> <span class="n">old_registers</span><span class="p">[</span><span class="s1">&#39;r9&#39;</span><span class="p">]</span>
+				<span class="n">raw_registers</span><span class="p">[</span><span class="mi">9</span><span class="p">]</span> <span class="o">=</span> <span class="n">old_registers</span><span class="p">[</span><span class="s1">&#39;r8&#39;</span><span class="p">]</span>
+				<span class="n">raw_registers</span><span class="p">[</span><span class="mi">10</span><span class="p">]</span> <span class="o">=</span> <span class="n">old_registers</span><span class="p">[</span><span class="s1">&#39;rax&#39;</span><span class="p">]</span>
+				<span class="n">raw_registers</span><span class="p">[</span><span class="mi">11</span><span class="p">]</span> <span class="o">=</span> <span class="n">old_registers</span><span class="p">[</span><span class="s1">&#39;rcx&#39;</span><span class="p">]</span>
+				<span class="n">raw_registers</span><span class="p">[</span><span class="mi">12</span><span class="p">]</span> <span class="o">=</span> <span class="n">old_registers</span><span class="p">[</span><span class="s1">&#39;rdx&#39;</span><span class="p">]</span>
+				<span class="n">raw_registers</span><span class="p">[</span><span class="mi">13</span><span class="p">]</span> <span class="o">=</span> <span class="n">old_registers</span><span class="p">[</span><span class="s1">&#39;rsi&#39;</span><span class="p">]</span>
+				<span class="n">raw_registers</span><span class="p">[</span><span class="mi">14</span><span class="p">]</span> <span class="o">=</span> <span class="n">old_registers</span><span class="p">[</span><span class="s1">&#39;rdi&#39;</span><span class="p">]</span>
+				<span class="n">raw_registers</span><span class="p">[</span><span class="mi">15</span><span class="p">]</span> <span class="o">=</span> <span class="n">old_registers</span><span class="p">[</span><span class="s1">&#39;orig_rax&#39;</span><span class="p">]</span>
+				<span class="n">raw_registers</span><span class="p">[</span><span class="mi">16</span><span class="p">]</span> <span class="o">=</span> <span class="n">old_registers</span><span class="p">[</span><span class="s1">&#39;rip&#39;</span><span class="p">]</span>
+				<span class="n">raw_registers</span><span class="p">[</span><span class="mi">17</span><span class="p">]</span> <span class="o">=</span> <span class="n">old_registers</span><span class="p">[</span><span class="s1">&#39;cs&#39;</span><span class="p">]</span>
+				<span class="n">raw_registers</span><span class="p">[</span><span class="mi">18</span><span class="p">]</span> <span class="o">=</span> <span class="n">old_registers</span><span class="p">[</span><span class="s1">&#39;eflags&#39;</span><span class="p">]</span>
+				<span class="n">raw_registers</span><span class="p">[</span><span class="mi">19</span><span class="p">]</span> <span class="o">=</span> <span class="n">old_registers</span><span class="p">[</span><span class="s1">&#39;rsp&#39;</span><span class="p">]</span>
+				<span class="n">raw_registers</span><span class="p">[</span><span class="mi">20</span><span class="p">]</span> <span class="o">=</span> <span class="n">old_registers</span><span class="p">[</span><span class="s1">&#39;ss&#39;</span><span class="p">]</span>
+				<span class="n">raw_registers</span><span class="p">[</span><span class="mi">21</span><span class="p">]</span> <span class="o">=</span> <span class="n">old_registers</span><span class="p">[</span><span class="s1">&#39;fs_base&#39;</span><span class="p">]</span>
+				<span class="n">raw_registers</span><span class="p">[</span><span class="mi">22</span><span class="p">]</span> <span class="o">=</span> <span class="n">old_registers</span><span class="p">[</span><span class="s1">&#39;gs_base&#39;</span><span class="p">]</span>
+				<span class="n">raw_registers</span><span class="p">[</span><span class="mi">23</span><span class="p">]</span> <span class="o">=</span> <span class="n">old_registers</span><span class="p">[</span><span class="s1">&#39;ds&#39;</span><span class="p">]</span>
+				<span class="n">raw_registers</span><span class="p">[</span><span class="mi">24</span><span class="p">]</span> <span class="o">=</span> <span class="n">old_registers</span><span class="p">[</span><span class="s1">&#39;es&#39;</span><span class="p">]</span>
+				<span class="n">raw_registers</span><span class="p">[</span><span class="mi">25</span><span class="p">]</span> <span class="o">=</span> <span class="n">old_registers</span><span class="p">[</span><span class="s1">&#39;fs&#39;</span><span class="p">]</span>
+				<span class="n">raw_registers</span><span class="p">[</span><span class="mi">26</span><span class="p">]</span> <span class="o">=</span> <span class="n">old_registers</span><span class="p">[</span><span class="s1">&#39;gs&#39;</span><span class="p">]</span>
+		<span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ptrace</span><span class="p">(</span><span class="n">PTRACE_SETREGS</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">byref</span><span class="p">(</span><span class="n">raw_registers</span><span class="p">))</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+			<span class="k">raise</span> <span class="n">LinuxProcessError</span><span class="p">(</span><span class="s1">&#39;Error: PTRACE_SETREGS&#39;</span><span class="p">,</span> <span class="n">errno</span><span class="o">=</span><span class="n">get_errno</span><span class="p">())</span>
+		<span class="k">return</span>
+
+	<span class="k">def</span> <span class="nf">_allocate_malloc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">size</span><span class="p">):</span>
+		<span class="n">malloc_addr</span> <span class="o">=</span> <span class="kc">None</span>
+		<span class="k">for</span> <span class="n">lib</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;libc-&#39;</span><span class="p">,</span> <span class="s1">&#39;ld-linux.so&#39;</span><span class="p">):</span>
+			<span class="k">try</span><span class="p">:</span>
+				<span class="n">malloc_addr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_function_address</span><span class="p">(</span><span class="n">lib</span><span class="p">,</span> <span class="s1">&#39;malloc&#39;</span><span class="p">)</span>
+			<span class="k">except</span> <span class="n">mayhem</span><span class="o">.</span><span class="n">proc</span><span class="o">.</span><span class="n">ProcessError</span><span class="p">:</span>
+				<span class="k">continue</span>
+			<span class="k">break</span>
+		<span class="k">if</span> <span class="n">malloc_addr</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+			<span class="k">raise</span> <span class="n">mayhem</span><span class="o">.</span><span class="n">proc</span><span class="o">.</span><span class="n">ProcessError</span><span class="p">(</span><span class="s1">&#39;unable to locate function&#39;</span><span class="p">)</span>
+		<span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_call_function</span><span class="p">(</span><span class="n">malloc_addr</span><span class="p">,</span> <span class="n">size</span><span class="p">)</span>
+
+	<span class="k">def</span> <span class="nf">_free_free</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">address</span><span class="p">):</span>
+		<span class="n">free_addr</span> <span class="o">=</span> <span class="kc">None</span>
+		<span class="k">for</span> <span class="n">lib</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;libc-&#39;</span><span class="p">,</span> <span class="s1">&#39;ld-linux.so&#39;</span><span class="p">):</span>
+			<span class="k">try</span><span class="p">:</span>
+				<span class="n">free_addr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_function_address</span><span class="p">(</span><span class="n">lib</span><span class="p">,</span> <span class="s1">&#39;free&#39;</span><span class="p">)</span>
+			<span class="k">except</span> <span class="n">mayhem</span><span class="o">.</span><span class="n">proc</span><span class="o">.</span><span class="n">ProcessError</span><span class="p">:</span>
+				<span class="k">continue</span>
+			<span class="k">break</span>
+		<span class="k">if</span> <span class="n">free_addr</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+			<span class="k">raise</span> <span class="n">LinuxProcessError</span><span class="p">(</span><span class="s1">&#39;unable to locate function&#39;</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">_call_function</span><span class="p">(</span><span class="n">free_addr</span><span class="p">,</span> <span class="n">address</span><span class="p">)</span>
+		<span class="k">return</span>
+
+	<span class="k">def</span> <span class="nf">_allocate_mmap</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">address</span><span class="p">,</span> <span class="n">permissions</span><span class="p">,</span> <span class="n">mmap_flags</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+		<span class="n">mmap_addr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_function_address</span><span class="p">(</span><span class="s1">&#39;libc-&#39;</span><span class="p">,</span> <span class="s1">&#39;mmap&#39;</span><span class="p">)</span>
+		<span class="n">address</span> <span class="o">=</span> <span class="p">(</span><span class="n">address</span> <span class="ow">or</span> <span class="mi">0</span><span class="p">)</span>
+		<span class="n">permissions</span> <span class="o">=</span> <span class="p">(</span><span class="n">permissions</span> <span class="ow">or</span> <span class="s1">&#39;PROT_READ | PROT_WRITE | PROT_EXEC&#39;</span><span class="p">)</span>
+		<span class="n">permissions</span> <span class="o">=</span> <span class="n">flags</span><span class="p">(</span><span class="n">permissions</span><span class="p">)</span>
+		<span class="k">if</span> <span class="n">mmap_flags</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+			<span class="k">if</span> <span class="n">address</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+				<span class="n">mmap_flags</span> <span class="o">=</span> <span class="n">flags</span><span class="p">(</span><span class="s1">&#39;MAP_ANONYMOUS | MAP_PRIVATE&#39;</span><span class="p">)</span>
+			<span class="k">else</span><span class="p">:</span>
+				<span class="n">mmap_flags</span> <span class="o">=</span> <span class="n">flags</span><span class="p">(</span><span class="s1">&#39;MAP_ANONYMOUS | MAP_PRIVATE | MAP_FIXED&#39;</span><span class="p">)</span>
+		<span class="k">else</span><span class="p">:</span>
+			<span class="n">mmap_flags</span> <span class="o">=</span> <span class="n">flags</span><span class="p">(</span><span class="n">mmap_flags</span><span class="p">)</span>
+		<span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_call_function</span><span class="p">(</span><span class="n">mmap_addr</span><span class="p">,</span> <span class="n">address</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">permissions</span><span class="p">,</span> <span class="n">mmap_flags</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
+	<span class="k">def</span> <span class="nf">_free_munmap</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">address</span><span class="p">,</span> <span class="n">size</span><span class="p">):</span>
+		<span class="n">munmap_addr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_function_address</span><span class="p">(</span><span class="s1">&#39;libc-&#39;</span><span class="p">,</span> <span class="s1">&#39;munmap&#39;</span><span class="p">)</span>
+		<span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_call_function</span><span class="p">(</span><span class="n">munmap_addr</span><span class="p">,</span> <span class="n">address</span><span class="p">,</span> <span class="n">size</span><span class="p">)</span>
+		<span class="k">if</span> <span class="n">result</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+			<span class="k">raise</span> <span class="n">LinuxProcessError</span><span class="p">(</span><span class="s1">&#39;Error: munmap&#39;</span><span class="p">)</span>
+		<span class="k">return</span>
+
+<div class="viewcode-block" id="LinuxProcess.install_hook"><a class="viewcode-back" href="../../../mayhem/proc/linux.html#mayhem.proc.linux.LinuxProcess.install_hook">[docs]</a>	<span class="k">def</span> <span class="nf">install_hook</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mod_name</span><span class="p">,</span> <span class="n">new_address</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ordinal</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+		<span class="k">if</span> <span class="n">mayhem</span><span class="o">.</span><span class="n">utilities</span><span class="o">.</span><span class="n">architecture_is_32bit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__arch__</span><span class="p">):</span>
+			<span class="n">lm_struct</span> <span class="o">=</span> <span class="n">elf</span><span class="o">.</span><span class="n">Elf32_Link_Map</span>
+			<span class="n">dyn_struct</span> <span class="o">=</span> <span class="n">elf</span><span class="o">.</span><span class="n">Elf32_Dyn</span>
+			<span class="n">sym_struct</span> <span class="o">=</span> <span class="n">elf</span><span class="o">.</span><span class="n">Elf32_Sym</span>
+		<span class="k">elif</span> <span class="n">mayhem</span><span class="o">.</span><span class="n">utilities</span><span class="o">.</span><span class="n">architecture_is_64bit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__arch__</span><span class="p">):</span>
+			<span class="n">lm_struct</span> <span class="o">=</span> <span class="n">elf</span><span class="o">.</span><span class="n">Elf64_Link_Map</span>
+			<span class="n">dyn_struct</span> <span class="o">=</span> <span class="n">elf</span><span class="o">.</span><span class="n">Elf64_Dyn</span>
+			<span class="n">sym_struct</span> <span class="o">=</span> <span class="n">elf</span><span class="o">.</span><span class="n">Elf64_Sym</span>
+		<span class="k">else</span><span class="p">:</span>
+			<span class="k">raise</span> <span class="n">LinuxProcessError</span><span class="p">(</span><span class="s1">&#39;unsupported architecture: &#39;</span> <span class="o">+</span> <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__arch__</span><span class="p">))</span>
+		<span class="k">if</span> <span class="n">ordinal</span><span class="p">:</span>
+			<span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;an ordinal is not supported for this implementation&#39;</span><span class="p">)</span>
+		<span class="k">if</span> <span class="ow">not</span> <span class="n">name</span><span class="p">:</span>
+			<span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;a name is required for this implementation&#39;</span><span class="p">)</span>
+		<span class="n">lm</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_structure_from_memory</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_proc_attribute</span><span class="p">(</span><span class="s1">&#39;link_map_addr&#39;</span><span class="p">),</span> <span class="n">lm_struct</span><span class="p">)</span>
+		<span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isabs</span><span class="p">(</span><span class="n">mod_name</span><span class="p">):</span>
+			<span class="n">validate_name</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">lm</span><span class="p">:</span> <span class="nb">bool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">read_memory_string</span><span class="p">(</span><span class="n">lm</span><span class="o">.</span><span class="n">l_name</span><span class="p">)</span> <span class="o">==</span> <span class="n">mod_name</span><span class="p">)</span>
+		<span class="k">else</span><span class="p">:</span>
+			<span class="n">validate_name</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">lm</span><span class="p">:</span> <span class="nb">bool</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">read_memory_string</span><span class="p">(</span><span class="n">lm</span><span class="o">.</span><span class="n">l_name</span><span class="p">))[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">mod_name</span><span class="p">))</span>
+		<span class="k">while</span> <span class="ow">not</span> <span class="n">validate_name</span><span class="p">(</span><span class="n">lm</span><span class="p">):</span>
+			<span class="k">if</span> <span class="n">lm</span><span class="o">.</span><span class="n">l_next</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+				<span class="k">raise</span> <span class="n">mayhem</span><span class="o">.</span><span class="n">proc</span><span class="o">.</span><span class="n">ProcessError</span><span class="p">(</span><span class="s1">&#39;unable to locate shared library&#39;</span><span class="p">)</span>
+			<span class="n">lm</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_structure_from_memory</span><span class="p">(</span><span class="n">lm</span><span class="o">.</span><span class="n">l_next</span><span class="p">,</span> <span class="n">lm_struct</span><span class="p">)</span>
+		<span class="n">idx</span> <span class="o">=</span> <span class="mi">0</span>
+		<span class="n">dyn</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_structure_from_memory</span><span class="p">(</span><span class="n">lm</span><span class="o">.</span><span class="n">l_ld</span><span class="p">,</span> <span class="n">dyn_struct</span><span class="p">)</span>
+		<span class="n">nchains</span> <span class="o">=</span> <span class="mi">0</span>
+		<span class="n">strtab</span> <span class="o">=</span> <span class="mi">0</span>
+		<span class="n">symtab</span> <span class="o">=</span> <span class="mi">0</span>
+		<span class="k">while</span> <span class="n">dyn</span><span class="o">.</span><span class="n">d_tag</span><span class="p">:</span>
+			<span class="n">idx</span> <span class="o">+=</span> <span class="mi">1</span>
+			<span class="k">if</span> <span class="n">dyn</span><span class="o">.</span><span class="n">d_tag</span> <span class="o">==</span> <span class="n">elf</span><span class="o">.</span><span class="n">constants</span><span class="o">.</span><span class="n">DT_HASH</span><span class="p">:</span>
+				<span class="n">nchains</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="s1">&#39;I&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_memory</span><span class="p">(</span><span class="n">dyn</span><span class="o">.</span><span class="n">d_un</span><span class="o">.</span><span class="n">d_ptr</span> <span class="o">+</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">sizeof</span><span class="p">(</span><span class="n">ctypes</span><span class="o">.</span><span class="n">c_int</span><span class="p">),</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">sizeof</span><span class="p">(</span><span class="n">ctypes</span><span class="o">.</span><span class="n">c_int</span><span class="p">)))[</span><span class="mi">0</span><span class="p">]</span>
+			<span class="k">elif</span> <span class="n">dyn</span><span class="o">.</span><span class="n">d_tag</span> <span class="o">==</span> <span class="n">elf</span><span class="o">.</span><span class="n">constants</span><span class="o">.</span><span class="n">DT_STRTAB</span><span class="p">:</span>
+				<span class="n">strtab</span> <span class="o">=</span> <span class="n">dyn</span><span class="o">.</span><span class="n">d_un</span><span class="o">.</span><span class="n">d_ptr</span>
+			<span class="k">elif</span> <span class="n">dyn</span><span class="o">.</span><span class="n">d_tag</span> <span class="o">==</span> <span class="n">elf</span><span class="o">.</span><span class="n">constants</span><span class="o">.</span><span class="n">DT_SYMTAB</span><span class="p">:</span>
+				<span class="n">symtab</span> <span class="o">=</span> <span class="n">dyn</span><span class="o">.</span><span class="n">d_un</span><span class="o">.</span><span class="n">d_ptr</span>
+			<span class="n">dyn</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_structure_from_memory</span><span class="p">(</span><span class="n">lm</span><span class="o">.</span><span class="n">l_ld</span> <span class="o">+</span> <span class="p">(</span><span class="n">ctypes</span><span class="o">.</span><span class="n">sizeof</span><span class="p">(</span><span class="n">dyn_struct</span><span class="p">)</span> <span class="o">*</span> <span class="n">idx</span><span class="p">),</span> <span class="n">dyn_struct</span><span class="p">)</span>
+		<span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">nchains</span><span class="p">):</span>
+			<span class="n">sym</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_structure_from_memory</span><span class="p">(</span><span class="n">symtab</span> <span class="o">+</span> <span class="p">(</span><span class="n">ctypes</span><span class="o">.</span><span class="n">sizeof</span><span class="p">(</span><span class="n">sym_struct</span><span class="p">)</span> <span class="o">*</span> <span class="n">idx</span><span class="p">),</span> <span class="n">sym_struct</span><span class="p">)</span>
+			<span class="k">if</span> <span class="p">(</span><span class="n">sym</span><span class="o">.</span><span class="n">st_info</span> <span class="o">&amp;</span> <span class="mh">0xf</span><span class="p">)</span> <span class="o">!=</span> <span class="n">elf</span><span class="o">.</span><span class="n">constants</span><span class="o">.</span><span class="n">STT_FUNC</span><span class="p">:</span>
+				<span class="k">continue</span>
+			<span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_memory_string</span><span class="p">(</span><span class="n">strtab</span> <span class="o">+</span> <span class="n">sym</span><span class="o">.</span><span class="n">st_name</span><span class="p">)</span> <span class="o">==</span> <span class="n">name</span><span class="p">:</span>
+				<span class="n">sym_addr</span> <span class="o">=</span> <span class="p">(</span><span class="n">symtab</span> <span class="o">+</span> <span class="p">(</span><span class="n">ctypes</span><span class="o">.</span><span class="n">sizeof</span><span class="p">(</span><span class="n">sym_struct</span><span class="p">)</span> <span class="o">*</span> <span class="n">idx</span><span class="p">))</span>
+				<span class="n">old_address</span> <span class="o">=</span> <span class="n">lm</span><span class="o">.</span><span class="n">l_addr</span> <span class="o">+</span> <span class="n">sym</span><span class="o">.</span><span class="n">st_value</span>
+				<span class="n">sym</span><span class="o">.</span><span class="n">st_value</span> <span class="o">=</span> <span class="p">(</span><span class="n">lm</span><span class="o">.</span><span class="n">l_addr</span> <span class="o">-</span> <span class="n">new_address</span><span class="p">)</span>
+				<span class="bp">self</span><span class="o">.</span><span class="n">write_memory</span><span class="p">(</span><span class="n">sym_addr</span><span class="p">,</span> <span class="n">mayhem</span><span class="o">.</span><span class="n">utilities</span><span class="o">.</span><span class="n">struct_pack</span><span class="p">(</span><span class="n">sym</span><span class="p">))</span>
+				<span class="n">hook</span> <span class="o">=</span> <span class="n">mayhem</span><span class="o">.</span><span class="n">proc</span><span class="o">.</span><span class="n">Hook</span><span class="p">(</span><span class="s1">&#39;eat&#39;</span><span class="p">,</span> <span class="p">(</span><span class="n">sym_addr</span> <span class="o">+</span> <span class="n">sym_struct</span><span class="o">.</span><span class="n">st_value</span><span class="o">.</span><span class="n">offset</span><span class="p">),</span> <span class="n">old_address</span><span class="p">,</span> <span class="n">new_address</span><span class="p">)</span>
+				<span class="bp">self</span><span class="o">.</span><span class="n">_installed_hooks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">hook</span><span class="p">)</span>
+				<span class="k">return</span> <span class="n">hook</span>
+		<span class="k">raise</span> <span class="n">mayhem</span><span class="o">.</span><span class="n">proc</span><span class="o">.</span><span class="n">ProcessError</span><span class="p">(</span><span class="s1">&#39;unable to locate function&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="LinuxProcess.allocate"><a class="viewcode-back" href="../../../mayhem/proc/linux.html#mayhem.proc.linux.LinuxProcess.allocate">[docs]</a>	<span class="k">def</span> <span class="nf">allocate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mh">0x400</span><span class="p">,</span> <span class="n">address</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">permissions</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+		<span class="n">permissions</span> <span class="o">=</span> <span class="p">(</span><span class="n">permissions</span> <span class="ow">or</span> <span class="s1">&#39;PROT_READ | PROT_WRITE | PROT_EXEC&#39;</span><span class="p">)</span>
+		<span class="k">if</span> <span class="n">address</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">permissions</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+			<span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_allocate_mmap</span><span class="p">(</span><span class="n">size</span><span class="p">,</span> <span class="n">address</span><span class="p">,</span> <span class="n">permissions</span><span class="p">)</span>
+		<span class="k">try</span><span class="p">:</span>
+			<span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_allocate_malloc</span><span class="p">(</span><span class="n">size</span><span class="p">)</span>
+		<span class="k">except</span> <span class="n">mayhem</span><span class="o">.</span><span class="n">proc</span><span class="o">.</span><span class="n">ProcessError</span><span class="p">:</span>
+			<span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_allocate_mmap</span><span class="p">(</span><span class="n">size</span><span class="p">,</span> <span class="n">address</span><span class="p">,</span> <span class="n">permissions</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="LinuxProcess.free"><a class="viewcode-back" href="../../../mayhem/proc/linux.html#mayhem.proc.linux.LinuxProcess.free">[docs]</a>	<span class="k">def</span> <span class="nf">free</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">address</span><span class="p">):</span>
+		<span class="n">memregion</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">maps</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">address</span><span class="p">)</span>
+		<span class="k">if</span> <span class="n">memregion</span><span class="p">:</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">_free_munmap</span><span class="p">(</span><span class="n">address</span><span class="p">,</span> <span class="p">(</span><span class="n">memregion</span><span class="o">.</span><span class="n">addr_high</span> <span class="o">-</span> <span class="n">memregion</span><span class="o">.</span><span class="n">addr_low</span><span class="p">))</span>
+		<span class="k">else</span><span class="p">:</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">_free_free</span><span class="p">(</span><span class="n">address</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="LinuxProcess.protect"><a class="viewcode-back" href="../../../mayhem/proc/linux.html#mayhem.proc.linux.LinuxProcess.protect">[docs]</a>	<span class="k">def</span> <span class="nf">protect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">address</span><span class="p">,</span> <span class="n">permissions</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mh">0x400</span><span class="p">):</span>
+		<span class="n">permissions</span> <span class="o">=</span> <span class="p">(</span><span class="n">permissions</span> <span class="ow">or</span> <span class="s1">&#39;PROT_READ | PROT_WRITE | PROT_EXEC&#39;</span><span class="p">)</span>
+		<span class="n">mprotect_addr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_function_address</span><span class="p">(</span><span class="s1">&#39;libc-&#39;</span><span class="p">,</span> <span class="s1">&#39;mprotect&#39;</span><span class="p">)</span>
+		<span class="n">permissions</span> <span class="o">=</span> <span class="n">flags</span><span class="p">(</span><span class="n">permissions</span><span class="p">)</span>
+		<span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_call_function</span><span class="p">(</span><span class="n">mprotect_addr</span><span class="p">,</span> <span class="n">address</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">permissions</span><span class="p">)</span>
+		<span class="k">if</span> <span class="n">result</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+			<span class="k">raise</span> <span class="n">LinuxProcessError</span><span class="p">(</span><span class="s1">&#39;Error: mprotect&#39;</span><span class="p">)</span>
+		<span class="k">return</span></div>
+
+<div class="viewcode-block" id="LinuxProcess.start_thread"><a class="viewcode-back" href="../../../mayhem/proc/linux.html#mayhem.proc.linux.LinuxProcess.start_thread">[docs]</a>	<span class="k">def</span> <span class="nf">start_thread</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">address</span><span class="p">,</span> <span class="n">targ</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+		<span class="n">thread_create_addr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_function_address</span><span class="p">(</span><span class="s1">&#39;libpthread&#39;</span><span class="p">,</span> <span class="s1">&#39;pthread_create&#39;</span><span class="p">)</span>
+		<span class="n">thread_id_addr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_allocate_malloc</span><span class="p">(</span><span class="mh">0x10</span><span class="p">)</span>
+		<span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_call_function</span><span class="p">(</span><span class="n">thread_create_addr</span><span class="p">,</span> <span class="n">thread_id_addr</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">address</span><span class="p">,</span> <span class="n">targ</span><span class="p">)</span>
+		<span class="k">if</span> <span class="n">result</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+			<span class="k">raise</span> <span class="n">LinuxProcessError</span><span class="p">(</span><span class="s1">&#39;Error: pthread_create&#39;</span><span class="p">)</span>
+		<span class="n">thread_id</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="s1">&#39;L&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_memory</span><span class="p">(</span><span class="n">thread_id_addr</span><span class="p">,</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">sizeof</span><span class="p">(</span><span class="n">ctypes</span><span class="o">.</span><span class="n">c_long</span><span class="p">)))[</span><span class="mi">0</span><span class="p">]</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">_free_free</span><span class="p">(</span><span class="n">thread_id_addr</span><span class="p">)</span>
+		<span class="k">return</span> <span class="n">thread_id</span></div>
+
+<div class="viewcode-block" id="LinuxProcess.join_thread"><a class="viewcode-back" href="../../../mayhem/proc/linux.html#mayhem.proc.linux.LinuxProcess.join_thread">[docs]</a>	<span class="k">def</span> <span class="nf">join_thread</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">thread_id</span><span class="p">):</span>
+		<span class="n">thread_join_addr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_function_address</span><span class="p">(</span><span class="s1">&#39;libpthread&#39;</span><span class="p">,</span> <span class="s1">&#39;pthread_join&#39;</span><span class="p">)</span>
+		<span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_call_function</span><span class="p">(</span><span class="n">thread_join_addr</span><span class="p">,</span> <span class="n">thread_id</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+			<span class="k">raise</span> <span class="n">LinuxProcessError</span><span class="p">(</span><span class="s1">&#39;Error: pthread_join&#39;</span><span class="p">)</span>
+		<span class="k">return</span></div>
+
+<div class="viewcode-block" id="LinuxProcess.close"><a class="viewcode-back" href="../../../mayhem/proc/linux.html#mayhem.proc.linux.LinuxProcess.close">[docs]</a>	<span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">_ptrace</span><span class="p">(</span><span class="n">PTRACE_DETACH</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="LinuxProcess.kill"><a class="viewcode-back" href="../../../mayhem/proc/linux.html#mayhem.proc.linux.LinuxProcess.kill">[docs]</a>	<span class="k">def</span> <span class="nf">kill</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="n">signal</span><span class="o">.</span><span class="n">signal</span><span class="p">(</span><span class="n">signal</span><span class="o">.</span><span class="n">SIGCHLD</span><span class="p">,</span> <span class="n">signal</span><span class="o">.</span><span class="n">SIG_DFL</span><span class="p">)</span>
+		<span class="n">os</span><span class="o">.</span><span class="n">kill</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pid</span><span class="p">,</span> <span class="n">signal</span><span class="o">.</span><span class="n">SIGKILL</span><span class="p">)</span>
+		<span class="n">os</span><span class="o">.</span><span class="n">waitpid</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pid</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="LinuxProcess.load_library"><a class="viewcode-back" href="../../../mayhem/proc/linux.html#mayhem.proc.linux.LinuxProcess.load_library">[docs]</a>	<span class="k">def</span> <span class="nf">load_library</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">libpath</span><span class="p">):</span>
+		<span class="n">libpath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">libpath</span><span class="p">)</span>
+		<span class="n">libpath</span> <span class="o">=</span> <span class="n">libpath</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\x00</span><span class="s2">&quot;</span>
+		<span class="n">dlopen_addr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_function_address</span><span class="p">(</span><span class="s1">&#39;libc-&#39;</span><span class="p">,</span> <span class="s1">&#39;__libc_dlopen_mode&#39;</span><span class="p">)</span>
+		<span class="n">readable_address</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_allocate_malloc</span><span class="p">(</span><span class="mh">0x400</span><span class="p">)</span>
+		<span class="n">readdata_backup</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_memory</span><span class="p">(</span><span class="n">readable_address</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">libpath</span><span class="p">))</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">write_memory</span><span class="p">(</span><span class="n">readable_address</span><span class="p">,</span> <span class="n">libpath</span><span class="p">)</span>
+		<span class="n">dlopen_flags</span> <span class="o">=</span> <span class="n">flags</span><span class="p">(</span><span class="s1">&#39;RTLD_LAZY | RTLD_GLOBAL&#39;</span><span class="p">)</span>
+		<span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_call_function</span><span class="p">(</span><span class="n">dlopen_addr</span><span class="p">,</span> <span class="n">readable_address</span><span class="p">,</span> <span class="n">dlopen_flags</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">write_memory</span><span class="p">(</span><span class="n">readable_address</span><span class="p">,</span> <span class="n">readdata_backup</span><span class="p">)</span>
+		<span class="k">if</span> <span class="n">result</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+			<span class="k">raise</span> <span class="n">LinuxProcessError</span><span class="p">(</span><span class="s1">&#39;Error: failed to load: &#39;</span> <span class="o">+</span> <span class="nb">repr</span><span class="p">(</span><span class="n">libpath</span><span class="p">))</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">_free_free</span><span class="p">(</span><span class="n">readable_address</span><span class="p">)</span>
+		<span class="k">return</span> <span class="n">result</span></div>
+
+<div class="viewcode-block" id="LinuxProcess.read_memory"><a class="viewcode-back" href="../../../mayhem/proc/linux.html#mayhem.proc.linux.LinuxProcess.read_memory">[docs]</a>	<span class="k">def</span> <span class="nf">read_memory</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">address</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mh">0x400</span><span class="p">):</span>
+		<span class="n">data</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;&#39;</span>
+		<span class="n">address_cursor</span> <span class="o">=</span> <span class="n">address</span>
+		<span class="n">size_of_long</span> <span class="o">=</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">sizeof</span><span class="p">(</span><span class="n">ctypes</span><span class="o">.</span><span class="n">c_long</span><span class="p">)</span>
+		<span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">size</span><span class="p">:</span>
+			<span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ptrace</span><span class="p">(</span><span class="n">PTRACE_PEEKDATA</span><span class="p">,</span> <span class="n">address_cursor</span><span class="p">)</span>
+			<span class="k">if</span> <span class="n">value</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+				<span class="n">errno</span> <span class="o">=</span> <span class="n">get_errno</span><span class="p">()</span>
+				<span class="k">if</span> <span class="n">errno</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+					<span class="k">raise</span> <span class="n">LinuxProcessError</span><span class="p">(</span><span class="s1">&#39;Error: PTRACE_PEEKDATA&#39;</span><span class="p">,</span> <span class="n">errno</span><span class="o">=</span><span class="n">get_errno</span><span class="p">())</span>
+			<span class="n">data</span> <span class="o">+=</span> <span class="n">struct</span><span class="o">.</span><span class="n">pack</span><span class="p">(</span><span class="s1">&#39;l&#39;</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+			<span class="n">address_cursor</span> <span class="o">+=</span> <span class="n">size_of_long</span>
+		<span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[:</span><span class="n">size</span><span class="p">]</span>
+		<span class="k">return</span> <span class="n">data</span></div>
+
+<div class="viewcode-block" id="LinuxProcess.write_memory"><a class="viewcode-back" href="../../../mayhem/proc/linux.html#mayhem.proc.linux.LinuxProcess.write_memory">[docs]</a>	<span class="k">def</span> <span class="nf">write_memory</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">address</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+		<span class="n">address_cursor</span> <span class="o">=</span> <span class="n">address</span>
+		<span class="n">size_of_long</span> <span class="o">=</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">sizeof</span><span class="p">(</span><span class="n">ctypes</span><span class="o">.</span><span class="n">c_long</span><span class="p">)</span>
+		<span class="n">sz_overlap</span> <span class="o">=</span> <span class="n">address_cursor</span> <span class="o">%</span> <span class="n">size_of_long</span>
+		<span class="k">if</span> <span class="n">sz_overlap</span><span class="p">:</span>
+			<span class="n">address_cursor</span> <span class="o">-=</span> <span class="n">sz_overlap</span>
+			<span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_memory</span><span class="p">(</span><span class="n">address_cursor</span><span class="p">,</span> <span class="n">sz_overlap</span><span class="p">)</span> <span class="o">+</span> <span class="n">data</span>
+		<span class="n">sz_overlap</span> <span class="o">=</span> <span class="n">size_of_long</span> <span class="o">-</span> <span class="p">((</span><span class="n">address_cursor</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">))</span> <span class="o">%</span> <span class="n">size_of_long</span><span class="p">)</span>
+		<span class="k">if</span> <span class="mi">0</span> <span class="o">&lt;</span> <span class="n">sz_overlap</span> <span class="o">&lt;</span> <span class="mi">8</span><span class="p">:</span>
+			<span class="n">data</span> <span class="o">=</span> <span class="n">data</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_memory</span><span class="p">(</span><span class="n">address_cursor</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">),</span> <span class="n">sz_overlap</span><span class="p">)</span>
+		<span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">),</span> <span class="n">size_of_long</span><span class="p">):</span>
+			<span class="n">data_chunk</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">idx</span><span class="p">:(</span><span class="n">idx</span> <span class="o">+</span> <span class="n">size_of_long</span><span class="p">)]</span>
+			<span class="n">data_chunk</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="s1">&#39;l&#39;</span><span class="p">,</span> <span class="n">data_chunk</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+			<span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ptrace</span><span class="p">(</span><span class="n">PTRACE_POKEDATA</span><span class="p">,</span> <span class="n">address_cursor</span> <span class="o">+</span> <span class="n">idx</span><span class="p">,</span> <span class="n">data_chunk</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+				<span class="k">raise</span> <span class="n">LinuxProcessError</span><span class="p">(</span><span class="s1">&#39;Error: PTRACE_POKEDATA&#39;</span><span class="p">,</span> <span class="n">errno</span><span class="o">=</span><span class="n">get_errno</span><span class="p">())</span>
+		<span class="k">return</span></div></div>
+</pre></div>
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Spencer McIntyre.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../',
+            VERSION:'0.2',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

@@ -1,0 +1,402 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>utilities &mdash; Mayhem 0.2 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="../genindex.html"/>
+        <link rel="search" title="Search" href="../search.html"/>
+    <link rel="top" title="Mayhem 0.2 documentation" href="../index.html"/>
+        <link rel="up" title="mayhem" href="index.html"/>
+        <link rel="prev" title="windows" href="proc/windows.html"/> 
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> Mayhem
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html"><code class="docutils literal notranslate"><span class="pre">mayhem</span></code></a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="proc/index.html"><code class="docutils literal notranslate"><span class="pre">proc</span></code></a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#"><code class="docutils literal notranslate"><span class="pre">utilities</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#functions">Functions</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Mayhem</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="index.html"><code class="docutils literal notranslate"><span class="pre">mayhem</span></code></a> &raquo;</li>
+        
+      <li><code class="docutils literal notranslate"><span class="pre">utilities</span></code></li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/mayhem/utilities.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-utilities">
+<span id="utilities"></span><h1><a class="reference internal" href="#module-utilities" title="utilities: Miscellaneous utilities"><code class="xref py py-mod docutils literal notranslate"><span class="pre">utilities</span></code></a><a class="headerlink" href="#module-utilities" title="Permalink to this headline">¶</a></h1>
+<p>This modules provides utility functions for a variety of purposes.</p>
+<div class="section" id="functions">
+<h2>Functions<a class="headerlink" href="#functions" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="mayhem.utilities.align_down">
+<code class="descname">align_down</code><span class="sig-paren">(</span><em>number</em>, <em>alignment=16</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mayhem/utilities.html#align_down"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mayhem.utilities.align_down" title="Permalink to this definition">¶</a></dt>
+<dd><p>Subtract from <em>number</em> so it is divisible by <em>alignment</em>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>number</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – The value to decrease.</li>
+<li><strong>alignment</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – The value to make <em>number</em> divisible by.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The modified value.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="mayhem.utilities.align_up">
+<code class="descname">align_up</code><span class="sig-paren">(</span><em>number</em>, <em>alignment=16</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mayhem/utilities.html#align_up"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mayhem.utilities.align_up" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add to <em>number</em> so it is divisible by <em>alignment</em>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>number</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – The value to increase.</li>
+<li><strong>alignment</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – The value to make <em>number</em> divisible by.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The modified value.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="mayhem.utilities.architecture_is_32bit">
+<code class="descname">architecture_is_32bit</code><span class="sig-paren">(</span><em>arch</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mayhem/utilities.html#architecture_is_32bit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mayhem.utilities.architecture_is_32bit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if the architecture specified in <em>arch</em> is 32-bit.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>arch</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The value to check.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)">bool</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="mayhem.utilities.architecture_is_64bit">
+<code class="descname">architecture_is_64bit</code><span class="sig-paren">(</span><em>arch</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mayhem/utilities.html#architecture_is_64bit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mayhem.utilities.architecture_is_64bit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if the architecture specified in <em>arch</em> is 64-bit.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>arch</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The value to check.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)">bool</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="mayhem.utilities.eval_number">
+<code class="descname">eval_number</code><span class="sig-paren">(</span><em>number</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mayhem/utilities.html#eval_number"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mayhem.utilities.eval_number" title="Permalink to this definition">¶</a></dt>
+<dd><p>Evaluate a numerical expressions in different string formats indicating
+base.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>number</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The string to evaluate.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The converted value.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="mayhem.utilities.print_hexdump">
+<code class="descname">print_hexdump</code><span class="sig-paren">(</span><em>data</em>, <em>address=0</em>, <em>stream=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mayhem/utilities.html#print_hexdump"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mayhem.utilities.print_hexdump" title="Permalink to this definition">¶</a></dt>
+<dd><p>Print data to stdout in a visually pleasant hex format.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>data</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The data to print.</li>
+<li><strong>address</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – The base address to display for <em>data</em>.</li>
+<li><strong>stream</strong> – The object to write the data to be displayed to.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="mayhem.utilities.struct_pack">
+<code class="descname">struct_pack</code><span class="sig-paren">(</span><em>structure</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mayhem/utilities.html#struct_pack"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mayhem.utilities.struct_pack" title="Permalink to this definition">¶</a></dt>
+<dd><p>Pack a <a class="reference external" href="https://docs.python.org/3.6/library/ctypes.html#ctypes.Structure" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ctypes.Structure</span></code></a> object and convert it to a packed string.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>structure</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/ctypes.html#ctypes.Structure" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ctypes.Structure</span></code></a>) – The structure instance to convert</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The structure instance converted to a string.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)">str</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="mayhem.utilities.struct_unpack">
+<code class="descname">struct_unpack</code><span class="sig-paren">(</span><em>structure</em>, <em>raw_data</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mayhem/utilities.html#struct_unpack"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mayhem.utilities.struct_unpack" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert <em>raw_data</em> to an instance of <em>structure</em>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>structure</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/ctypes.html#ctypes.Structure" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ctypes.Structure</span></code></a>) – The structure that describes <em>raw_data</em>.</li>
+<li><strong>raw_data</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The binary string which contains the structures data.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">A new instance of <em>structure</em>.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3.6/library/ctypes.html#ctypes.Structure" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ctypes.Structure</span></code></a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href="proc/windows.html" class="btn btn-neutral" title="windows" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Spencer McIntyre.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../',
+            VERSION:'0.2',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../_static/jquery.js"></script>
+      <script type="text/javascript" src="../_static/underscore.js"></script>
+      <script type="text/javascript" src="../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

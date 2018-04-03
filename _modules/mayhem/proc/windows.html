@@ -1,0 +1,736 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>mayhem.proc.windows &mdash; Mayhem 0.2 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="../../../genindex.html"/>
+        <link rel="search" title="Search" href="../../../search.html"/>
+    <link rel="top" title="Mayhem 0.2 documentation" href="../../../index.html"/>
+        <link rel="up" title="mayhem.proc" href="../proc.html"/> 
+
+  
+  <script src="../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> Mayhem
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../mayhem/index.html"><code class="docutils literal notranslate"><span class="pre">mayhem</span></code></a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Mayhem</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+          <li><a href="../proc.html">mayhem.proc</a> &raquo;</li>
+        
+      <li>mayhem.proc.windows</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for mayhem.proc.windows</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="c1">#</span>
+<span class="c1">#  mayhem/proc/windows.py</span>
+<span class="c1">#</span>
+<span class="c1">#  Redistribution and use in source and binary forms, with or without</span>
+<span class="c1">#  modification, are permitted provided that the following conditions are</span>
+<span class="c1">#  met:</span>
+<span class="c1">#</span>
+<span class="c1">#  * Redistributions of source code must retain the above copyright</span>
+<span class="c1">#    notice, this list of conditions and the following disclaimer.</span>
+<span class="c1">#  * Redistributions in binary form must reproduce the above</span>
+<span class="c1">#    copyright notice, this list of conditions and the following disclaimer</span>
+<span class="c1">#    in the documentation and/or other materials provided with the</span>
+<span class="c1">#    distribution.</span>
+<span class="c1">#  * Neither the name of the project nor the names of its</span>
+<span class="c1">#    contributors may be used to endorse or promote products derived from</span>
+<span class="c1">#    this software without specific prior written permission.</span>
+<span class="c1">#</span>
+<span class="c1">#  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS</span>
+<span class="c1">#  &quot;AS IS&quot; AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT</span>
+<span class="c1">#  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR</span>
+<span class="c1">#  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT</span>
+<span class="c1">#  OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,</span>
+<span class="c1">#  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT</span>
+<span class="c1">#  LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,</span>
+<span class="c1">#  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY</span>
+<span class="c1">#  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT</span>
+<span class="c1">#  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE</span>
+<span class="c1">#  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</span>
+<span class="c1">#</span>
+
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">unicode_literals</span>
+
+<span class="kn">import</span> <span class="nn">collections</span>
+<span class="kn">import</span> <span class="nn">ctypes</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">platform</span>
+
+<span class="kn">from</span> <span class="nn">mayhem.proc</span> <span class="k">import</span> <span class="n">ProcessBase</span><span class="p">,</span> <span class="n">ProcessError</span><span class="p">,</span> <span class="n">Hook</span><span class="p">,</span> <span class="n">MemoryRegion</span>
+<span class="kn">from</span> <span class="nn">mayhem.datatypes</span> <span class="k">import</span> <span class="n">windows</span> <span class="k">as</span> <span class="n">wintypes</span>
+<span class="kn">from</span> <span class="nn">mayhem.utilities</span> <span class="k">import</span> <span class="n">ctarray_to_bytes</span><span class="p">,</span> <span class="n">eval_number</span>
+
+<span class="n">CONSTANTS</span> <span class="o">=</span> <span class="p">{</span>
+	<span class="s1">&#39;GENERIC_READ&#39;</span><span class="p">:</span> <span class="mh">0x80000000</span><span class="p">,</span>
+	<span class="s1">&#39;GENERIC_WRITE&#39;</span><span class="p">:</span> <span class="mh">0x40000000</span><span class="p">,</span>
+
+	<span class="s1">&#39;OPEN_EXISTING&#39;</span><span class="p">:</span> <span class="mh">0x03</span><span class="p">,</span>
+	<span class="s1">&#39;CREATE_ALWAYS&#39;</span><span class="p">:</span> <span class="mh">0x02</span><span class="p">,</span>
+
+	<span class="c1"># http://msdn.microsoft.com/en-us/library/windows/desktop/aa366890%28v=vs.85%29.aspx</span>
+	<span class="s1">&#39;MEM_COMMIT&#39;</span><span class="p">:</span> <span class="mh">0x00001000</span><span class="p">,</span>
+	<span class="s1">&#39;MEM_RESERVE&#39;</span><span class="p">:</span> <span class="mh">0x00002000</span><span class="p">,</span>
+	<span class="s1">&#39;MEM_RESET&#39;</span><span class="p">:</span> <span class="mh">0x00080000</span><span class="p">,</span>
+	<span class="s1">&#39;MEM_RESET_UNDO&#39;</span><span class="p">:</span> <span class="mh">0x01000000</span><span class="p">,</span>
+	<span class="s1">&#39;MEM_LARGE_PAGES&#39;</span><span class="p">:</span> <span class="mh">0x20000000</span><span class="p">,</span>
+	<span class="s1">&#39;MEM_PHYSICAL&#39;</span><span class="p">:</span> <span class="mh">0x00400000</span><span class="p">,</span>
+	<span class="s1">&#39;MEM_TOP_DOWN&#39;</span><span class="p">:</span> <span class="mh">0x00100000</span><span class="p">,</span>
+
+	<span class="c1"># http://msdn.microsoft.com/en-us/library/windows/desktop/aa366775%28v=vs.85%29.aspx</span>
+	<span class="s1">&#39;MEM_IMAGE&#39;</span><span class="p">:</span> <span class="mh">0x01000000</span><span class="p">,</span>
+	<span class="s1">&#39;MEM_MAPPED&#39;</span><span class="p">:</span> <span class="mh">0x00040000</span><span class="p">,</span>
+	<span class="s1">&#39;MEM_PRIVATE&#39;</span><span class="p">:</span> <span class="mh">0x00020000</span><span class="p">,</span>
+
+	<span class="c1"># http://msdn.microsoft.com/en-us/library/windows/desktop/aa366894%28v=vs.85%29.aspx</span>
+	<span class="s1">&#39;MEM_DECOMMIT&#39;</span><span class="p">:</span> <span class="mh">0x4000</span><span class="p">,</span>
+	<span class="s1">&#39;MEM_RELEASE&#39;</span><span class="p">:</span> <span class="mh">0x8000</span><span class="p">,</span>
+
+	<span class="c1"># http://msdn.microsoft.com/en-us/library/windows/desktop/aa366786%28v=vs.85%29.aspx</span>
+	<span class="s1">&#39;PAGE_EXECUTE&#39;</span><span class="p">:</span> <span class="mh">0x10</span><span class="p">,</span>
+	<span class="s1">&#39;PAGE_EXECUTE_READ&#39;</span><span class="p">:</span> <span class="mh">0x20</span><span class="p">,</span>
+	<span class="s1">&#39;PAGE_EXECUTE_READWRITE&#39;</span><span class="p">:</span> <span class="mh">0x40</span><span class="p">,</span>
+	<span class="s1">&#39;PAGE_EXECUTE_WRITECOPY&#39;</span><span class="p">:</span> <span class="mh">0x80</span><span class="p">,</span>
+	<span class="s1">&#39;PAGE_NOACCESS&#39;</span><span class="p">:</span> <span class="mh">0x01</span><span class="p">,</span>
+	<span class="s1">&#39;PAGE_READONLY&#39;</span><span class="p">:</span> <span class="mh">0x02</span><span class="p">,</span>
+	<span class="s1">&#39;PAGE_READWRITE&#39;</span><span class="p">:</span> <span class="mh">0x04</span><span class="p">,</span>
+	<span class="s1">&#39;PAGE_WRITECOPY&#39;</span><span class="p">:</span> <span class="mh">0x08</span><span class="p">,</span>
+
+	<span class="c1"># http://msdn.microsoft.com/en-us/library/windows/desktop/ms684880%28v=vs.85%29.aspx</span>
+	<span class="s1">&#39;PROCESS_CREATE_PROCESS&#39;</span><span class="p">:</span> <span class="mh">0x0080</span><span class="p">,</span>
+	<span class="s1">&#39;PROCESS_CREATE_THREAD&#39;</span><span class="p">:</span> <span class="mh">0x0002</span><span class="p">,</span>
+	<span class="s1">&#39;PROCESS_DUP_HANDLE&#39;</span><span class="p">:</span> <span class="mh">0x0040</span><span class="p">,</span>
+	<span class="s1">&#39;PROCESS_QUERY_INFORMATION&#39;</span><span class="p">:</span> <span class="mh">0x0400</span><span class="p">,</span>
+	<span class="s1">&#39;PROCESS_QUERY_LIMITED_INFORMATION&#39;</span><span class="p">:</span> <span class="mh">0x1000</span><span class="p">,</span>
+	<span class="s1">&#39;PROCESS_SET_INFORMATION&#39;</span><span class="p">:</span> <span class="mh">0x0200</span><span class="p">,</span>
+	<span class="s1">&#39;PROCESS_SET_QUOTA&#39;</span><span class="p">:</span> <span class="mh">0x0100</span><span class="p">,</span>
+	<span class="s1">&#39;PROCESS_SUSPEND_RESUME&#39;</span><span class="p">:</span> <span class="mh">0x0800</span><span class="p">,</span>
+	<span class="s1">&#39;PROCESS_TERMINATE&#39;</span><span class="p">:</span> <span class="mh">0x0001</span><span class="p">,</span>
+	<span class="s1">&#39;PROCESS_VM_OPERATION&#39;</span><span class="p">:</span> <span class="mh">0x0008</span><span class="p">,</span>
+	<span class="s1">&#39;PROCESS_VM_READ&#39;</span><span class="p">:</span> <span class="mh">0x0010</span><span class="p">,</span>
+	<span class="s1">&#39;PROCESS_VM_WRITE&#39;</span><span class="p">:</span> <span class="mh">0x0020</span><span class="p">,</span>
+	<span class="s1">&#39;SYNCHRONIZE&#39;</span><span class="p">:</span> <span class="mh">0x00100000</span><span class="p">,</span>
+
+	<span class="c1"># http://msdn.microsoft.com/en-us/library/windows/desktop/aa363858%28v:vs.85%29.aspx</span>
+	<span class="s1">&#39;FILE_SHARE_READ&#39;</span><span class="p">:</span> <span class="mh">0x00000001</span><span class="p">,</span>
+	<span class="s1">&#39;FILE_SHARE_WRITE&#39;</span><span class="p">:</span> <span class="mh">0x00000002</span><span class="p">,</span>
+	<span class="s1">&#39;FILE_SHARE_DELETE&#39;</span><span class="p">:</span> <span class="mh">0x00000004</span><span class="p">,</span>
+
+	<span class="s1">&#39;FILE_FLAG_OVERLAPPED&#39;</span><span class="p">:</span> <span class="mh">0x40000000</span>
+<span class="p">}</span>
+
+<span class="n">IMAGE_DIRECTORY_ENTRY_EXPORT</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">IMAGE_DIRECTORY_ENTRY_IMPORT</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">IMAGE_DIRECTORY_ENTRY_RESOURCE</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="n">IMAGE_DIRECTORY_ENTRY_BASERELOC</span> <span class="o">=</span> <span class="mi">5</span>
+<span class="n">IMAGE_DIRECTORY_ENTRY_DEBUG</span> <span class="o">=</span> <span class="mi">6</span>
+<span class="n">IMAGE_DIRECTORY_ENTRY_TLS</span> <span class="o">=</span> <span class="mi">9</span>
+
+<div class="viewcode-block" id="WindowsProcessError"><a class="viewcode-back" href="../../../mayhem/proc/windows.html#mayhem.proc.windows.WindowsProcessError">[docs]</a><span class="k">class</span> <span class="nc">WindowsProcessError</span><span class="p">(</span><span class="n">ProcessError</span><span class="p">):</span>
+	<span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">get_last_error</span> <span class="o">=</span> <span class="kc">None</span>
+		<span class="k">if</span> <span class="s1">&#39;get_last_error&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">get_last_error</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;get_last_error&#39;</span><span class="p">]</span>
+			<span class="k">del</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;get_last_error&#39;</span><span class="p">]</span>
+		<span class="n">ProcessError</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+<span class="k">def</span> <span class="nf">flags</span><span class="p">(</span><span class="n">flags</span><span class="p">):</span>
+	<span class="n">supported_operators</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;|&#39;</span><span class="p">,</span> <span class="s1">&#39;+&#39;</span><span class="p">,</span> <span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="s1">&#39;^&#39;</span><span class="p">]</span>
+	<span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">flags</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+		<span class="k">return</span> <span class="n">flags</span>
+	<span class="k">if</span> <span class="n">flags</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;(&#39;</span> <span class="ow">and</span> <span class="n">flags</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;)&#39;</span><span class="p">:</span>
+		<span class="n">flags</span> <span class="o">=</span> <span class="n">flags</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+	<span class="k">for</span> <span class="n">sop</span> <span class="ow">in</span> <span class="n">supported_operators</span><span class="p">:</span>
+		<span class="n">flags</span> <span class="o">=</span> <span class="n">flags</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">sop</span><span class="p">,</span> <span class="s1">&#39; &#39;</span> <span class="o">+</span> <span class="n">sop</span> <span class="o">+</span> <span class="s1">&#39; &#39;</span><span class="p">)</span>
+	<span class="n">flags</span> <span class="o">=</span> <span class="n">flags</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+	<span class="n">parsed_flags</span> <span class="o">=</span> <span class="mi">0</span>
+	<span class="n">last_operator</span> <span class="o">=</span> <span class="kc">None</span>
+	<span class="k">for</span> <span class="n">part</span> <span class="ow">in</span> <span class="n">flags</span><span class="p">:</span>
+		<span class="k">if</span> <span class="n">part</span> <span class="ow">in</span> <span class="n">CONSTANTS</span><span class="p">:</span>
+			<span class="n">part</span> <span class="o">=</span> <span class="n">CONSTANTS</span><span class="p">[</span><span class="n">part</span><span class="p">]</span>
+		<span class="k">elif</span> <span class="n">part</span> <span class="ow">in</span> <span class="n">supported_operators</span><span class="p">:</span>
+			<span class="n">last_operator</span> <span class="o">=</span> <span class="n">part</span>
+			<span class="k">continue</span>
+		<span class="k">else</span><span class="p">:</span>
+			<span class="n">part</span> <span class="o">=</span> <span class="n">eval_number</span><span class="p">(</span><span class="n">part</span><span class="p">)</span>
+		<span class="k">if</span> <span class="n">last_operator</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+			<span class="n">parsed_flags</span> <span class="o">=</span> <span class="n">part</span>
+		<span class="k">else</span><span class="p">:</span>
+			<span class="n">parsed_flags</span> <span class="o">=</span> <span class="nb">eval</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">parsed_flags</span><span class="p">)</span> <span class="o">+</span> <span class="n">last_operator</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">part</span><span class="p">))</span>
+	<span class="k">return</span> <span class="n">parsed_flags</span>
+
+<span class="k">def</span> <span class="nf">process_is_wow64</span><span class="p">(</span><span class="n">handle</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+	<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">	Determine whether the process associated with the handle is running</span>
+<span class="sd">	in WOW64 or not.</span>
+
+<span class="sd">	:param int handle: A handle to the process to check.</span>
+<span class="sd">	:return: Whether the process is running in WOW64 or not.</span>
+<span class="sd">	:rtype: bool</span>
+<span class="sd">	&quot;&quot;&quot;</span>
+	<span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">ctypes</span><span class="o">.</span><span class="n">windll</span><span class="o">.</span><span class="n">kernel32</span><span class="p">,</span> <span class="s1">&#39;IsWow64Process&#39;</span><span class="p">):</span>
+		<span class="k">return</span> <span class="kc">False</span>
+	<span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">architecture</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;64bit&#39;</span><span class="p">:</span>
+		<span class="n">ctypes</span><span class="o">.</span><span class="n">windll</span><span class="o">.</span><span class="n">kernel32</span><span class="o">.</span><span class="n">IsWow64Process</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[</span><span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint64</span><span class="p">,</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">POINTER</span><span class="p">(</span><span class="n">ctypes</span><span class="o">.</span><span class="n">c_bool</span><span class="p">)]</span>
+	<span class="n">handle</span> <span class="o">=</span> <span class="p">(</span><span class="n">handle</span> <span class="ow">or</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+	<span class="n">is_wow64</span> <span class="o">=</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">c_bool</span><span class="p">()</span>
+	<span class="k">if</span> <span class="ow">not</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">windll</span><span class="o">.</span><span class="n">kernel32</span><span class="o">.</span><span class="n">IsWow64Process</span><span class="p">(</span><span class="n">handle</span><span class="p">,</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">byref</span><span class="p">(</span><span class="n">is_wow64</span><span class="p">)):</span>
+		<span class="k">raise</span> <span class="n">WindowsProcessError</span><span class="p">(</span><span class="s1">&#39;Error: IsWow64Process&#39;</span><span class="p">,</span> <span class="n">get_last_error</span><span class="o">=</span><span class="n">ctypes</span><span class="o">.</span><span class="n">windll</span><span class="o">.</span><span class="n">kernel32</span><span class="o">.</span><span class="n">GetLastError</span><span class="p">())</span>
+	<span class="k">return</span> <span class="n">is_wow64</span><span class="o">.</span><span class="n">value</span>
+
+<div class="viewcode-block" id="WindowsProcess"><a class="viewcode-back" href="../../../mayhem/proc/windows.html#mayhem.proc.windows.WindowsProcess">[docs]</a><span class="k">class</span> <span class="nc">WindowsProcess</span><span class="p">(</span><span class="n">ProcessBase</span><span class="p">):</span>
+	<span class="sd">&quot;&quot;&quot;This class represents a process in a Windows environment.&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="WindowsProcess.__init__"><a class="viewcode-back" href="../../../mayhem/proc/windows.html#mayhem.proc.windows.WindowsProcess.__init__">[docs]</a>	<span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pid</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">exe</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">handle</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">arch</span><span class="o">=</span><span class="s1">&#39;x86&#39;</span><span class="p">,</span> <span class="n">access</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+		<span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">system</span><span class="p">()</span> <span class="o">!=</span> <span class="s1">&#39;Windows&#39;</span><span class="p">:</span>
+			<span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;incompatible platform&#39;</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">__arch__</span> <span class="o">=</span> <span class="n">arch</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">k32</span> <span class="o">=</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">windll</span><span class="o">.</span><span class="n">kernel32</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">ntdll</span> <span class="o">=</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">windll</span><span class="o">.</span><span class="n">ntdll</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">psapi</span> <span class="o">=</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">windll</span><span class="o">.</span><span class="n">psapi</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">_setup_winapi</span><span class="p">()</span>
+
+		<span class="bp">self</span><span class="o">.</span><span class="n">handle</span> <span class="o">=</span> <span class="kc">None</span>
+		<span class="k">if</span> <span class="n">pid</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+			<span class="n">handle</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+			<span class="n">pid</span> <span class="o">=</span> <span class="kc">None</span>
+		<span class="k">if</span> <span class="n">access</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+			<span class="n">access</span> <span class="o">=</span> <span class="s2">&quot;(PROCESS_CREATE_THREAD | PROCESS_QUERY_INFORMATION | PROCESS_VM_OPERATION | PROCESS_VM_WRITE | PROCESS_VM_READ | PROCESS_TERMINATE)&quot;</span>
+		<span class="k">if</span> <span class="n">pid</span><span class="p">:</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">handle</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">k32</span><span class="o">.</span><span class="n">OpenProcess</span><span class="p">(</span><span class="n">flags</span><span class="p">(</span><span class="n">access</span><span class="p">),</span> <span class="kc">False</span><span class="p">,</span> <span class="n">pid</span><span class="p">)</span>
+			<span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">handle</span><span class="p">:</span>
+				<span class="k">raise</span> <span class="n">ProcessError</span><span class="p">(</span><span class="s1">&#39;could not open PID&#39;</span><span class="p">)</span>
+		<span class="k">elif</span> <span class="n">exe</span><span class="p">:</span>
+			<span class="n">startupinfo</span> <span class="o">=</span> <span class="n">wintypes</span><span class="o">.</span><span class="n">STARTUPINFO</span><span class="p">()</span>
+			<span class="n">process_info</span> <span class="o">=</span> <span class="n">wintypes</span><span class="o">.</span><span class="n">PROCESS_INFORMATION</span><span class="p">()</span>
+			<span class="n">startupinfo</span><span class="o">.</span><span class="n">dwFlags</span> <span class="o">=</span> <span class="mh">0x01</span>
+			<span class="n">startupinfo</span><span class="o">.</span><span class="n">wShowWindow</span> <span class="o">=</span> <span class="mh">0x00</span>
+			<span class="n">startupinfo</span><span class="o">.</span><span class="n">cb</span> <span class="o">=</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">sizeof</span><span class="p">(</span><span class="n">startupinfo</span><span class="p">)</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">k32</span><span class="o">.</span><span class="n">CreateProcessA</span><span class="p">(</span><span class="n">exe</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">byref</span><span class="p">(</span><span class="n">startupinfo</span><span class="p">),</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">byref</span><span class="p">(</span><span class="n">process_info</span><span class="p">))</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">handle</span> <span class="o">=</span> <span class="n">process_info</span><span class="o">.</span><span class="n">hProcess</span>
+			<span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">handle</span><span class="p">:</span>
+				<span class="k">raise</span> <span class="n">ProcessError</span><span class="p">(</span><span class="s1">&#39;could not the create process&#39;</span><span class="p">)</span>
+		<span class="k">elif</span> <span class="n">handle</span><span class="p">:</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">handle</span> <span class="o">=</span> <span class="n">handle</span>
+		<span class="k">else</span><span class="p">:</span>
+			<span class="k">raise</span> <span class="n">ProcessError</span><span class="p">(</span><span class="s1">&#39;either a pid, exe or a handle must be specified&#39;</span><span class="p">)</span>
+		<span class="k">if</span> <span class="n">process_is_wow64</span><span class="p">()</span> <span class="o">!=</span> <span class="n">process_is_wow64</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">handle</span><span class="p">):</span>
+			<span class="k">raise</span> <span class="n">ProcessError</span><span class="p">(</span><span class="s1">&#39;the python process must be the same architecture as the target process&#39;</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">pid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">k32</span><span class="o">.</span><span class="n">GetProcessId</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">handle</span><span class="p">)</span>
+		<span class="n">_name</span> <span class="o">=</span> <span class="p">(</span><span class="n">ctypes</span><span class="o">.</span><span class="n">c_char</span> <span class="o">*</span> <span class="mh">0x400</span><span class="p">)</span>
+		<span class="n">name</span> <span class="o">=</span> <span class="n">_name</span><span class="p">()</span>
+		<span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">psapi</span><span class="p">,</span> <span class="s1">&#39;GetModuleFileNameExA&#39;</span><span class="p">):</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">psapi</span><span class="o">.</span><span class="n">GetModuleFileNameExA</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">handle</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">sizeof</span><span class="p">(</span><span class="n">name</span><span class="p">))</span>
+		<span class="k">else</span><span class="p">:</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">k32</span><span class="o">.</span><span class="n">GetModuleFileNameExA</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">handle</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">sizeof</span><span class="p">(</span><span class="n">name</span><span class="p">))</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">exe_file</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">name</span><span class="p">)</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x00</span><span class="s1">&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">_installed_hooks</span> <span class="o">=</span> <span class="p">[]</span></div>
+
+	<span class="k">def</span> <span class="nf">__del__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">handle</span><span class="p">:</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+<div class="viewcode-block" id="WindowsProcess.get_proc_attribute"><a class="viewcode-back" href="../../../mayhem/proc/windows.html#mayhem.proc.windows.WindowsProcess.get_proc_attribute">[docs]</a>	<span class="k">def</span> <span class="nf">get_proc_attribute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attribute</span><span class="p">):</span>
+		<span class="n">requested_attribute</span> <span class="o">=</span> <span class="n">attribute</span>
+		<span class="k">if</span> <span class="n">attribute</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;&amp;&#39;</span><span class="p">):</span>
+			<span class="n">attribute</span> <span class="o">=</span> <span class="n">attribute</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">+</span> <span class="s1">&#39;_addr&#39;</span>
+		<span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_get_attr_&#39;</span> <span class="o">+</span> <span class="n">attribute</span><span class="p">):</span>
+			<span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_get_attr_&#39;</span> <span class="o">+</span> <span class="n">attribute</span><span class="p">)()</span>
+		<span class="k">raise</span> <span class="n">ProcessError</span><span class="p">(</span><span class="s1">&#39;Unknown Attribute: &#39;</span> <span class="o">+</span> <span class="n">requested_attribute</span><span class="p">)</span></div>
+
+	<span class="k">def</span> <span class="nf">_get_attr_peb_addr</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="n">process_basic_information</span> <span class="o">=</span> <span class="n">wintypes</span><span class="o">.</span><span class="n">PROCESS_BASIC_INFORMATION</span><span class="p">()</span>
+		<span class="n">return_length</span> <span class="o">=</span> <span class="n">wintypes</span><span class="o">.</span><span class="n">DWORD</span><span class="p">()</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">ntdll</span><span class="o">.</span><span class="n">NtQueryInformationProcess</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">handle</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">byref</span><span class="p">(</span><span class="n">process_basic_information</span><span class="p">),</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">sizeof</span><span class="p">(</span><span class="n">process_basic_information</span><span class="p">),</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">byref</span><span class="p">(</span><span class="n">return_length</span><span class="p">))</span>
+		<span class="k">return</span> <span class="n">process_basic_information</span><span class="o">.</span><span class="n">PebBaseAddress</span>
+
+	<span class="k">def</span> <span class="nf">_get_attr_peb</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="n">peb_addr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_proc_attribute</span><span class="p">(</span><span class="s1">&#39;peb_addr&#39;</span><span class="p">)</span>
+		<span class="n">peb</span> <span class="o">=</span> <span class="n">wintypes</span><span class="o">.</span><span class="n">PEB</span><span class="p">()</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">k32</span><span class="o">.</span><span class="n">ReadProcessMemory</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">handle</span><span class="p">,</span> <span class="n">peb_addr</span><span class="p">,</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">byref</span><span class="p">(</span><span class="n">peb</span><span class="p">),</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">sizeof</span><span class="p">(</span><span class="n">peb</span><span class="p">),</span> <span class="mi">0</span><span class="p">)</span>
+		<span class="k">return</span> <span class="n">peb</span>
+
+	<span class="k">def</span> <span class="nf">_get_attr_peb_ldr_data_addr</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="n">peb</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_proc_attribute</span><span class="p">(</span><span class="s1">&#39;peb&#39;</span><span class="p">)</span>
+		<span class="k">return</span> <span class="n">peb</span><span class="o">.</span><span class="n">Ldr</span>
+
+	<span class="k">def</span> <span class="nf">_get_attr_peb_ldr_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="n">peb_ldr_data_addr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_proc_attribute</span><span class="p">(</span><span class="s1">&#39;peb_ldr_data_addr&#39;</span><span class="p">)</span>
+		<span class="n">peb_ldr_data</span> <span class="o">=</span> <span class="n">wintypes</span><span class="o">.</span><span class="n">PEB_LDR_DATA</span><span class="p">()</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">k32</span><span class="o">.</span><span class="n">ReadProcessMemory</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">handle</span><span class="p">,</span> <span class="n">peb_ldr_data_addr</span><span class="p">,</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">byref</span><span class="p">(</span><span class="n">peb_ldr_data</span><span class="p">),</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">sizeof</span><span class="p">(</span><span class="n">peb_ldr_data</span><span class="p">),</span> <span class="mi">0</span><span class="p">)</span>
+		<span class="k">return</span> <span class="n">peb_ldr_data</span>
+
+	<span class="k">def</span> <span class="nf">_get_attr_image_dos_header_addr</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_proc_attribute</span><span class="p">(</span><span class="s1">&#39;peb&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">ImageBaseAddress</span>
+
+	<span class="k">def</span> <span class="nf">_get_attr_image_dos_header</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="n">image_dos_header_addr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_proc_attribute</span><span class="p">(</span><span class="s1">&#39;image_dos_header_addr&#39;</span><span class="p">)</span>
+		<span class="n">image_dos_header</span> <span class="o">=</span> <span class="n">wintypes</span><span class="o">.</span><span class="n">IMAGE_DOS_HEADER</span><span class="p">()</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">k32</span><span class="o">.</span><span class="n">ReadProcessMemory</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">handle</span><span class="p">,</span> <span class="n">image_dos_header_addr</span><span class="p">,</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">byref</span><span class="p">(</span><span class="n">image_dos_header</span><span class="p">),</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">sizeof</span><span class="p">(</span><span class="n">image_dos_header</span><span class="p">),</span> <span class="mi">0</span><span class="p">)</span>
+		<span class="k">return</span> <span class="n">image_dos_header</span>
+
+	<span class="k">def</span> <span class="nf">_get_attr_image_nt_headers_addr</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="n">image_dos_header_addr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_proc_attribute</span><span class="p">(</span><span class="s1">&#39;image_dos_header_addr&#39;</span><span class="p">)</span>
+		<span class="n">image_dos_header</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_proc_attribute</span><span class="p">(</span><span class="s1">&#39;image_dos_header&#39;</span><span class="p">)</span>
+		<span class="k">return</span> <span class="n">image_dos_header_addr</span> <span class="o">+</span> <span class="n">image_dos_header</span><span class="o">.</span><span class="n">e_lfanew</span>
+
+	<span class="k">def</span> <span class="nf">_get_attr_image_nt_headers</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__arch__</span> <span class="o">==</span> <span class="s1">&#39;x86&#39;</span><span class="p">:</span>
+			<span class="n">image_nt_headers</span> <span class="o">=</span> <span class="n">wintypes</span><span class="o">.</span><span class="n">IMAGE_NT_HEADERS32</span><span class="p">()</span>
+		<span class="k">else</span><span class="p">:</span>
+			<span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;the selected architecture is not supported&#39;</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">k32</span><span class="o">.</span><span class="n">ReadProcessMemory</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">handle</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_proc_attribute</span><span class="p">(</span><span class="s1">&#39;image_nt_headers_addr&#39;</span><span class="p">),</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">byref</span><span class="p">(</span><span class="n">image_nt_headers</span><span class="p">),</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">sizeof</span><span class="p">(</span><span class="n">image_nt_headers</span><span class="p">),</span> <span class="mi">0</span><span class="p">)</span>
+		<span class="k">return</span> <span class="n">image_nt_headers</span>
+
+	<span class="k">def</span> <span class="nf">_get_attr_image_import_descriptor_addr</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="n">image_dos_header_addr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_proc_attribute</span><span class="p">(</span><span class="s1">&#39;image_dos_header_addr&#39;</span><span class="p">)</span>
+		<span class="n">optional_header</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_proc_attribute</span><span class="p">(</span><span class="s1">&#39;image_nt_headers&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">OptionalHeader</span>
+		<span class="k">return</span> <span class="n">image_dos_header_addr</span> <span class="o">+</span> <span class="n">optional_header</span><span class="o">.</span><span class="n">DataDirectory</span><span class="p">[</span><span class="n">IMAGE_DIRECTORY_ENTRY_IMPORT</span><span class="p">]</span><span class="o">.</span><span class="n">VirtualAddress</span>
+
+	<span class="k">def</span> <span class="nf">_get_attr_image_import_descriptor</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="n">image_dos_header_addr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_proc_attribute</span><span class="p">(</span><span class="s1">&#39;image_dos_header_addr&#39;</span><span class="p">)</span>
+		<span class="n">optional_header</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_proc_attribute</span><span class="p">(</span><span class="s1">&#39;image_nt_headers&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">OptionalHeader</span>
+
+		<span class="n">import_directory</span> <span class="o">=</span> <span class="n">optional_header</span><span class="o">.</span><span class="n">DataDirectory</span><span class="p">[</span><span class="n">IMAGE_DIRECTORY_ENTRY_IMPORT</span><span class="p">]</span>
+		<span class="n">_import_descriptors</span> <span class="o">=</span> <span class="n">wintypes</span><span class="o">.</span><span class="n">IMAGE_IMPORT_DESCRIPTOR</span> <span class="o">*</span> <span class="p">((</span><span class="n">import_directory</span><span class="o">.</span><span class="n">Size</span> <span class="o">/</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">sizeof</span><span class="p">(</span><span class="n">wintypes</span><span class="o">.</span><span class="n">IMAGE_IMPORT_DESCRIPTOR</span><span class="p">))</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+		<span class="n">import_descriptors</span> <span class="o">=</span> <span class="n">_import_descriptors</span><span class="p">()</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">k32</span><span class="o">.</span><span class="n">ReadProcessMemory</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">handle</span><span class="p">,</span> <span class="n">image_dos_header_addr</span> <span class="o">+</span> <span class="n">import_directory</span><span class="o">.</span><span class="n">VirtualAddress</span><span class="p">,</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">byref</span><span class="p">(</span><span class="n">import_descriptors</span><span class="p">),</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">sizeof</span><span class="p">(</span><span class="n">import_descriptors</span><span class="p">),</span> <span class="mi">0</span><span class="p">)</span>
+		<span class="k">return</span> <span class="n">import_descriptors</span>
+
+	<span class="k">def</span> <span class="nf">_get_attr_system_info</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="n">system_info</span> <span class="o">=</span> <span class="n">wintypes</span><span class="o">.</span><span class="n">SYSTEM_INFO</span><span class="p">()</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">k32</span><span class="o">.</span><span class="n">GetSystemInfo</span><span class="p">(</span><span class="n">ctypes</span><span class="o">.</span><span class="n">byref</span><span class="p">(</span><span class="n">system_info</span><span class="p">))</span>
+		<span class="k">return</span> <span class="n">system_info</span>
+
+	<span class="k">def</span> <span class="nf">_get_name_for_ilt_entry</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ilt_ent</span><span class="p">):</span>
+		<span class="n">image_dos_header_addr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_proc_attribute</span><span class="p">(</span><span class="s1">&#39;image_dos_header_addr&#39;</span><span class="p">)</span>
+		<span class="n">_name</span> <span class="o">=</span> <span class="p">(</span><span class="n">ctypes</span><span class="o">.</span><span class="n">c_char</span> <span class="o">*</span> <span class="mh">0x200</span><span class="p">)</span>
+		<span class="n">name</span> <span class="o">=</span> <span class="n">_name</span><span class="p">()</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">k32</span><span class="o">.</span><span class="n">ReadProcessMemory</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">handle</span><span class="p">,</span> <span class="n">image_dos_header_addr</span> <span class="o">+</span> <span class="n">ilt_ent</span> <span class="o">+</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">sizeof</span><span class="p">(</span><span class="n">wintypes</span><span class="o">.</span><span class="n">WORD</span><span class="p">),</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">byref</span><span class="p">(</span><span class="n">name</span><span class="p">),</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">sizeof</span><span class="p">(</span><span class="n">name</span><span class="p">),</span> <span class="mi">0</span><span class="p">)</span>
+		<span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+		<span class="n">name</span> <span class="o">=</span> <span class="n">name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\x00</span><span class="s1">&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+		<span class="k">return</span> <span class="n">name</span>
+
+	<span class="k">def</span> <span class="nf">_get_ordinal_for_ilt_entry</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ilt_ent</span><span class="p">):</span>
+		<span class="k">return</span> <span class="p">(</span><span class="n">ilt_ent</span> <span class="o">&amp;</span> <span class="mh">0x7FFFFFFF</span><span class="p">)</span>
+
+	<span class="k">def</span> <span class="nf">_get_name_for_image_import_descriptor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">iid</span><span class="p">):</span>
+		<span class="n">image_dos_header_addr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_proc_attribute</span><span class="p">(</span><span class="s1">&#39;image_dos_header_addr&#39;</span><span class="p">)</span>
+		<span class="n">_name</span> <span class="o">=</span> <span class="p">(</span><span class="n">ctypes</span><span class="o">.</span><span class="n">c_char</span> <span class="o">*</span> <span class="mh">0x400</span><span class="p">)</span>
+		<span class="n">name</span> <span class="o">=</span> <span class="n">_name</span><span class="p">()</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">k32</span><span class="o">.</span><span class="n">ReadProcessMemory</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">handle</span><span class="p">,</span> <span class="n">image_dos_header_addr</span> <span class="o">+</span> <span class="n">iid</span><span class="o">.</span><span class="n">Name</span><span class="p">,</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">byref</span><span class="p">(</span><span class="n">name</span><span class="p">),</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">sizeof</span><span class="p">(</span><span class="n">name</span><span class="p">),</span> <span class="mi">0</span><span class="p">)</span>
+		<span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+		<span class="n">name</span> <span class="o">=</span> <span class="n">name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\x00</span><span class="s1">&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+		<span class="k">return</span> <span class="n">name</span>
+
+	<span class="k">def</span> <span class="nf">_get_ilt_for_image_import_descriptor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">iid</span><span class="p">):</span> <span class="c1"># import lookup table</span>
+		<span class="n">image_dos_header_addr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_proc_attribute</span><span class="p">(</span><span class="s1">&#39;image_dos_header_addr&#39;</span><span class="p">)</span>
+		<span class="n">_ilt</span> <span class="o">=</span> <span class="p">(</span><span class="n">ctypes</span><span class="o">.</span><span class="n">c_void_p</span> <span class="o">*</span> <span class="mh">0x200</span><span class="p">)</span>
+		<span class="n">ilt</span> <span class="o">=</span> <span class="n">_ilt</span><span class="p">()</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">k32</span><span class="o">.</span><span class="n">ReadProcessMemory</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">handle</span><span class="p">,</span> <span class="n">image_dos_header_addr</span> <span class="o">+</span> <span class="n">iid</span><span class="o">.</span><span class="n">OriginalFirstThunk</span><span class="p">,</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">byref</span><span class="p">(</span><span class="n">ilt</span><span class="p">),</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">sizeof</span><span class="p">(</span><span class="n">ilt</span><span class="p">),</span> <span class="mi">0</span><span class="p">)</span>
+		<span class="k">return</span> <span class="n">ilt</span>
+
+	<span class="k">def</span> <span class="nf">_get_iat_for_image_import_descriptor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">iid</span><span class="p">):</span> <span class="c1"># import address table</span>
+		<span class="n">image_dos_header_addr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_proc_attribute</span><span class="p">(</span><span class="s1">&#39;image_dos_header_addr&#39;</span><span class="p">)</span>
+		<span class="n">_iat</span> <span class="o">=</span> <span class="p">(</span><span class="n">ctypes</span><span class="o">.</span><span class="n">c_void_p</span> <span class="o">*</span> <span class="mh">0x200</span><span class="p">)</span>
+		<span class="n">iat</span> <span class="o">=</span> <span class="n">_iat</span><span class="p">()</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">k32</span><span class="o">.</span><span class="n">ReadProcessMemory</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">handle</span><span class="p">,</span> <span class="n">image_dos_header_addr</span> <span class="o">+</span> <span class="n">iid</span><span class="o">.</span><span class="n">FirstThunk</span><span class="p">,</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">byref</span><span class="p">(</span><span class="n">iat</span><span class="p">),</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">sizeof</span><span class="p">(</span><span class="n">iat</span><span class="p">),</span> <span class="mi">0</span><span class="p">)</span>
+		<span class="k">return</span> <span class="n">iat</span>
+
+	<span class="k">def</span> <span class="nf">_get_image_base_by_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+		<span class="n">peb_ldr_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_proc_attribute</span><span class="p">(</span><span class="s1">&#39;peb_ldr_data&#39;</span><span class="p">)</span>
+
+		<span class="n">firstFLink</span> <span class="o">=</span> <span class="mi">0</span>
+		<span class="n">fLink</span> <span class="o">=</span> <span class="n">peb_ldr_data</span><span class="o">.</span><span class="n">InLoadOrderModuleList</span><span class="o">.</span><span class="n">Flink</span>
+		<span class="k">while</span> <span class="n">fLink</span> <span class="o">!=</span> <span class="n">firstFLink</span><span class="p">:</span>
+			<span class="n">firstFLink</span> <span class="o">=</span> <span class="n">peb_ldr_data</span><span class="o">.</span><span class="n">InLoadOrderModuleList</span><span class="o">.</span><span class="n">Flink</span>
+			<span class="n">module</span> <span class="o">=</span> <span class="n">wintypes</span><span class="o">.</span><span class="n">LDR_MODULE</span><span class="p">()</span>
+
+			<span class="bp">self</span><span class="o">.</span><span class="n">k32</span><span class="o">.</span><span class="n">ReadProcessMemory</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">handle</span><span class="p">,</span> <span class="n">fLink</span><span class="p">,</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">byref</span><span class="p">(</span><span class="n">module</span><span class="p">),</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">sizeof</span><span class="p">(</span><span class="n">module</span><span class="p">),</span> <span class="mi">0</span><span class="p">)</span>
+
+			<span class="n">_base_dll_name</span> <span class="o">=</span> <span class="p">(</span><span class="n">ctypes</span><span class="o">.</span><span class="n">c_wchar</span> <span class="o">*</span> <span class="n">module</span><span class="o">.</span><span class="n">BaseDllName</span><span class="o">.</span><span class="n">MaximumLength</span><span class="p">)</span>
+			<span class="n">base_dll_name</span> <span class="o">=</span> <span class="n">_base_dll_name</span><span class="p">()</span>
+
+			<span class="bp">self</span><span class="o">.</span><span class="n">k32</span><span class="o">.</span><span class="n">ReadProcessMemory</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">handle</span><span class="p">,</span> <span class="n">module</span><span class="o">.</span><span class="n">BaseDllName</span><span class="o">.</span><span class="n">Buffer</span><span class="p">,</span> <span class="n">base_dll_name</span><span class="p">,</span> <span class="n">module</span><span class="o">.</span><span class="n">BaseDllName</span><span class="o">.</span><span class="n">Length</span> <span class="o">+</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+			<span class="n">base_dll_name</span> <span class="o">=</span> <span class="n">base_dll_name</span><span class="p">[:(</span><span class="n">module</span><span class="o">.</span><span class="n">BaseDllName</span><span class="o">.</span><span class="n">Length</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)]</span>
+			<span class="k">if</span> <span class="n">name</span> <span class="o">==</span> <span class="n">base_dll_name</span><span class="p">:</span>
+				<span class="k">return</span> <span class="n">module</span>
+			<span class="n">fLink</span> <span class="o">=</span> <span class="n">module</span><span class="o">.</span><span class="n">InLoadOrderModuleList</span><span class="o">.</span><span class="n">Flink</span>
+		<span class="k">return</span> <span class="kc">None</span>
+
+	<span class="k">def</span> <span class="nf">_setup_winapi</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">k32</span><span class="o">.</span><span class="n">CreateRemoteThread</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[</span><span class="n">wintypes</span><span class="o">.</span><span class="n">HANDLE</span><span class="p">,</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">POINTER</span><span class="p">(</span><span class="n">wintypes</span><span class="o">.</span><span class="n">SECURITY_ATTRIBUTES</span><span class="p">),</span> <span class="n">wintypes</span><span class="o">.</span><span class="n">SIZE_T</span><span class="p">,</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">c_void_p</span><span class="p">,</span> <span class="n">wintypes</span><span class="o">.</span><span class="n">LPVOID</span><span class="p">,</span> <span class="n">wintypes</span><span class="o">.</span><span class="n">DWORD</span><span class="p">,</span> <span class="n">wintypes</span><span class="o">.</span><span class="n">PDWORD</span><span class="p">]</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">k32</span><span class="o">.</span><span class="n">CreateRemoteThread</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="n">wintypes</span><span class="o">.</span><span class="n">HANDLE</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">k32</span><span class="o">.</span><span class="n">GetExitCodeThread</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[</span><span class="n">wintypes</span><span class="o">.</span><span class="n">HANDLE</span><span class="p">,</span> <span class="n">wintypes</span><span class="o">.</span><span class="n">PDWORD</span><span class="p">]</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">k32</span><span class="o">.</span><span class="n">GetModuleHandleA</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[</span><span class="n">wintypes</span><span class="o">.</span><span class="n">LPSTR</span><span class="p">]</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">k32</span><span class="o">.</span><span class="n">GetModuleHandleA</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="n">wintypes</span><span class="o">.</span><span class="n">HANDLE</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">k32</span><span class="o">.</span><span class="n">GetProcAddress</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[</span><span class="n">wintypes</span><span class="o">.</span><span class="n">HMODULE</span><span class="p">,</span> <span class="n">wintypes</span><span class="o">.</span><span class="n">LPSTR</span><span class="p">]</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">k32</span><span class="o">.</span><span class="n">GetProcAddress</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">c_void_p</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">k32</span><span class="o">.</span><span class="n">GetProcessId</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[</span><span class="n">wintypes</span><span class="o">.</span><span class="n">HANDLE</span><span class="p">]</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">k32</span><span class="o">.</span><span class="n">GetProcessId</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="n">wintypes</span><span class="o">.</span><span class="n">DWORD</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">k32</span><span class="o">.</span><span class="n">ReadProcessMemory</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[</span><span class="n">wintypes</span><span class="o">.</span><span class="n">HANDLE</span><span class="p">,</span> <span class="n">wintypes</span><span class="o">.</span><span class="n">LPCVOID</span><span class="p">,</span> <span class="n">wintypes</span><span class="o">.</span><span class="n">LPVOID</span><span class="p">,</span> <span class="n">wintypes</span><span class="o">.</span><span class="n">SIZE_T</span><span class="p">,</span> <span class="n">wintypes</span><span class="o">.</span><span class="n">SIZE_T</span><span class="p">]</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">k32</span><span class="o">.</span><span class="n">VirtualAllocEx</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[</span><span class="n">wintypes</span><span class="o">.</span><span class="n">HANDLE</span><span class="p">,</span> <span class="n">wintypes</span><span class="o">.</span><span class="n">LPVOID</span><span class="p">,</span> <span class="n">wintypes</span><span class="o">.</span><span class="n">SIZE_T</span><span class="p">,</span> <span class="n">wintypes</span><span class="o">.</span><span class="n">DWORD</span><span class="p">,</span> <span class="n">wintypes</span><span class="o">.</span><span class="n">DWORD</span><span class="p">]</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">k32</span><span class="o">.</span><span class="n">VirtualAllocEx</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="n">wintypes</span><span class="o">.</span><span class="n">SIZE_T</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">k32</span><span class="o">.</span><span class="n">VirtualFreeEx</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[</span><span class="n">wintypes</span><span class="o">.</span><span class="n">HANDLE</span><span class="p">,</span> <span class="n">wintypes</span><span class="o">.</span><span class="n">LPVOID</span><span class="p">,</span> <span class="n">wintypes</span><span class="o">.</span><span class="n">SIZE_T</span><span class="p">,</span> <span class="n">wintypes</span><span class="o">.</span><span class="n">DWORD</span><span class="p">]</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">k32</span><span class="o">.</span><span class="n">VirtualProtectEx</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[</span><span class="n">wintypes</span><span class="o">.</span><span class="n">HANDLE</span><span class="p">,</span> <span class="n">wintypes</span><span class="o">.</span><span class="n">LPVOID</span><span class="p">,</span> <span class="n">wintypes</span><span class="o">.</span><span class="n">SIZE_T</span><span class="p">,</span> <span class="n">wintypes</span><span class="o">.</span><span class="n">DWORD</span><span class="p">,</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">POINTER</span><span class="p">(</span><span class="n">wintypes</span><span class="o">.</span><span class="n">DWORD</span><span class="p">)]</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">k32</span><span class="o">.</span><span class="n">VirtualQueryEx</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[</span><span class="n">wintypes</span><span class="o">.</span><span class="n">HANDLE</span><span class="p">,</span> <span class="n">wintypes</span><span class="o">.</span><span class="n">LPCVOID</span><span class="p">,</span> <span class="n">wintypes</span><span class="o">.</span><span class="n">PMEMORY_BASIC_INFORMATION</span><span class="p">,</span> <span class="n">wintypes</span><span class="o">.</span><span class="n">SIZE_T</span><span class="p">]</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">k32</span><span class="o">.</span><span class="n">VirtualQueryEx</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="n">wintypes</span><span class="o">.</span><span class="n">SIZE_T</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">k32</span><span class="o">.</span><span class="n">WaitForSingleObject</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[</span><span class="n">wintypes</span><span class="o">.</span><span class="n">HANDLE</span><span class="p">,</span> <span class="n">wintypes</span><span class="o">.</span><span class="n">DWORD</span><span class="p">]</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">k32</span><span class="o">.</span><span class="n">WaitForSingleObject</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="n">wintypes</span><span class="o">.</span><span class="n">DWORD</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">k32</span><span class="o">.</span><span class="n">WriteProcessMemory</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[</span><span class="n">wintypes</span><span class="o">.</span><span class="n">HANDLE</span><span class="p">,</span> <span class="n">wintypes</span><span class="o">.</span><span class="n">LPVOID</span><span class="p">,</span> <span class="n">wintypes</span><span class="o">.</span><span class="n">LPCVOID</span><span class="p">,</span> <span class="n">wintypes</span><span class="o">.</span><span class="n">SIZE_T</span><span class="p">,</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">POINTER</span><span class="p">(</span><span class="n">wintypes</span><span class="o">.</span><span class="n">SIZE_T</span><span class="p">)]</span>
+		<span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">psapi</span><span class="p">,</span> <span class="s1">&#39;GetModuleFileNameExA&#39;</span><span class="p">):</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">psapi</span><span class="o">.</span><span class="n">GetModuleFileNameExA</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[</span><span class="n">wintypes</span><span class="o">.</span><span class="n">HANDLE</span><span class="p">,</span> <span class="n">wintypes</span><span class="o">.</span><span class="n">HMODULE</span><span class="p">,</span> <span class="n">wintypes</span><span class="o">.</span><span class="n">LPSTR</span><span class="p">,</span> <span class="n">wintypes</span><span class="o">.</span><span class="n">DWORD</span><span class="p">]</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">psapi</span><span class="o">.</span><span class="n">GetModuleFileNameExA</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="n">wintypes</span><span class="o">.</span><span class="n">DWORD</span>
+		<span class="k">else</span><span class="p">:</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">k32</span><span class="o">.</span><span class="n">GetModuleFileNameExA</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[</span><span class="n">wintypes</span><span class="o">.</span><span class="n">HANDLE</span><span class="p">,</span> <span class="n">wintypes</span><span class="o">.</span><span class="n">HMODULE</span><span class="p">,</span> <span class="n">wintypes</span><span class="o">.</span><span class="n">LPSTR</span><span class="p">,</span> <span class="n">wintypes</span><span class="o">.</span><span class="n">DWORD</span><span class="p">]</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">k32</span><span class="o">.</span><span class="n">GetModuleFileNameExA</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="n">wintypes</span><span class="o">.</span><span class="n">DWORD</span>
+
+	<span class="nd">@property</span>
+	<span class="k">def</span> <span class="nf">maps</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="n">sys_info</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_proc_attribute</span><span class="p">(</span><span class="s1">&#39;system_info&#39;</span><span class="p">)</span>
+		<span class="n">_maps</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">deque</span><span class="p">()</span>
+		<span class="n">address_cursor</span> <span class="o">=</span> <span class="mi">0</span>
+		<span class="n">VirtualQueryEx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">k32</span><span class="o">.</span><span class="n">VirtualQueryEx</span>
+		<span class="n">meminfo</span> <span class="o">=</span> <span class="n">wintypes</span><span class="o">.</span><span class="n">MEMORY_BASIC_INFORMATION</span><span class="p">()</span>
+		<span class="n">MEM_COMMIT</span> <span class="o">=</span> <span class="n">flags</span><span class="p">(</span><span class="s1">&#39;MEM_COMMIT&#39;</span><span class="p">)</span>
+		<span class="n">MEM_PRIVATE</span> <span class="o">=</span> <span class="n">flags</span><span class="p">(</span><span class="s1">&#39;MEM_PRIVATE&#39;</span><span class="p">)</span>
+		<span class="n">PROTECT_FLAGS</span> <span class="o">=</span> <span class="p">{</span><span class="mh">0x01</span><span class="p">:</span> <span class="s1">&#39;---&#39;</span><span class="p">,</span> <span class="mh">0x02</span><span class="p">:</span> <span class="s1">&#39;r--&#39;</span><span class="p">,</span> <span class="mh">0x04</span><span class="p">:</span> <span class="s1">&#39;rw-&#39;</span><span class="p">,</span> <span class="mh">0x08</span><span class="p">:</span> <span class="s1">&#39;r--&#39;</span><span class="p">,</span> <span class="mh">0x10</span><span class="p">:</span> <span class="s1">&#39;--x&#39;</span><span class="p">,</span> <span class="mh">0x20</span><span class="p">:</span> <span class="s1">&#39;r-x&#39;</span><span class="p">,</span> <span class="mh">0x40</span><span class="p">:</span> <span class="s1">&#39;rwx&#39;</span><span class="p">,</span> <span class="mh">0x80</span><span class="p">:</span> <span class="s1">&#39;r-x&#39;</span><span class="p">}</span>
+		<span class="k">while</span> <span class="n">address_cursor</span> <span class="o">&lt;</span> <span class="n">sys_info</span><span class="o">.</span><span class="n">lpMaximumApplicationAddress</span><span class="p">:</span>
+			<span class="k">if</span> <span class="n">VirtualQueryEx</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">handle</span><span class="p">,</span> <span class="n">address_cursor</span><span class="p">,</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">byref</span><span class="p">(</span><span class="n">meminfo</span><span class="p">),</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">sizeof</span><span class="p">(</span><span class="n">meminfo</span><span class="p">))</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+				<span class="k">break</span>
+			<span class="n">address_cursor</span> <span class="o">=</span> <span class="n">meminfo</span><span class="o">.</span><span class="n">BaseAddress</span> <span class="o">+</span> <span class="n">meminfo</span><span class="o">.</span><span class="n">RegionSize</span>
+			<span class="k">if</span> <span class="ow">not</span> <span class="n">meminfo</span><span class="o">.</span><span class="n">State</span> <span class="o">&amp;</span> <span class="n">MEM_COMMIT</span><span class="p">:</span>
+				<span class="k">continue</span>
+			<span class="n">addr_low</span> <span class="o">=</span> <span class="n">meminfo</span><span class="o">.</span><span class="n">BaseAddress</span>
+			<span class="n">addr_high</span> <span class="o">=</span> <span class="n">address_cursor</span>
+			<span class="n">perms</span> <span class="o">=</span> <span class="n">PROTECT_FLAGS</span><span class="p">[</span><span class="n">meminfo</span><span class="o">.</span><span class="n">Protect</span> <span class="o">&amp;</span> <span class="mh">0xff</span><span class="p">]</span>
+			<span class="n">perms</span> <span class="o">+=</span> <span class="s1">&#39;p&#39;</span> <span class="k">if</span> <span class="n">meminfo</span><span class="o">.</span><span class="n">Type</span> <span class="o">&amp;</span> <span class="n">MEM_PRIVATE</span> <span class="k">else</span> <span class="s1">&#39;s&#39;</span>
+			<span class="n">_maps</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">MemoryRegion</span><span class="p">(</span><span class="n">addr_low</span><span class="p">,</span> <span class="n">addr_high</span><span class="p">,</span> <span class="n">perms</span><span class="p">))</span>
+		<span class="k">return</span> <span class="n">collections</span><span class="o">.</span><span class="n">OrderedDict</span><span class="p">((</span><span class="n">mr</span><span class="o">.</span><span class="n">addr_low</span><span class="p">,</span> <span class="n">mr</span><span class="p">)</span> <span class="k">for</span> <span class="n">mr</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">_maps</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">mr</span><span class="p">:</span> <span class="n">mr</span><span class="o">.</span><span class="n">addr_low</span><span class="p">))</span>
+
+<div class="viewcode-block" id="WindowsProcess.install_hook"><a class="viewcode-back" href="../../../mayhem/proc/windows.html#mayhem.proc.windows.WindowsProcess.install_hook">[docs]</a>	<span class="k">def</span> <span class="nf">install_hook</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mod_name</span><span class="p">,</span> <span class="n">new_address</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ordinal</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+		<span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="nb">bool</span><span class="p">(</span><span class="n">name</span><span class="p">)</span> <span class="o">^</span> <span class="nb">bool</span><span class="p">(</span><span class="n">ordinal</span><span class="p">)):</span>
+			<span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;must select either name or ordinal, not both&#39;</span><span class="p">)</span>
+		<span class="n">image_import_descriptors</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_proc_attribute</span><span class="p">(</span><span class="s1">&#39;image_import_descriptor&#39;</span><span class="p">)</span>
+		<span class="n">image_dos_header_addr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_proc_attribute</span><span class="p">(</span><span class="s1">&#39;image_dos_header_addr&#39;</span><span class="p">)</span>
+		<span class="n">is_ordinal</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">bool</span><span class="p">(</span><span class="n">x</span> <span class="o">&amp;</span> <span class="mh">0x80000000</span><span class="p">)</span>
+
+		<span class="k">for</span> <span class="n">iid</span> <span class="ow">in</span> <span class="n">image_import_descriptors</span><span class="p">:</span>
+			<span class="n">cur_mod_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_name_for_image_import_descriptor</span><span class="p">(</span><span class="n">iid</span><span class="p">)</span>
+			<span class="k">if</span> <span class="n">cur_mod_name</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">!=</span> <span class="n">mod_name</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
+				<span class="k">continue</span>
+			<span class="n">ilt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_ilt_for_image_import_descriptor</span><span class="p">(</span><span class="n">iid</span><span class="p">)</span>
+			<span class="n">iat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_iat_for_image_import_descriptor</span><span class="p">(</span><span class="n">iid</span><span class="p">)</span>
+
+			<span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">ilt</span><span class="p">)):</span>
+				<span class="k">if</span> <span class="n">ilt</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+					<span class="k">continue</span>
+				<span class="n">hook_it</span> <span class="o">=</span> <span class="kc">False</span>
+				<span class="k">if</span> <span class="ow">not</span> <span class="n">is_ordinal</span><span class="p">(</span><span class="n">ilt</span><span class="p">[</span><span class="n">idx</span><span class="p">])</span> <span class="ow">and</span> <span class="n">name</span><span class="p">:</span>
+					<span class="n">cur_func_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_name_for_ilt_entry</span><span class="p">(</span><span class="n">ilt</span><span class="p">[</span><span class="n">idx</span><span class="p">])</span>
+					<span class="k">if</span> <span class="n">cur_func_name</span> <span class="o">==</span> <span class="n">name</span><span class="p">:</span>
+						<span class="n">hook_it</span> <span class="o">=</span> <span class="kc">True</span>
+				<span class="k">elif</span> <span class="n">is_ordinal</span><span class="p">(</span><span class="n">ilt</span><span class="p">[</span><span class="n">idx</span><span class="p">])</span> <span class="ow">and</span> <span class="n">ordinal</span><span class="p">:</span>
+					<span class="n">cur_func_ordinal</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_ordinal_for_ilt_entry</span><span class="p">(</span><span class="n">ilt</span><span class="p">[</span><span class="n">idx</span><span class="p">])</span>
+					<span class="k">if</span> <span class="n">cur_func_ordinal</span> <span class="o">==</span> <span class="n">ordinal</span><span class="p">:</span>
+						<span class="n">hook_it</span> <span class="o">=</span> <span class="kc">True</span>
+				<span class="k">if</span> <span class="n">hook_it</span><span class="p">:</span>
+					<span class="n">old_address</span> <span class="o">=</span> <span class="n">iat</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
+
+					<span class="n">iat_ent_addr</span> <span class="o">=</span> <span class="n">image_dos_header_addr</span>
+					<span class="n">iat_ent_addr</span> <span class="o">+=</span> <span class="n">iid</span><span class="o">.</span><span class="n">FirstThunk</span>
+					<span class="n">iat_ent_addr</span> <span class="o">+=</span> <span class="p">(</span><span class="n">ctypes</span><span class="o">.</span><span class="n">sizeof</span><span class="p">(</span><span class="n">ctypes</span><span class="o">.</span><span class="n">c_void_p</span><span class="p">)</span> <span class="o">*</span> <span class="n">idx</span><span class="p">)</span>
+
+					<span class="n">new_addr</span> <span class="o">=</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">c_void_p</span><span class="p">()</span>
+					<span class="n">new_addr</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">new_address</span>
+					<span class="n">written</span> <span class="o">=</span> <span class="n">wintypes</span><span class="o">.</span><span class="n">DWORD</span><span class="p">()</span>
+					<span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">k32</span><span class="o">.</span><span class="n">WriteProcessMemory</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">handle</span><span class="p">,</span> <span class="n">iat_ent_addr</span><span class="p">,</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">byref</span><span class="p">(</span><span class="n">new_addr</span><span class="p">),</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">sizeof</span><span class="p">(</span><span class="n">new_addr</span><span class="p">),</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">byref</span><span class="p">(</span><span class="n">written</span><span class="p">))</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+						<span class="n">errno</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">k32</span><span class="o">.</span><span class="n">GetLastError</span><span class="p">()</span>
+						<span class="k">if</span> <span class="n">errno</span> <span class="o">==</span> <span class="mi">998</span><span class="p">:</span>
+							<span class="n">errno</span> <span class="o">=</span> <span class="mi">0</span>
+							<span class="n">old_permissions</span> <span class="o">=</span> <span class="n">wintypes</span><span class="o">.</span><span class="n">DWORD</span><span class="p">()</span>
+							<span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">k32</span><span class="o">.</span><span class="n">VirtualProtectEx</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">handle</span><span class="p">,</span> <span class="n">iat_ent_addr</span><span class="p">,</span> <span class="mh">0x400</span><span class="p">,</span> <span class="n">flags</span><span class="p">(</span><span class="s1">&#39;PAGE_READWRITE&#39;</span><span class="p">),</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">byref</span><span class="p">(</span><span class="n">old_permissions</span><span class="p">))</span> <span class="o">==</span> <span class="mi">0</span><span class="p">):</span>
+								<span class="k">raise</span> <span class="n">WindowsProcessError</span><span class="p">(</span><span class="s1">&#39;Error: VirtualProtectEx&#39;</span><span class="p">,</span> <span class="n">get_last_error</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">k32</span><span class="o">.</span><span class="n">GetLastError</span><span class="p">())</span>
+							<span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">k32</span><span class="o">.</span><span class="n">WriteProcessMemory</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">handle</span><span class="p">,</span> <span class="n">iat_ent_addr</span><span class="p">,</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">byref</span><span class="p">(</span><span class="n">new_addr</span><span class="p">),</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">sizeof</span><span class="p">(</span><span class="n">new_addr</span><span class="p">),</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">byref</span><span class="p">(</span><span class="n">written</span><span class="p">))</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+								<span class="n">errno</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">k32</span><span class="o">.</span><span class="n">GetLastError</span><span class="p">()</span>
+							<span class="bp">self</span><span class="o">.</span><span class="n">protect</span><span class="p">(</span><span class="n">iat_ent_addr</span><span class="p">,</span> <span class="n">permissions</span><span class="o">=</span><span class="n">old_permissions</span><span class="p">)</span>
+						<span class="k">if</span> <span class="n">errno</span><span class="p">:</span>
+							<span class="k">raise</span> <span class="n">WindowsProcessError</span><span class="p">(</span><span class="s1">&#39;Error: WriteProcessMemory&#39;</span><span class="p">,</span> <span class="n">get_last_error</span><span class="o">=</span><span class="n">errno</span><span class="p">)</span>
+					<span class="n">hook</span> <span class="o">=</span> <span class="n">Hook</span><span class="p">(</span><span class="s1">&#39;iat&#39;</span><span class="p">,</span> <span class="n">iat_ent_addr</span><span class="p">,</span> <span class="n">old_address</span><span class="p">,</span> <span class="n">new_address</span><span class="p">)</span>
+					<span class="bp">self</span><span class="o">.</span><span class="n">_installed_hooks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">hook</span><span class="p">)</span>
+					<span class="k">return</span> <span class="n">hook</span>
+		<span class="k">raise</span> <span class="n">ProcessError</span><span class="p">(</span><span class="s1">&#39;failed to find location to install hook&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="WindowsProcess.close"><a class="viewcode-back" href="../../../mayhem/proc/windows.html#mayhem.proc.windows.WindowsProcess.close">[docs]</a>	<span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">k32</span><span class="o">.</span><span class="n">CloseHandle</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">handle</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">handle</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="WindowsProcess.kill"><a class="viewcode-back" href="../../../mayhem/proc/windows.html#mayhem.proc.windows.WindowsProcess.kill">[docs]</a>	<span class="k">def</span> <span class="nf">kill</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">k32</span><span class="o">.</span><span class="n">TerminateProcess</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">handle</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="WindowsProcess.load_library"><a class="viewcode-back" href="../../../mayhem/proc/windows.html#mayhem.proc.windows.WindowsProcess.load_library">[docs]</a>	<span class="k">def</span> <span class="nf">load_library</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">libpath</span><span class="p">):</span>
+		<span class="n">libpath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">libpath</span><span class="p">)</span>
+		<span class="n">libpath</span> <span class="o">=</span> <span class="n">libpath</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x00</span><span class="s1">&#39;</span>
+		<span class="n">LoadLibraryA</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">k32</span><span class="o">.</span><span class="n">GetProcAddress</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">k32</span><span class="o">.</span><span class="n">GetModuleHandleA</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;kernel32.dll&#39;</span><span class="p">),</span> <span class="sa">b</span><span class="s1">&#39;LoadLibraryA&#39;</span><span class="p">)</span>
+		<span class="n">remote_page</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">k32</span><span class="o">.</span><span class="n">VirtualAllocEx</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">handle</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">libpath</span><span class="p">),</span> <span class="n">flags</span><span class="p">(</span><span class="s2">&quot;MEM_COMMIT&quot;</span><span class="p">),</span> <span class="n">flags</span><span class="p">(</span><span class="s2">&quot;PAGE_EXECUTE_READWRITE&quot;</span><span class="p">))</span>
+		<span class="k">if</span> <span class="ow">not</span> <span class="n">remote_page</span><span class="p">:</span>
+			<span class="k">raise</span> <span class="n">WindowsProcessError</span><span class="p">(</span><span class="s1">&#39;Error: failed to allocate space for library name in the target process&#39;</span><span class="p">)</span>
+		<span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">k32</span><span class="o">.</span><span class="n">WriteProcessMemory</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">handle</span><span class="p">,</span> <span class="n">remote_page</span><span class="p">,</span> <span class="n">libpath</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">libpath</span><span class="p">),</span> <span class="kc">None</span><span class="p">):</span>
+			<span class="k">raise</span> <span class="n">WindowsProcessError</span><span class="p">(</span><span class="s1">&#39;Error: failed to copy the library name to the target process&#39;</span><span class="p">)</span>
+		<span class="n">remote_thread</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">k32</span><span class="o">.</span><span class="n">CreateRemoteThread</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">handle</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">LoadLibraryA</span><span class="p">,</span> <span class="n">remote_page</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">k32</span><span class="o">.</span><span class="n">WaitForSingleObject</span><span class="p">(</span><span class="n">remote_thread</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+
+		<span class="n">exitcode</span> <span class="o">=</span> <span class="n">wintypes</span><span class="o">.</span><span class="n">DWORD</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">k32</span><span class="o">.</span><span class="n">GetExitCodeThread</span><span class="p">(</span><span class="n">remote_thread</span><span class="p">,</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">byref</span><span class="p">(</span><span class="n">exitcode</span><span class="p">))</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">k32</span><span class="o">.</span><span class="n">VirtualFreeEx</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">handle</span><span class="p">,</span> <span class="n">remote_page</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">libpath</span><span class="p">),</span> <span class="n">flags</span><span class="p">(</span><span class="s2">&quot;MEM_RELEASE&quot;</span><span class="p">))</span>
+		<span class="k">if</span> <span class="n">exitcode</span><span class="o">.</span><span class="n">value</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+			<span class="k">raise</span> <span class="n">WindowsProcessError</span><span class="p">(</span><span class="s2">&quot;Error: failed to load: </span><span class="si">{0}</span><span class="s2">, thread exited with status: 0x</span><span class="si">{1:x}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">libpath</span><span class="p">,</span> <span class="n">exitcode</span><span class="o">.</span><span class="n">value</span><span class="p">))</span>
+		<span class="k">return</span> <span class="n">exitcode</span><span class="o">.</span><span class="n">value</span></div>
+
+<div class="viewcode-block" id="WindowsProcess.read_memory"><a class="viewcode-back" href="../../../mayhem/proc/windows.html#mayhem.proc.windows.WindowsProcess.read_memory">[docs]</a>	<span class="k">def</span> <span class="nf">read_memory</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">address</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mh">0x400</span><span class="p">):</span>
+		<span class="n">_data</span> <span class="o">=</span> <span class="p">(</span><span class="n">ctypes</span><span class="o">.</span><span class="n">c_byte</span> <span class="o">*</span> <span class="n">size</span><span class="p">)</span>
+		<span class="n">data</span> <span class="o">=</span> <span class="n">_data</span><span class="p">()</span>
+		<span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">k32</span><span class="o">.</span><span class="n">ReadProcessMemory</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">handle</span><span class="p">,</span> <span class="n">address</span><span class="p">,</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">byref</span><span class="p">(</span><span class="n">data</span><span class="p">),</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">sizeof</span><span class="p">(</span><span class="n">data</span><span class="p">),</span> <span class="mi">0</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">):</span>
+			<span class="k">raise</span> <span class="n">WindowsProcessError</span><span class="p">(</span><span class="s1">&#39;Error: ReadProcessMemory&#39;</span><span class="p">,</span> <span class="n">get_last_error</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">k32</span><span class="o">.</span><span class="n">GetLastError</span><span class="p">())</span>
+		<span class="k">return</span> <span class="n">ctarray_to_bytes</span><span class="p">(</span><span class="n">data</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="WindowsProcess.write_memory"><a class="viewcode-back" href="../../../mayhem/proc/windows.html#mayhem.proc.windows.WindowsProcess.write_memory">[docs]</a>	<span class="k">def</span> <span class="nf">write_memory</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">address</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+		<span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+			<span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
+		<span class="n">_wr_data</span> <span class="o">=</span> <span class="p">(</span><span class="n">ctypes</span><span class="o">.</span><span class="n">c_char</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">))</span>
+		<span class="n">wr_data</span> <span class="o">=</span> <span class="n">_wr_data</span><span class="p">()</span>
+		<span class="n">wr_data</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">data</span>
+		<span class="n">written</span> <span class="o">=</span> <span class="n">wintypes</span><span class="o">.</span><span class="n">SIZE_T</span><span class="p">()</span>
+		<span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">k32</span><span class="o">.</span><span class="n">WriteProcessMemory</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">handle</span><span class="p">,</span> <span class="n">address</span><span class="p">,</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">byref</span><span class="p">(</span><span class="n">wr_data</span><span class="p">),</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">sizeof</span><span class="p">(</span><span class="n">wr_data</span><span class="p">),</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">byref</span><span class="p">(</span><span class="n">written</span><span class="p">)):</span>
+			<span class="k">raise</span> <span class="n">WindowsProcessError</span><span class="p">(</span><span class="s1">&#39;Error: WriteProcessMemory&#39;</span><span class="p">,</span> <span class="n">get_last_error</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">k32</span><span class="o">.</span><span class="n">GetLastError</span><span class="p">())</span>
+		<span class="k">return</span></div>
+
+<div class="viewcode-block" id="WindowsProcess.allocate"><a class="viewcode-back" href="../../../mayhem/proc/windows.html#mayhem.proc.windows.WindowsProcess.allocate">[docs]</a>	<span class="k">def</span> <span class="nf">allocate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mh">0x400</span><span class="p">,</span> <span class="n">address</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">permissions</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+		<span class="n">alloc_type</span> <span class="o">=</span> <span class="n">flags</span><span class="p">(</span><span class="s1">&#39;MEM_COMMIT&#39;</span><span class="p">)</span>
+		<span class="n">permissions</span> <span class="o">=</span> <span class="n">flags</span><span class="p">(</span><span class="n">permissions</span> <span class="ow">or</span> <span class="s1">&#39;PAGE_EXECUTE_READWRITE&#39;</span><span class="p">)</span>
+		<span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">k32</span><span class="o">.</span><span class="n">VirtualAllocEx</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">handle</span><span class="p">,</span> <span class="n">address</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">alloc_type</span><span class="p">,</span> <span class="n">permissions</span><span class="p">)</span>
+		<span class="k">return</span> <span class="n">result</span></div>
+
+<div class="viewcode-block" id="WindowsProcess.free"><a class="viewcode-back" href="../../../mayhem/proc/windows.html#mayhem.proc.windows.WindowsProcess.free">[docs]</a>	<span class="k">def</span> <span class="nf">free</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">address</span><span class="p">):</span>
+		<span class="n">free_type</span> <span class="o">=</span> <span class="n">flags</span><span class="p">(</span><span class="s1">&#39;MEM_RELEASE&#39;</span><span class="p">)</span>
+		<span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">k32</span><span class="o">.</span><span class="n">VirtualFreeEx</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">handle</span><span class="p">,</span> <span class="n">address</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">free_type</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">):</span>
+			<span class="k">raise</span> <span class="n">WindowsProcessError</span><span class="p">(</span><span class="s1">&#39;Error: VirtualFreeEx&#39;</span><span class="p">,</span> <span class="n">get_last_error</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">k32</span><span class="o">.</span><span class="n">GetLastError</span><span class="p">())</span>
+		<span class="k">return</span></div>
+
+<div class="viewcode-block" id="WindowsProcess.protect"><a class="viewcode-back" href="../../../mayhem/proc/windows.html#mayhem.proc.windows.WindowsProcess.protect">[docs]</a>	<span class="k">def</span> <span class="nf">protect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">address</span><span class="p">,</span> <span class="n">permissions</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mh">0x400</span><span class="p">):</span>
+		<span class="n">permissions</span> <span class="o">=</span> <span class="n">flags</span><span class="p">(</span><span class="n">permissions</span> <span class="ow">or</span> <span class="s1">&#39;PAGE_EXECUTE_READWRITE&#39;</span><span class="p">)</span>
+		<span class="n">old_permissions</span> <span class="o">=</span> <span class="n">wintypes</span><span class="o">.</span><span class="n">DWORD</span><span class="p">()</span>
+		<span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">k32</span><span class="o">.</span><span class="n">VirtualProtectEx</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">handle</span><span class="p">,</span> <span class="n">address</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">permissions</span><span class="p">,</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">byref</span><span class="p">(</span><span class="n">old_permissions</span><span class="p">))</span> <span class="o">==</span> <span class="mi">0</span><span class="p">):</span>
+			<span class="k">raise</span> <span class="n">WindowsProcessError</span><span class="p">(</span><span class="s1">&#39;Error: VirtualProtectEx&#39;</span><span class="p">,</span> <span class="n">get_last_error</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">k32</span><span class="o">.</span><span class="n">GetLastError</span><span class="p">())</span>
+		<span class="k">return</span></div>
+
+<div class="viewcode-block" id="WindowsProcess.start_thread"><a class="viewcode-back" href="../../../mayhem/proc/windows.html#mayhem.proc.windows.WindowsProcess.start_thread">[docs]</a>	<span class="k">def</span> <span class="nf">start_thread</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">address</span><span class="p">,</span> <span class="n">targ</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+		<span class="n">handle</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">k32</span><span class="o">.</span><span class="n">CreateRemoteThread</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">handle</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">address</span><span class="p">,</span> <span class="n">targ</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+		<span class="k">if</span> <span class="n">handle</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+			<span class="k">raise</span> <span class="n">WindowsProcessError</span><span class="p">(</span><span class="s1">&#39;Error: CreateRemoteThread&#39;</span><span class="p">,</span> <span class="n">get_last_error</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">k32</span><span class="o">.</span><span class="n">GetLastError</span><span class="p">())</span>
+		<span class="k">return</span> <span class="n">handle</span></div>
+
+<div class="viewcode-block" id="WindowsProcess.join_thread"><a class="viewcode-back" href="../../../mayhem/proc/windows.html#mayhem.proc.windows.WindowsProcess.join_thread">[docs]</a>	<span class="k">def</span> <span class="nf">join_thread</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">thread_id</span><span class="p">):</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">k32</span><span class="o">.</span><span class="n">WaitForSingleObject</span><span class="p">(</span><span class="n">thread_id</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+		<span class="k">return</span></div></div>
+</pre></div>
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Spencer McIntyre.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../',
+            VERSION:'0.2',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>
