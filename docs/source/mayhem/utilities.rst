@@ -1,7 +1,7 @@
-:mod:`mayhem.utilities` --- Miscellaneous utilities
-===================================================
+:mod:`utilities`
+================
 
-.. module:: mayhem.utilities
+.. module:: utilities
    :synopsis: Miscellaneous utilities
 
 This modules provides utility functions for a variety of purposes.

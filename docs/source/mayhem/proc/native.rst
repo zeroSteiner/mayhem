@@ -1,7 +1,7 @@
-:mod:`mayhem.proc.native` --- Native platform manipulation classes
-==================================================================
+:mod:`native`
+=============
 
-.. module:: mayhem.proc.native
+.. module:: native
    :synopsis: Native platform manipulation classes
 
 This module contains a :py:class:`.Process` class suitable for use on the operating

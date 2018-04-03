@@ -1,5 +1,5 @@
-:mod:`mayhem.proc.windows` --- Windows manipulation classes
-===========================================================
+:mod:`windows`
+==============
 
 .. module:: mayhem.proc.windows
    :synopsis: Windows manipulation classes

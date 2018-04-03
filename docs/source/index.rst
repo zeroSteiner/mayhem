@@ -1,17 +1,15 @@
 The mayhem Package
 ==================
 
-Contents:
+The Mayhem packages aims to provide a Python interface for the programmatic
+manipulation of executable files at runtime on both the Linux and Windows
+platforms.
 
 .. toctree::
-   :maxdepth: 4
+   :maxdepth: 2
+   :caption: Contents:
 
-   mayhem.rst
-   mayhem.proc.rst
-   mayhem.proc.linux.rst
-   mayhem.proc.native.rst
-   mayhem.proc.windows.rst
-   mayhem.utilities.rst
+   mayhem/index.rst
 
 Indices and tables
 ==================

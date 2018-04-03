@@ -1,7 +1,7 @@
-:mod:`mayhem.proc.linux` --- Linux manipulation classes
-=======================================================
+:mod:`linux`
+============
 
-.. module:: mayhem.proc.linux
+.. module:: linux
    :synopsis: Linux manipulation classes
 
 This module contains classes functions and exceptions specific to POSIX
