@@ -31,6 +31,7 @@
 #
 
 import argparse
+import binascii
 import os
 import sys
 sys.path.insert(1, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
@@ -91,10 +92,10 @@ def main():
 		else:
 			raise RuntimeError('unknown shellcode source')
 		if arguments.decode == 'b64':
-			shellcode = shellcode.decode('base64')
+			shellcode = binascii.a2b_base64(shellcode)
 		elif arguments.decode == 'hex':
-			shellcode = shellcode.decode('hex')
-		stub = ''  # no stub by default
+			shellcode = binascii.a2b_hex(shellcode)
+		stub = b''  # no stub by default
 		if architecture_is_32bit(process_h.arch):
 			stub = b'\x8b\x44\x24\x04'      # mov eax,[esp+4]
 		elif architecture_is_64bit(process_h.arch):

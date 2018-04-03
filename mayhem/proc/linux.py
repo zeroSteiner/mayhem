@@ -350,11 +350,12 @@ class LinuxProcess(mayhem.proc.ProcessBase):
 		else:
 			raise LinuxProcessError('unsupported architecture: ' + repr(self.__arch__))
 
+		func_name = func_name.encode('utf-8') + b'\x00'
 		if os.path.isabs(mod_name):
-			exe_maps = filter(lambda x: x.pathname == mod_name, self.maps.values())
+			exe_maps = tuple(mr for mr in self.maps.values() if mr.pathname == mod_name)
 			filename = mod_name
 		else:
-			exe_maps = filter(lambda x: x.pathname is not None and os.path.basename(x.pathname).startswith(mod_name), self.maps.values())
+			exe_maps = tuple(mr for mr in self.maps.values() if mr.pathname and os.path.basename(mr.pathname).startswith(mod_name))
 			filename = exe_maps[0].pathname
 		handle = open(filename, 'rb')
 		ehdr = mayhem.utilities.struct_unpack(ehdr_struct, handle.read(ctypes.sizeof(ehdr_struct)))
@@ -366,10 +367,8 @@ class LinuxProcess(mayhem.proc.ProcessBase):
 		shdrs = _shdrs()
 		ctypes.memmove(ctypes.byref(shdrs), data, len(data))
 
-		strtab = 0
-		symtab = 0
-		for idx in range(len(shdrs)):
-			shdr = shdrs[idx]
+		symtab = strtab = 0
+		for idx, shdr in enumerate(shdrs):
 			if shdr.sh_type == elf.constants.SHT_SYMTAB or shdr.sh_type == elf.constants.SHT_DYNSYM:
 				if not (shdr.sh_entsize and shdr.sh_size):
 					continue
@@ -377,31 +376,24 @@ class LinuxProcess(mayhem.proc.ProcessBase):
 			elif shdr.sh_type == elf.constants.SHT_STRTAB:
 				if idx != ehdr.e_shstrndx:
 					strtab = idx
-			if symtab == 0 or strtab == 0:
+			if not (symtab and strtab):
 				continue
 			symh = shdrs[symtab]
 			strh = shdrs[strtab]
 			handle.seek(strh.sh_offset, os.SEEK_SET)
 			strsymtbl = handle.read(strh.sh_size)
-			sym_num = symh.sh_size / symh.sh_entsize
+			sym_num = symh.sh_size // symh.sh_entsize
 			_syms = (sym_struct * sym_num)
 			syms = _syms()
 			handle.seek(symh.sh_offset, os.SEEK_SET)
 			ctypes.memmove(ctypes.byref(syms), handle.read(ctypes.sizeof(syms)), ctypes.sizeof(syms))
-			for idx in range(1, len(syms)):
-				sym = syms[idx]
+			for sym in syms[1:]:
 				if sym.st_name == 0:
 					continue
-				name_end = strsymtbl.find(b'\x00', sym.st_name)
-				if strsymtbl[sym.st_name:name_end] != func_name:
+				if strsymtbl[sym.st_name:(sym.st_name + len(func_name))] != func_name:
 					continue
-				address = sym.st_value
-				if filter(lambda mr: (address > mr.addr_low and address < mr.addr_high), exe_maps):
-					return address
-				else:
-					return address + sorted(exe_maps, key=lambda mr: mr.addr_low)[0].addr_low
-			strtab = 0
-			symtab = 0
+				return sym.st_value
+			symtab = strtab = 0
 		raise LinuxProcessError('unable to locate function')
 
 	def _call_function(self, function_address, *args):
@@ -610,28 +602,24 @@ class LinuxProcess(mayhem.proc.ProcessBase):
 
 	def _allocate_malloc(self, size):
 		malloc_addr = None
-		malloc_locations = ['libc-', 'ld-linux.so']
-		for lib in malloc_locations:
+		for lib in ('libc-', 'ld-linux.so'):
 			try:
 				malloc_addr = self._get_function_address(lib, 'malloc')
 			except mayhem.proc.ProcessError:
 				continue
-			else:
-				break
+			break
 		if malloc_addr is None:
 			raise mayhem.proc.ProcessError('unable to locate function')
 		return self._call_function(malloc_addr, size)
 
 	def _free_free(self, address):
 		free_addr = None
-		free_locations = ['libc-', 'ld-linux.so']
-		for lib in free_locations:
+		for lib in ('libc-', 'ld-linux.so'):
 			try:
 				free_addr = self._get_function_address(lib, 'free')
 			except mayhem.proc.ProcessError:
-				pass
-			else:
-				break
+				continue
+			break
 		if free_addr is None:
 			raise LinuxProcessError('unable to locate function')
 		self._call_function(free_addr, address)
@@ -797,11 +785,11 @@ class LinuxProcess(mayhem.proc.ProcessBase):
 			address_cursor -= sz_overlap
 			data = self.read_memory(address_cursor, sz_overlap) + data
 		sz_overlap = size_of_long - ((address_cursor + len(data)) % size_of_long)
-		if sz_overlap > 0 and sz_overlap < 8:
+		if 0 < sz_overlap < 8:
 			data = data + self.read_memory(address_cursor + len(data), sz_overlap)
-		for idx in xrange(0, len(data), size_of_long):
+		for idx in range(0, len(data), size_of_long):
 			data_chunk = data[idx:(idx + size_of_long)]
 			data_chunk = struct.unpack('l', data_chunk)[0]
 			if self._ptrace(PTRACE_POKEDATA, address_cursor + idx, data_chunk) != 0:
 				raise LinuxProcessError('Error: PTRACE_POKEDATA', errno=get_errno())
-		return None
+		return
