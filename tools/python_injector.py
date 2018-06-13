@@ -52,6 +52,7 @@ PIPE_NAME = 'mayhem'
 
 INJECTION_STUB_TEMPLATE = r"""
 import codecs
+import ctypes
 import runpy
 import sys
 import traceback
@@ -59,11 +60,14 @@ import traceback
 pipe = open(r'\\.\\pipe\{pipe_name}', 'w+b', 0)
 sys.argv = ['']
 sys.stderr = sys.stdout = codecs.getwriter('utf-8')(pipe)
+
 try:
     runpy.run_path('{path}', run_name='__mayhem__')
 except:
     traceback.print_exc()
 pipe.close()
+
+ctypes.windll.kernel32.ExitThread(0)
 """
 
 def _escape(path):
@@ -158,7 +162,10 @@ def main():
 
 	print("[*] Waiting for client to connect on \\\\.\\pipe\\{0}".format(PIPE_NAME))
 	injection_stub = INJECTION_STUB_TEMPLATE
-	injection_stub = injection_stub.format(path=_escape(os.path.abspath(arguments.script_path)), pipe_name=PIPE_NAME)
+	injection_stub = injection_stub.format(
+		path=_escape(os.path.abspath(arguments.script_path)),
+		pipe_name=PIPE_NAME
+	)
 	injection_stub = injection_stub.encode('utf-8') + b'\x00'
 
 	shellcode_addr = process_h.allocate(size=utilities.align_up(len(injection_stub)), permissions='PAGE_READWRITE')
