@@ -92,7 +92,7 @@ def eval_number(number):
 		return int(number[2:], 2)
 	elif number.startswith('0x'):
 		return int(number[2:], 16)
-	elif number.startswith('0'):
+	elif number.startswith('0o'):
 		return int(number, 8)
 	elif number.isdigit():
 		return int(number)

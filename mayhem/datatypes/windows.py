@@ -39,6 +39,8 @@ from .windows_ntstatus import NTSTATUS_CODES
 _IMAGE_NUMBEROF_DIRECTORY_ENTRIES = 16
 is_64bit = platform.architecture()[0] == '64bit'
 
+VOID    = None
+
 # http://msdn.microsoft.com/en-us/library/windows/desktop/aa383751(v=vs.85).aspx
 BOOLEAN = ctypes.c_byte
 BOOL    = ctypes.c_int
@@ -60,6 +62,7 @@ PQWORD   = ctypes.POINTER(QWORD)
 LPQWORD  = PQWORD
 
 SHORT    = ctypes.c_int16
+INT      = ctypes.c_int32
 
 LONG     = ctypes.c_int32
 LONGLONG = ctypes.c_int64
@@ -68,13 +71,16 @@ LONG64   = ctypes.c_int64
 PLONG    = ctypes.POINTER(LONG)
 LPLONG   = PLONG
 
-UCHAR      = ctypes.c_uint8
-USHORT     = ctypes.c_uint16
-ULONG      = ctypes.c_uint32
-PULONG     = ctypes.POINTER(ULONG)
-ULONGLONG  = ctypes.c_uint64
-PULONGLONG = ctypes.POINTER(ULONGLONG)
-ULONG_PTR  = ctypes.c_uint64 if is_64bit else ctypes.c_ulong
+UCHAR       = ctypes.c_uint8
+USHORT      = ctypes.c_uint16
+UINT        = ctypes.c_uint32
+ULONG       = ctypes.c_uint32
+PULONG      = ctypes.POINTER(ULONG)
+LPULONG     = PULONG
+ULONGLONG   = ctypes.c_uint64
+PULONGLONG  = ctypes.POINTER(ULONGLONG)
+LPULONGLONG = PULONGLONG
+ULONG_PTR   = ctypes.c_uint64 if is_64bit else ctypes.c_ulong
 
 PSTR   = ctypes.c_char_p
 LPSTR  = PSTR
@@ -85,6 +91,8 @@ UCHAR  = ctypes.c_ubyte
 PUCHAR = ctypes.POINTER(ctypes.c_ubyte)
 
 HANDLE    = ctypes.c_void_p
+PHANDLE   = ctypes.POINTER(HANDLE)
+LPHANDLE  = PHANDLE
 HINSTANCE = HANDLE
 HMODULE   = HANDLE
 PVOID     = ctypes.c_void_p
@@ -97,18 +105,21 @@ if is_64bit:
 	SIZE_T = ctypes.c_uint64
 else:
 	SIZE_T = ctypes.c_uint32
+PSIZE_T = ctypes.POINTER(SIZE_T)
 
 class LARGE_INTEGER(MayhemStructure):
 	_fields_ = [
 		('LowPart', DWORD),
 		('HighPart', LONG),
 	]
+PLARGE_INTEGER = ctypes.POINTER(LARGE_INTEGER)
 
 class LIST_ENTRY(MayhemStructure):
 	_fields_ = [
 		('Flink', ctypes.c_void_p),
 		('Blink', ctypes.c_void_p),
 	]
+PLIST_ENTRY = ctypes.POINTER(LIST_ENTRY)
 
 class UNICODE_STRING(MayhemStructure):
 	_fields_ = [
@@ -124,6 +135,7 @@ class UNICODE_STRING(MayhemStructure):
 		inst.MaximumLength = len(string) + 1
 		inst.Buffer = string
 		return inst
+PUNICODE_STRING = ctypes.POINTER(UNICODE_STRING)
 
 class STARTUPINFO(MayhemStructure):
 	"""see:
@@ -149,6 +161,7 @@ class STARTUPINFO(MayhemStructure):
 		('hStdOutput', HANDLE),
 		('hStdError', HANDLE),
 	]
+PSTARTUPINFO = ctypes.POINTER(STARTUPINFO)
 
 class LDR_MODULE(MayhemStructure):
 	_fields_ = [
@@ -166,6 +179,7 @@ class LDR_MODULE(MayhemStructure):
 		('HashTableEntry', LIST_ENTRY),
 		('TimeDateStamp', ULONG),
 	]
+PLDR_MODULE = ctypes.POINTER(LDR_MODULE)
 
 class LOADED_IMAGE(MayhemStructure):
 	"""see:
@@ -187,6 +201,7 @@ class LOADED_IMAGE(MayhemStructure):
 		('Links', ctypes.c_void_p),
 		('SizeOfImage', ULONG),
 	]
+PLOADED_IMAGE = ctypes.POINTER(LOADED_IMAGE)
 
 class LUID(MayhemStructure):
 	"""see:
@@ -196,6 +211,7 @@ class LUID(MayhemStructure):
 		('LowPart', DWORD),
 		('HighPart', LONG),
 	]
+PLUID = ctypes.POINTER(LUID)
 
 class IMAGE_DATA_DIRECTORY(MayhemStructure):
 	"""see:
@@ -205,6 +221,7 @@ class IMAGE_DATA_DIRECTORY(MayhemStructure):
 		('VirtualAddress', DWORD),
 		('Size', DWORD),
 	]
+PIMAGE_DATA_DIRECTORY = ctypes.POINTER(IMAGE_DATA_DIRECTORY)
 
 class IMAGE_DOS_HEADER(MayhemStructure):
 	_fields_ = [
@@ -228,6 +245,7 @@ class IMAGE_DOS_HEADER(MayhemStructure):
 		('e_res2', WORD * 10),
 		('e_lfanew', LONG),
 	]
+PIMAGE_DOS_HEADER = ctypes.POINTER(IMAGE_DOS_HEADER)
 
 class IMAGE_EXPORT_DIRECTORY(MayhemStructure):
 	_fields_ = [
@@ -243,6 +261,7 @@ class IMAGE_EXPORT_DIRECTORY(MayhemStructure):
 		('AddressOfNames', DWORD),
 		('AddressOfNameOrdinals', DWORD),
 	]
+PIMAGE_EXPORT_DIRECTORY = ctypes.POINTER(IMAGE_EXPORT_DIRECTORY)
 
 class IMAGE_FILE_HEADER(MayhemStructure):
 	_fields_ = [
@@ -254,6 +273,7 @@ class IMAGE_FILE_HEADER(MayhemStructure):
 		('SizeOfOptionalHeader', WORD),
 		('Characteristics', WORD),
 	]
+PIMAGE_FILE_HEADER = ctypes.POINTER(IMAGE_FILE_HEADER)
 
 class IMAGE_OPTIONAL_HEADER(MayhemStructure):
 	_fields_ = [
@@ -289,12 +309,14 @@ class IMAGE_OPTIONAL_HEADER(MayhemStructure):
 		('NumberOfRvaAndSizes', DWORD),
 		('DataDirectory', IMAGE_DATA_DIRECTORY * _IMAGE_NUMBEROF_DIRECTORY_ENTRIES),
 	]
+PIMAGE_OPTIONAL_HEADER = ctypes.POINTER(IMAGE_OPTIONAL_HEADER)
 
 class IMAGE_IMPORT_BY_NAME(MayhemStructure):
 	_fields_ = [
 		('Hint', WORD),
 		('Name', BYTE),
 	]
+PIMAGE_IMPORT_BY_NAME = ctypes.POINTER(IMAGE_IMPORT_BY_NAME)
 
 class IMAGE_IMPORT_DESCRIPTOR(MayhemStructure):
 	_fields_ = [
@@ -304,6 +326,7 @@ class IMAGE_IMPORT_DESCRIPTOR(MayhemStructure):
 		('Name', DWORD),
 		('FirstThunk', DWORD),
 	]
+PIMAGE_IMPORT_DESCRIPTOR = ctypes.POINTER(IMAGE_IMPORT_DESCRIPTOR)
 
 class IMAGE_THUNK_DATA32(MayhemStructure):
 	_fields_ = [
@@ -312,6 +335,7 @@ class IMAGE_THUNK_DATA32(MayhemStructure):
 		('Ordinal', DWORD),
 		('AddressOfData', DWORD),
 	]
+PIMAGE_THUNK_DATA32 = ctypes.POINTER(IMAGE_THUNK_DATA32)
 
 class IMAGE_NT_HEADERS32(MayhemStructure):
 	_fields_ = [
@@ -319,6 +343,7 @@ class IMAGE_NT_HEADERS32(MayhemStructure):
 		('FileHeader', IMAGE_FILE_HEADER),
 		('OptionalHeader', IMAGE_OPTIONAL_HEADER),
 	]
+PIMAGE_NT_HEADERS32 = ctypes.POINTER(IMAGE_NT_HEADERS32)
 
 class _IO_STATUS_BLOCK_U0(ctypes.Union):
 	_fields_ = [
@@ -332,6 +357,7 @@ class IO_STATUS_BLOCK(MayhemStructure):
 		('u0', _IO_STATUS_BLOCK_U0),
 		('Information', ULONG_PTR),
 	]
+PIO_STATUS_BLOCK = ctypes.POINTER(IO_STATUS_BLOCK)
 
 class PEB(MayhemStructure):
 	"""see:
@@ -354,6 +380,7 @@ class PEB(MayhemStructure):
 		('Reserved7', ctypes.c_void_p),
 		('SessionId', ULONG),
 	]
+PPEB = ctypes.POINTER(PEB)
 
 class PEB_LDR_DATA(MayhemStructure):
 	_fields_ = [
@@ -364,6 +391,7 @@ class PEB_LDR_DATA(MayhemStructure):
 		('InMemoryOrderModuleList', LIST_ENTRY),
 		('InInitializationOrderModuleList', LIST_ENTRY),
 	]
+PPEB_LDR_DATA = ctypes.POINTER(PEB_LDR_DATA)
 
 class PROCESS_BASIC_INFORMATION(MayhemStructure):
 	"""see:
@@ -376,6 +404,7 @@ class PROCESS_BASIC_INFORMATION(MayhemStructure):
 		('UniqueProcessId', PULONG),
 		('Reserved3', ctypes.c_void_p),
 	]
+PPROCESS_BASIC_INFORMATION = ctypes.POINTER(PROCESS_BASIC_INFORMATION)
 
 class SECURITY_ATTRIBUTES(MayhemStructure):
 	"""see:
@@ -386,6 +415,7 @@ class SECURITY_ATTRIBUTES(MayhemStructure):
 		('lpSecurityDescriptor', LPVOID),
 		('bInheritHandle', BOOL),
 	]
+PSECURITY_ATTRIBUTES = ctypes.POINTER(SECURITY_ATTRIBUTES)
 
 class HANDLE_ENTRY(MayhemStructure):
 	_fields_ = [
@@ -401,12 +431,14 @@ class HANDLE_ENTRY(MayhemStructure):
 		shared_info = SHARED_INFO.from_user32()
 		addr = shared_info.aheList + (ctypes.sizeof(cls) * (handle & 0xffff))
 		return cls.from_address(addr)
+PHANDLE_ENTRY = ctypes.POINTER(HANDLE_ENTRY)
 
 class WND_MSG(MayhemStructure):
 	_fields_ = [
 		('maxMsgs', ctypes.c_uint32),
 		('abMsgs', ctypes.c_void_p),
 	]
+PWND_MSG = ctypes.POINTER(WND_MSG)
 
 class SHARED_INFO(MayhemStructure):
 	_fields_ = [
@@ -425,6 +457,7 @@ class SHARED_INFO(MayhemStructure):
 		kernel32 = ctypes.windll.kernel32
 		addr = kernel32.GetProcAddress(kernel32.GetModuleHandleA('user32.dll'), 'gSharedInfo')
 		return cls.from_address(addr)
+PSHARED_INFO = ctypes.POINTER(SHARED_INFO)
 
 class SYSTEM_INFO(MayhemStructure):
 	"""see:
@@ -450,6 +483,7 @@ class SYSTEM_INFO(MayhemStructure):
 		system_info = cls()
 		kernel32.GetSystemInfo(ctypes.byref(system_info))
 		return system_info
+SYSTEM_INFO = ctypes.POINTER(SYSTEM_INFO)
 
 class SYSTEM_PROCESS_INFORMATION(MayhemStructure):
 	"""see:
@@ -470,6 +504,7 @@ class SYSTEM_PROCESS_INFORMATION(MayhemStructure):
 		('PrivatePageCount', SIZE_T),
 		('Reserved6', LARGE_INTEGER * 6),
 	]
+PSYSTEM_PROCESS_INFORMATION = ctypes.POINTER(SYSTEM_PROCESS_INFORMATION)
 
 class PROCESS_INFORMATION(MayhemStructure):
 	"""see:
@@ -481,6 +516,7 @@ class PROCESS_INFORMATION(MayhemStructure):
 		('dwProcessId', DWORD),
 		('dwThreadId', DWORD),
 	]
+PPROCESS_INFORMATION = ctypes.POINTER(PROCESS_INFORMATION)
 
 class MEMORY_BASIC_INFORMATION32(MayhemStructure):
 	"""see:
@@ -537,3 +573,4 @@ class MENUITEMINFOW(MayhemStructure):
 		('cch', ctypes.c_uint),
 		('hbmpItem', HANDLE),
 	]
+PMENUITEMINFOW = ctypes.POINTER(MENUITEMINFOW)
