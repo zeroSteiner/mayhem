@@ -85,9 +85,20 @@ PULONGLONG  = ctypes.POINTER(ULONGLONG)
 LPULONGLONG = PULONGLONG
 ULONG_PTR   = ctypes.c_uint64 if is_64bit else ctypes.c_ulong
 
-PSTR   = ctypes.c_char_p
+class PSTR(ctypes.c_char_p):
+	def __str__(self):
+		return self.value.decode('ascii')
+
+	@classmethod
+	def from_param(cls, param):
+		if isinstance(param, str):
+			param = param.encode('ascii')
+		return super(PSTR, cls).from_param(param)
 LPSTR  = PSTR
-PWSTR  = ctypes.c_wchar_p
+
+class PWSTR(ctypes.c_wchar_p):
+	def __str__(self):
+		return self.value
 LPWSTR = PWSTR
 
 UCHAR  = ctypes.c_ubyte
@@ -365,7 +376,7 @@ class IO_STATUS_BLOCK(MayhemStructure):
 	]
 PIO_STATUS_BLOCK = ctypes.POINTER(IO_STATUS_BLOCK)
 
-_OVERLAPPED_U0_S0(MayhemStructure):
+class _OVERLAPPED_U0_S0(MayhemStructure):
 	_fields_ = [
 		('Offset', DWORD),
 		('OffsetHigh', DWORD)

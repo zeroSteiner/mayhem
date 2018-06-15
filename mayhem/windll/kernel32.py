@@ -13,6 +13,14 @@ class CFuncPtr(_ctypes.CFuncPtr):
 	def address(self):
 		return ctypes.cast(self, ctypes.c_void_p).value
 
+	def duplicate(self, other):
+		if callable(other):
+			if isinstance(other, ctypes._CFuncPtr):
+				other = ctypes.cast(other, ctypes.c_void_p).value
+		elif not isinstance(other, int):
+			other = ctypes.cast(other, ctypes.c_void_p).value
+		return self.__class__(other)
+
 	@classmethod
 	def new(cls, name, restype=None, argtypes=None, flags=0):
 		new = type(name, (cls,), {
@@ -36,9 +44,9 @@ def WINFUNCTYPE(restype, *argtypes, use_errno=False, use_last_error=False):
 	function = _function_cache.get(cache_entry)
 	if function is not None:
 		return function
-	WinFunctionType = CFuncPtr.new('WinFuncType', **cache_entry._asdict())
-	_function_cache[cache_entry] = WinFunctionType
-	return WinFunctionType
+	FunctionType = CFuncPtr.new('CFunctionType', **cache_entry._asdict())
+	_function_cache[cache_entry] = FunctionType
+	return FunctionType
 
 def _patch_winfunctype(address, restype, argtypes=(), **kwargs):
 	prototype = WINFUNCTYPE(restype, *argtypes, **kwargs)
