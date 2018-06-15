@@ -30,7 +30,52 @@
 #  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
+import _ctypes
+import collections
 import ctypes
+
+_function_cache = {}
+_function_cache_entry = collections.namedtuple('FunctionCacheEntry', ('restype', 'argtypes', 'flags'))
+
+class MayhemCFuncPtr(_ctypes.CFuncPtr):
+	_argtypes_ = ()
+	_restype_ = None
+	_flags_ = 0
+	@property
+	def address(self):
+		return ctypes.cast(self, ctypes.c_void_p).value
+
+	def duplicate(self, other):
+		if callable(other):
+			if isinstance(other, ctypes._CFuncPtr):
+				other = ctypes.cast(other, ctypes.c_void_p).value
+		elif not isinstance(other, int):
+			other = ctypes.cast(other, ctypes.c_void_p).value
+		return self.__class__(other)
+
+	@classmethod
+	def new(cls, name, restype=None, argtypes=None, flags=0):
+		new = type(name, (cls,), {
+			'_argtypes_': argtypes,
+			'_restype_': restype,
+			'_flags_': flags
+		})
+		return new
 
 class MayhemStructure(ctypes.Structure):
 	pass
+
+# defined here so it can use the function cache
+def _WINFUNCTYPE(restype, *argtypes, use_errno=False, use_last_error=False):
+	flags = _ctypes.FUNCFLAG_STDCALL
+	if use_errno:
+		flags |= _ctypes.FUNCFLAG_USE_ERRNO
+	if use_last_error:
+		flags |= _ctypes.FUNCFLAG_USE_LASTERROR
+	cache_entry = _function_cache_entry(restype=restype, argtypes=argtypes, flags=flags)
+	function = _function_cache.get(cache_entry)
+	if function is not None:
+		return function
+	FunctionType = MayhemCFuncPtr.new('CFunctionType', **cache_entry._asdict())
+	_function_cache[cache_entry] = FunctionType
+	return FunctionType

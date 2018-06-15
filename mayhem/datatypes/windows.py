@@ -33,8 +33,10 @@
 import ctypes
 import platform
 
-from .structure import MayhemStructure
+from . import common
 from .windows_ntstatus import NTSTATUS_CODES
+
+WINFUNCTYPE = common._WINFUNCTYPE
 
 _IMAGE_NUMBEROF_DIRECTORY_ENTRIES = 16
 is_64bit = platform.architecture()[0] == '64bit'
@@ -124,21 +126,21 @@ else:
 	SIZE_T = ctypes.c_uint32
 PSIZE_T = ctypes.POINTER(SIZE_T)
 
-class LARGE_INTEGER(MayhemStructure):
+class LARGE_INTEGER(common.MayhemStructure):
 	_fields_ = [
 		('LowPart', DWORD),
 		('HighPart', LONG),
 	]
 PLARGE_INTEGER = ctypes.POINTER(LARGE_INTEGER)
 
-class LIST_ENTRY(MayhemStructure):
+class LIST_ENTRY(common.MayhemStructure):
 	_fields_ = [
 		('Flink', ctypes.c_void_p),
 		('Blink', ctypes.c_void_p),
 	]
 PLIST_ENTRY = ctypes.POINTER(LIST_ENTRY)
 
-class UNICODE_STRING(MayhemStructure):
+class UNICODE_STRING(common.MayhemStructure):
 	_fields_ = [
 		('Length', USHORT),
 		('MaximumLength', USHORT),
@@ -154,7 +156,7 @@ class UNICODE_STRING(MayhemStructure):
 		return inst
 PUNICODE_STRING = ctypes.POINTER(UNICODE_STRING)
 
-class STARTUPINFO(MayhemStructure):
+class STARTUPINFO(common.MayhemStructure):
 	"""see:
 	http://msdn.microsoft.com/en-us/library/windows/desktop/ms686331(v=vs.85).aspx
 	"""
@@ -180,7 +182,7 @@ class STARTUPINFO(MayhemStructure):
 	]
 PSTARTUPINFO = ctypes.POINTER(STARTUPINFO)
 
-class LDR_MODULE(MayhemStructure):
+class LDR_MODULE(common.MayhemStructure):
 	_fields_ = [
 		('InLoadOrderModuleList', LIST_ENTRY),
 		('InMemoryOrderModuleList', LIST_ENTRY),
@@ -198,7 +200,7 @@ class LDR_MODULE(MayhemStructure):
 	]
 PLDR_MODULE = ctypes.POINTER(LDR_MODULE)
 
-class LOADED_IMAGE(MayhemStructure):
+class LOADED_IMAGE(common.MayhemStructure):
 	"""see:
 	http://msdn.microsoft.com/en-us/library/windows/desktop/ms680349%28v=vs.85%29.aspx
 	"""
@@ -220,7 +222,7 @@ class LOADED_IMAGE(MayhemStructure):
 	]
 PLOADED_IMAGE = ctypes.POINTER(LOADED_IMAGE)
 
-class LUID(MayhemStructure):
+class LUID(common.MayhemStructure):
 	"""see:
 	https://msdn.microsoft.com/en-us/library/windows/desktop/aa379261(v=vs.85).aspx
 	"""
@@ -230,7 +232,7 @@ class LUID(MayhemStructure):
 	]
 PLUID = ctypes.POINTER(LUID)
 
-class IMAGE_DATA_DIRECTORY(MayhemStructure):
+class IMAGE_DATA_DIRECTORY(common.MayhemStructure):
 	"""see:
 	http://msdn.microsoft.com/en-us/library/windows/desktop/ms680305%28v=vs.85%29.aspx
 	"""
@@ -240,7 +242,7 @@ class IMAGE_DATA_DIRECTORY(MayhemStructure):
 	]
 PIMAGE_DATA_DIRECTORY = ctypes.POINTER(IMAGE_DATA_DIRECTORY)
 
-class IMAGE_DOS_HEADER(MayhemStructure):
+class IMAGE_DOS_HEADER(common.MayhemStructure):
 	_fields_ = [
 		('e_magic', WORD),
 		('e_cblp', WORD),
@@ -264,7 +266,7 @@ class IMAGE_DOS_HEADER(MayhemStructure):
 	]
 PIMAGE_DOS_HEADER = ctypes.POINTER(IMAGE_DOS_HEADER)
 
-class IMAGE_EXPORT_DIRECTORY(MayhemStructure):
+class IMAGE_EXPORT_DIRECTORY(common.MayhemStructure):
 	_fields_ = [
 		('Characteristics', DWORD),
 		('TimeDateStamp', DWORD),
@@ -280,7 +282,7 @@ class IMAGE_EXPORT_DIRECTORY(MayhemStructure):
 	]
 PIMAGE_EXPORT_DIRECTORY = ctypes.POINTER(IMAGE_EXPORT_DIRECTORY)
 
-class IMAGE_FILE_HEADER(MayhemStructure):
+class IMAGE_FILE_HEADER(common.MayhemStructure):
 	_fields_ = [
 		('Machine', WORD),
 		('NumberOfSections', WORD),
@@ -292,7 +294,7 @@ class IMAGE_FILE_HEADER(MayhemStructure):
 	]
 PIMAGE_FILE_HEADER = ctypes.POINTER(IMAGE_FILE_HEADER)
 
-class IMAGE_OPTIONAL_HEADER(MayhemStructure):
+class IMAGE_OPTIONAL_HEADER(common.MayhemStructure):
 	_fields_ = [
 		('Magic', WORD),
 		('MajorLinkerVersion', BYTE),
@@ -328,14 +330,14 @@ class IMAGE_OPTIONAL_HEADER(MayhemStructure):
 	]
 PIMAGE_OPTIONAL_HEADER = ctypes.POINTER(IMAGE_OPTIONAL_HEADER)
 
-class IMAGE_IMPORT_BY_NAME(MayhemStructure):
+class IMAGE_IMPORT_BY_NAME(common.MayhemStructure):
 	_fields_ = [
 		('Hint', WORD),
 		('Name', BYTE),
 	]
 PIMAGE_IMPORT_BY_NAME = ctypes.POINTER(IMAGE_IMPORT_BY_NAME)
 
-class IMAGE_IMPORT_DESCRIPTOR(MayhemStructure):
+class IMAGE_IMPORT_DESCRIPTOR(common.MayhemStructure):
 	_fields_ = [
 		('OriginalFirstThunk', DWORD),
 		('TimeDateStamp', DWORD),
@@ -345,7 +347,7 @@ class IMAGE_IMPORT_DESCRIPTOR(MayhemStructure):
 	]
 PIMAGE_IMPORT_DESCRIPTOR = ctypes.POINTER(IMAGE_IMPORT_DESCRIPTOR)
 
-class IMAGE_THUNK_DATA32(MayhemStructure):
+class IMAGE_THUNK_DATA32(common.MayhemStructure):
 	_fields_ = [
 		('ForwarderString', DWORD),
 		('Function', DWORD),
@@ -354,7 +356,7 @@ class IMAGE_THUNK_DATA32(MayhemStructure):
 	]
 PIMAGE_THUNK_DATA32 = ctypes.POINTER(IMAGE_THUNK_DATA32)
 
-class IMAGE_NT_HEADERS32(MayhemStructure):
+class IMAGE_NT_HEADERS32(common.MayhemStructure):
 	_fields_ = [
 		('Signature', DWORD),
 		('FileHeader', IMAGE_FILE_HEADER),
@@ -368,7 +370,7 @@ class _IO_STATUS_BLOCK_U0(ctypes.Union):
 		('Pointer', PVOID),
 	]
 
-class IO_STATUS_BLOCK(MayhemStructure):
+class IO_STATUS_BLOCK(common.MayhemStructure):
 	_anonymous_ = ('u0',)
 	_fields_ = [
 		('u0', _IO_STATUS_BLOCK_U0),
@@ -376,7 +378,7 @@ class IO_STATUS_BLOCK(MayhemStructure):
 	]
 PIO_STATUS_BLOCK = ctypes.POINTER(IO_STATUS_BLOCK)
 
-class _OVERLAPPED_U0_S0(MayhemStructure):
+class _OVERLAPPED_U0_S0(common.MayhemStructure):
 	_fields_ = [
 		('Offset', DWORD),
 		('OffsetHigh', DWORD)
@@ -388,7 +390,7 @@ class _OVERLAPPED_U0(ctypes.Union):
 		('Pointer', PVOID)
 	]
 
-class OVERLAPPED(MayhemStructure):
+class OVERLAPPED(common.MayhemStructure):
 	_anonymous_ = ('u0',)
 	_fields_ = [
 		('Internal', ULONG_PTR),
@@ -398,7 +400,7 @@ class OVERLAPPED(MayhemStructure):
 	]
 POVERLAPPED = ctypes.POINTER(OVERLAPPED)
 
-class PEB(MayhemStructure):
+class PEB(common.MayhemStructure):
 	"""see:
 	http://msdn.microsoft.com/en-us/library/windows/desktop/aa813706%28v=vs.85%29.aspx
 	"""
@@ -421,7 +423,7 @@ class PEB(MayhemStructure):
 	]
 PPEB = ctypes.POINTER(PEB)
 
-class PEB_LDR_DATA(MayhemStructure):
+class PEB_LDR_DATA(common.MayhemStructure):
 	_fields_ = [
 		('Length', ULONG),
 		('Reserved', UCHAR * 4),
@@ -432,7 +434,7 @@ class PEB_LDR_DATA(MayhemStructure):
 	]
 PPEB_LDR_DATA = ctypes.POINTER(PEB_LDR_DATA)
 
-class PROCESS_BASIC_INFORMATION(MayhemStructure):
+class PROCESS_BASIC_INFORMATION(common.MayhemStructure):
 	"""see:
 	http://msdn.microsoft.com/en-us/library/windows/desktop/ms684280%28v=vs.85%29.aspx
 	"""
@@ -445,7 +447,7 @@ class PROCESS_BASIC_INFORMATION(MayhemStructure):
 	]
 PPROCESS_BASIC_INFORMATION = ctypes.POINTER(PROCESS_BASIC_INFORMATION)
 
-class SECURITY_ATTRIBUTES(MayhemStructure):
+class SECURITY_ATTRIBUTES(common.MayhemStructure):
 	"""see:
 	http://msdn.microsoft.com/en-us/library/windows/desktop/aa379560(v=vs.85).aspx
 	"""
@@ -456,7 +458,7 @@ class SECURITY_ATTRIBUTES(MayhemStructure):
 	]
 PSECURITY_ATTRIBUTES = ctypes.POINTER(SECURITY_ATTRIBUTES)
 
-class HANDLE_ENTRY(MayhemStructure):
+class HANDLE_ENTRY(common.MayhemStructure):
 	_fields_ = [
 		('phead', ctypes.c_void_p),
 		('pOwner', ctypes.c_void_p),
@@ -472,14 +474,14 @@ class HANDLE_ENTRY(MayhemStructure):
 		return cls.from_address(addr)
 PHANDLE_ENTRY = ctypes.POINTER(HANDLE_ENTRY)
 
-class WND_MSG(MayhemStructure):
+class WND_MSG(common.MayhemStructure):
 	_fields_ = [
 		('maxMsgs', ctypes.c_uint32),
 		('abMsgs', ctypes.c_void_p),
 	]
 PWND_MSG = ctypes.POINTER(WND_MSG)
 
-class SHARED_INFO(MayhemStructure):
+class SHARED_INFO(common.MayhemStructure):
 	_fields_ = [
 		('psi', ctypes.c_void_p),
 		('aheList', ctypes.c_void_p),
@@ -498,7 +500,7 @@ class SHARED_INFO(MayhemStructure):
 		return cls.from_address(addr)
 PSHARED_INFO = ctypes.POINTER(SHARED_INFO)
 
-class SYSTEM_INFO(MayhemStructure):
+class SYSTEM_INFO(common.MayhemStructure):
 	"""see:
 	http://msdn.microsoft.com/en-us/library/windows/desktop/ms724958(v=vs.85).aspx
 	"""
@@ -524,7 +526,7 @@ class SYSTEM_INFO(MayhemStructure):
 		return system_info
 PSYSTEM_INFO = ctypes.POINTER(SYSTEM_INFO)
 
-class SYSTEM_PROCESS_INFORMATION(MayhemStructure):
+class SYSTEM_PROCESS_INFORMATION(common.MayhemStructure):
 	"""see:
 	https://msdn.microsoft.com/en-us/library/windows/desktop/ms725506(v=vs.85).aspx
 	http://undocumented.ntinternals.net/index.html?page=UserMode%2FUndocumented%20Functions%2FSystem%20Information%2FStructures%2FSYSTEM_PROCESS_INFORMATION.html
@@ -545,7 +547,7 @@ class SYSTEM_PROCESS_INFORMATION(MayhemStructure):
 	]
 PSYSTEM_PROCESS_INFORMATION = ctypes.POINTER(SYSTEM_PROCESS_INFORMATION)
 
-class PROCESS_INFORMATION(MayhemStructure):
+class PROCESS_INFORMATION(common.MayhemStructure):
 	"""see:
 	http://msdn.microsoft.com/en-us/library/windows/desktop/ms684873(v=vs.85).aspx
 	"""
@@ -557,7 +559,7 @@ class PROCESS_INFORMATION(MayhemStructure):
 	]
 PPROCESS_INFORMATION = ctypes.POINTER(PROCESS_INFORMATION)
 
-class MEMORY_BASIC_INFORMATION32(MayhemStructure):
+class MEMORY_BASIC_INFORMATION32(common.MayhemStructure):
 	"""see:
 	http://msdn.microsoft.com/en-us/library/windows/desktop/aa366775(v=vs.85).aspx
 	"""
@@ -571,7 +573,7 @@ class MEMORY_BASIC_INFORMATION32(MayhemStructure):
 		('Type', DWORD),
 	]
 
-class MEMORY_BASIC_INFORMATION64(MayhemStructure):
+class MEMORY_BASIC_INFORMATION64(common.MayhemStructure):
 	"""see:
 	http://msdn.microsoft.com/en-us/library/windows/desktop/aa366775(v=vs.85).aspx
 	"""
@@ -594,7 +596,7 @@ else:
 	MEMORY_BASIC_INFORMATION = MEMORY_BASIC_INFORMATION32
 PMEMORY_BASIC_INFORMATION = ctypes.POINTER(MEMORY_BASIC_INFORMATION)
 
-class MENUITEMINFOW(MayhemStructure):
+class MENUITEMINFOW(common.MayhemStructure):
 	"""see:
 	https://msdn.microsoft.com/en-us/library/windows/desktop/ms647578(v=vs.85).aspx
 	"""
