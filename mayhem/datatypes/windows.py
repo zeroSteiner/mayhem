@@ -44,11 +44,14 @@ VOID    = None
 # http://msdn.microsoft.com/en-us/library/windows/desktop/aa383751(v=vs.85).aspx
 BOOLEAN = ctypes.c_byte
 BOOL    = ctypes.c_int
+PBOOL   = ctypes.POINTER(BOOL)
 BYTE    = ctypes.c_uint8
 PBYTE   = ctypes.POINTER(BYTE)
 LPBYTE  = PBYTE
 
-WORD = ctypes.c_uint16
+WORD    = ctypes.c_uint16
+PWORD   = ctypes.POINTER(WORD)
+LPWORD  = PWORD
 
 DWORD     = ctypes.c_uint32
 DWORDLONG = ctypes.c_uint64
@@ -95,9 +98,12 @@ PHANDLE   = ctypes.POINTER(HANDLE)
 LPHANDLE  = PHANDLE
 HINSTANCE = HANDLE
 HMODULE   = HANDLE
+PHMODULE  = ctypes.POINTER(HMODULE)
+LPHMODULE = PHMODULE
 PVOID     = ctypes.c_void_p
 LPVOID    = PVOID
-LPCVOID   = PVOID
+LPVOID    = PVOID
+
 NTSTATUS  = ctypes.c_uint32
 
 # platform specific data primitives
@@ -359,6 +365,28 @@ class IO_STATUS_BLOCK(MayhemStructure):
 	]
 PIO_STATUS_BLOCK = ctypes.POINTER(IO_STATUS_BLOCK)
 
+_OVERLAPPED_U0_S0(MayhemStructure):
+	_fields_ = [
+		('Offset', DWORD),
+		('OffsetHigh', DWORD)
+	]
+
+class _OVERLAPPED_U0(ctypes.Union):
+	_fields_ = [
+		('s0', _OVERLAPPED_U0_S0),
+		('Pointer', PVOID)
+	]
+
+class OVERLAPPED(MayhemStructure):
+	_anonymous_ = ('u0',)
+	_fields_ = [
+		('Internal', ULONG_PTR),
+		('InternalHigh', ULONG_PTR),
+		('u0', _OVERLAPPED_U0),
+		('hEvent', HANDLE)
+	]
+POVERLAPPED = ctypes.POINTER(OVERLAPPED)
+
 class PEB(MayhemStructure):
 	"""see:
 	http://msdn.microsoft.com/en-us/library/windows/desktop/aa813706%28v=vs.85%29.aspx
@@ -483,7 +511,7 @@ class SYSTEM_INFO(MayhemStructure):
 		system_info = cls()
 		kernel32.GetSystemInfo(ctypes.byref(system_info))
 		return system_info
-SYSTEM_INFO = ctypes.POINTER(SYSTEM_INFO)
+PSYSTEM_INFO = ctypes.POINTER(SYSTEM_INFO)
 
 class SYSTEM_PROCESS_INFORMATION(MayhemStructure):
 	"""see:
