@@ -36,6 +36,7 @@ import platform
 from . import common
 from .windows_ntstatus import NTSTATUS_CODES
 
+_kernel32 = ctypes.windll.kernel32
 WINFUNCTYPE = common._WINFUNCTYPE
 
 _IMAGE_NUMBEROF_DIRECTORY_ENTRIES = 16
@@ -495,9 +496,12 @@ class SHARED_INFO(common.MayhemStructure):
 
 	@classmethod
 	def from_user32(cls):
-		kernel32 = ctypes.windll.kernel32
-		addr = kernel32.GetProcAddress(kernel32.GetModuleHandleA('user32.dll'), 'gSharedInfo')
-		return cls.from_address(addr)
+		prototype = WINFUNCTYPE(HANDLE, LPWSTR)
+		GetModuleHandleW = prototype(ctypes.cast(_kernel32.GetModuleHandleW, ctypes.c_void_p).value)
+		prototype = WINFUNCTYPE(ctypes.c_void_p, HMODULE, LPSTR)
+		GetProcAddress = prototype(ctypes.cast(_kernel32.GetProcAddress, ctypes.c_void_p).value)
+		address = GetProcAddress(GetModuleHandleW('user32.dll'), 'gSharedInfo')
+		return cls.from_address(address)
 PSHARED_INFO = ctypes.POINTER(SHARED_INFO)
 
 class SYSTEM_INFO(common.MayhemStructure):
@@ -520,9 +524,10 @@ class SYSTEM_INFO(common.MayhemStructure):
 
 	@classmethod
 	def from_kernel32(cls):
-		kernel32 = ctypes.windll.kernel32
 		system_info = cls()
-		kernel32.GetSystemInfo(ctypes.byref(system_info))
+		prototype = WINFUNCTYPE(VOID, PVOID)
+		GetSystemInfo = prototype(ctypes.cast(_kernel32.GetSystemInfo, ctypes.c_void_p).value)
+		GetSystemInfo(ctypes.byref(system_info))
 		return system_info
 PSYSTEM_INFO = ctypes.POINTER(SYSTEM_INFO)
 

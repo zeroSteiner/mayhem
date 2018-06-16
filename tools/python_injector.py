@@ -41,8 +41,7 @@ from mayhem import utilities
 from mayhem.datatypes import windows as wintypes
 from mayhem.proc import ProcessError
 from mayhem.proc.windows import WindowsProcess
-
-kernel32 = ctypes.windll.kernel32
+from mayhem.windll import kernel32 as m_k32
 
 INVALID_HANDLE_VALUE =  -1
 PIPE_ACCESS_DUPLEX =    0x00000003
@@ -82,16 +81,16 @@ class NamedPipeClient(object):
 	def read(self):
 		ctarray = (ctypes.c_byte * self.buffer_size)()
 		bytes_read = wintypes.DWORD(0)
-		if not kernel32.ReadFile(self.handle, ctarray, self.buffer_size, ctypes.byref(bytes_read), 0):
+		if not m_k32.ReadFile(self.handle, ctypes.byref(ctarray), self.buffer_size, ctypes.byref(bytes_read), None):
 			return None
 		return utilities.ctarray_to_bytes(ctarray)[:bytes_read.value]
 
 	def close(self):
-		kernel32.CloseHandle(self.handle)
+		m_k32.CloseHandle(self.handle)
 
 	@classmethod
 	def from_named_pipe(cls, name, buffer_size=4096, default_timeout=100, max_instances=5):
-		handle = kernel32.CreateNamedPipeW(
+		handle = m_k32.CreateNamedPipeW(
 			'\\\\.\\pipe\\' + name,                     # _In_     LPCTSTR               lpName
 			PIPE_ACCESS_DUPLEX,                         # _In_     DWORD                 dwOpenMode
 			PIPE_TYPE_MESSAGE | PIPE_READMODE_MESSAGE,  # _In_     DWORD                 dwPipeMode
@@ -104,9 +103,9 @@ class NamedPipeClient(object):
 		if handle == INVALID_HANDLE_VALUE:
 			raise ctypes.WinError()
 
-		result = kernel32.ConnectNamedPipe(handle, 0)
+		result = m_k32.ConnectNamedPipe(handle, None)
 		if result == 0:
-			kernel32.CloseHandle(handle)
+			m_k32.CloseHandle(handle)
 			raise ctypes.WinError()
 		return cls(handle, buffer_size=buffer_size)
 
@@ -148,9 +147,9 @@ def main():
 		print("[+] Loaded {0} with handle 0x{1:08x}".format(python_lib, python_lib_h))
 
 	# resolve the necessary functions
-	local_handle = kernel32.GetModuleHandleW(python_lib)
-	py_initialize_ex = python_lib_h + (kernel32.GetProcAddress(local_handle, b'Py_InitializeEx\x00') - local_handle)
-	py_run_simple_string = python_lib_h + (kernel32.GetProcAddress(local_handle, b'PyRun_SimpleString\x00') - local_handle)
+	local_handle = m_k32.GetModuleHandleW(python_lib)
+	py_initialize_ex = python_lib_h + (m_k32.GetProcAddress(local_handle, b'Py_InitializeEx') - local_handle)
+	py_run_simple_string = python_lib_h + (m_k32.GetProcAddress(local_handle, b'PyRun_SimpleString') - local_handle)
 	print('[*] Resolved addresses:')
 	print("  - Py_InitializeEx:    0x{0:08x}".format(py_initialize_ex))
 	print("  - PyRun_SimpleString: 0x{0:08x}".format(py_run_simple_string))
