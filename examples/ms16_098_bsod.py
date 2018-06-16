@@ -60,30 +60,23 @@ MIIM_SUBMENU = 0x0004
 
 HBMMENU_SYSTEM = 1
 
-import binascii
 import ctypes
-import ctypes.wintypes as wintypes
 import os
 import platform
 import random
 import sys
-import threading
 import time
 
 lib_path = os.path.split(__file__)[0]
 lib_path = os.path.join(lib_path, '..')
 lib_path = os.path.abspath(lib_path)
 sys.path.insert(0, lib_path)
-import mayhem
 from mayhem.datatypes.windows import MENUITEMINFOW
 from mayhem.datatypes.windows import UNICODE_STRING
 from mayhem.exploit.windows import WindowsSyscall
 from mayhem.exploit.windows import error_on_null
 from mayhem.exploit.windows import print_handle
 
-gdi32 = ctypes.windll.gdi32
-kernel32 = ctypes.windll.kernel32
-ntdll = ctypes.windll.ntdll
 user32 = ctypes.windll.user32
 
 syscall = WindowsSyscall()
