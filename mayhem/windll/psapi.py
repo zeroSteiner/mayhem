@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-#  mayhem/windll/ntdll.py
+#  mayhem/windll/psapi.py
 #
 #  Redistribution and use in source and binary forms, with or without
 #  modification, are permitted provided that the following conditions are
@@ -35,48 +35,22 @@ import ctypes
 from . import kernel32 as m_k32
 import mayhem.datatypes.windows as wintypes
 
-_ntdll = ctypes.windll.ntdll
+_psapi = ctypes.windll.psapi
 
-NtAllocateVirtualMemory = m_k32._patch_winfunctype(
-	_ntdll.NtAllocateVirtualMemory,
-	wintypes.NTSTATUS,
-	(
-		wintypes.HANDLE,
-		ctypes.POINTER(wintypes.PVOID),
-		wintypes.ULONG_PTR,
-		wintypes.PSIZE_T,
-		wintypes.ULONG,
-		wintypes.ULONG
-	)
-)
-
-NtDeviceIoControlFile = m_k32._patch_winfunctype(
-	_ntdll.NtDeviceIoControlFile,
-	wintypes.NTSTATUS,
-	(
-		wintypes.HANDLE,
-		wintypes.HANDLE,
-		ctypes.c_void_p,
-		wintypes.PVOID,
-		wintypes.PIO_STATUS_BLOCK,
-		wintypes.ULONG,
-		wintypes.PVOID,
-		wintypes.ULONG,
-		wintypes.PVOID,
-		wintypes.ULONG
-	)
-)
-
-NtQueryInformationProcess = m_k32._patch_winfunctype(
-	_ntdll.NtQueryInformationProcess,
-	wintypes.NTSTATUS,
-	(
-		wintypes.HANDLE,
+if hasattr(_psapi, 'GetModuleFileNameExA'):
+	# https://msdn.microsoft.com/en-us/library/windows/desktop/ms683198(v=vs.85).aspx
+	GetModuleFileNameExA = m_k32._patch_winfunctype(
+		_psapi.GetModuleFileNameExA,
 		wintypes.DWORD,
-		wintypes.PVOID,
-		wintypes.ULONG,
-		wintypes.PULONG
+		(wintypes.HANDLE, wintypes.HMODULE, wintypes.LPSTR, wintypes.DWORD)
 	)
-)
 
-address = m_k32.GetModuleHandleW('ntdll.dll')
+if hasattr(_psapi, 'GetModuleFileNameExW'):
+	# https://msdn.microsoft.com/en-us/library/windows/desktop/ms683198(v=vs.85).aspx
+	GetModuleFileNameExW = m_k32._patch_winfunctype(
+		_psapi.GetModuleFileNameExW,
+		wintypes.DWORD,
+		(wintypes.HANDLE, wintypes.HMODULE, wintypes.LPSTR, wintypes.DWORD)
+	)
+
+address = m_k32.GetModuleHandleW('psapi.dll')

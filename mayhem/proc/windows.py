@@ -40,6 +40,9 @@ import platform
 from mayhem.proc import ProcessBase, ProcessError, Hook, MemoryRegion
 from mayhem.datatypes import windows as wintypes
 from mayhem.utilities import ctarray_to_bytes, eval_number
+from mayhem.windll import kernel32 as m_k32
+from mayhem.windll import ntdll as m_ntdll
+from mayhem.windll import psapi as m_psapi
 
 CONSTANTS = {
 	'GENERIC_READ': 0x80000000,
@@ -148,14 +151,12 @@ def process_is_wow64(handle=None):
 	:return: Whether the process is running in WOW64 or not.
 	:rtype: bool
 	"""
-	if not hasattr(ctypes.windll.kernel32, 'IsWow64Process'):
+	if not hasattr(m_k32, 'IsWow64Process'):
 		return False
-	if platform.architecture()[0] == '64bit':
-		ctypes.windll.kernel32.IsWow64Process.argtypes = [ctypes.c_uint64, ctypes.POINTER(ctypes.c_bool)]
 	handle = (handle or -1)
 	is_wow64 = ctypes.c_bool()
-	if not ctypes.windll.kernel32.IsWow64Process(handle, ctypes.byref(is_wow64)):
-		raise WindowsProcessError('Error: IsWow64Process', get_last_error=ctypes.windll.kernel32.GetLastError())
+	if not m_k32.IsWow64Process(handle, ctypes.byref(is_wow64)):
+		raise WindowsProcessError('Error: IsWow64Process', get_last_error=m_k32.GetLastError())
 	return is_wow64.value
 
 class WindowsProcess(ProcessBase):
@@ -164,10 +165,6 @@ class WindowsProcess(ProcessBase):
 		if platform.system() != 'Windows':
 			raise RuntimeError('incompatible platform')
 		self.__arch__ = arch
-		self.k32 = ctypes.windll.kernel32
-		self.ntdll = ctypes.windll.ntdll
-		self.psapi = ctypes.windll.psapi
-		self._setup_winapi()
 
 		self.handle = None
 		if pid == -1:
@@ -176,7 +173,7 @@ class WindowsProcess(ProcessBase):
 		if access is None:
 			access = "(PROCESS_CREATE_THREAD | PROCESS_QUERY_INFORMATION | PROCESS_VM_OPERATION | PROCESS_VM_WRITE | PROCESS_VM_READ | PROCESS_TERMINATE)"
 		if pid:
-			self.handle = self.k32.OpenProcess(flags(access), False, pid)
+			self.handle = m_k32.OpenProcess(flags(access), False, pid)
 			if not self.handle:
 				raise ProcessError('could not open PID')
 		elif exe:
@@ -185,7 +182,7 @@ class WindowsProcess(ProcessBase):
 			startupinfo.dwFlags = 0x01
 			startupinfo.wShowWindow = 0x00
 			startupinfo.cb = ctypes.sizeof(startupinfo)
-			self.k32.CreateProcessA(exe, None, None, None, True, 0, None, None, ctypes.byref(startupinfo), ctypes.byref(process_info))
+			m_k32.CreateProcessA(exe, None, None, None, True, 0, None, None, ctypes.byref(startupinfo), ctypes.byref(process_info))
 			self.handle = process_info.hProcess
 			if not self.handle:
 				raise ProcessError('could not the create process')
@@ -195,13 +192,13 @@ class WindowsProcess(ProcessBase):
 			raise ProcessError('either a pid, exe or a handle must be specified')
 		if process_is_wow64() != process_is_wow64(self.handle):
 			raise ProcessError('the python process must be the same architecture as the target process')
-		self.pid = self.k32.GetProcessId(self.handle)
+		self.pid = m_k32.GetProcessId(self.handle)
 		_name = (ctypes.c_char * 0x400)
 		name = _name()
-		if hasattr(self.psapi, 'GetModuleFileNameExA'):
-			self.psapi.GetModuleFileNameExA(self.handle, 0, name, ctypes.sizeof(name))
+		if hasattr(m_psapi, 'GetModuleFileNameExA'):
+			m_psapi.GetModuleFileNameExA(self.handle, 0, name, ctypes.sizeof(name))
 		else:
-			self.k32.GetModuleFileNameExA(self.handle, 0, name, ctypes.sizeof(name))
+			m_k32.GetModuleFileNameExA(self.handle, 0, name, ctypes.sizeof(name))
 		self.exe_file = b''.join(name).rstrip(b'\x00').decode('utf-8')
 		self._installed_hooks = []
 
@@ -220,13 +217,19 @@ class WindowsProcess(ProcessBase):
 	def _get_attr_peb_addr(self):
 		process_basic_information = wintypes.PROCESS_BASIC_INFORMATION()
 		return_length = wintypes.DWORD()
-		self.ntdll.NtQueryInformationProcess(self.handle, 0, ctypes.byref(process_basic_information), ctypes.sizeof(process_basic_information), ctypes.byref(return_length))
+		m_ntdll.NtQueryInformationProcess(
+			self.handle,
+			0,
+			ctypes.byref(process_basic_information),
+			ctypes.sizeof(process_basic_information),
+			ctypes.byref(return_length)
+		)
 		return process_basic_information.PebBaseAddress
 
 	def _get_attr_peb(self):
 		peb_addr = self.get_proc_attribute('peb_addr')
 		peb = wintypes.PEB()
-		self.k32.ReadProcessMemory(self.handle, peb_addr, ctypes.byref(peb), ctypes.sizeof(peb), 0)
+		m_k32.ReadProcessMemory(self.handle, peb_addr, ctypes.byref(peb), ctypes.sizeof(peb), 0)
 		return peb
 
 	def _get_attr_peb_ldr_data_addr(self):
@@ -236,7 +239,7 @@ class WindowsProcess(ProcessBase):
 	def _get_attr_peb_ldr_data(self):
 		peb_ldr_data_addr = self.get_proc_attribute('peb_ldr_data_addr')
 		peb_ldr_data = wintypes.PEB_LDR_DATA()
-		self.k32.ReadProcessMemory(self.handle, peb_ldr_data_addr, ctypes.byref(peb_ldr_data), ctypes.sizeof(peb_ldr_data), 0)
+		m_k32.ReadProcessMemory(self.handle, peb_ldr_data_addr, ctypes.byref(peb_ldr_data), ctypes.sizeof(peb_ldr_data), 0)
 		return peb_ldr_data
 
 	def _get_attr_image_dos_header_addr(self):
@@ -245,7 +248,7 @@ class WindowsProcess(ProcessBase):
 	def _get_attr_image_dos_header(self):
 		image_dos_header_addr = self.get_proc_attribute('image_dos_header_addr')
 		image_dos_header = wintypes.IMAGE_DOS_HEADER()
-		self.k32.ReadProcessMemory(self.handle, image_dos_header_addr, ctypes.byref(image_dos_header), ctypes.sizeof(image_dos_header), 0)
+		m_k32.ReadProcessMemory(self.handle, image_dos_header_addr, ctypes.byref(image_dos_header), ctypes.sizeof(image_dos_header), 0)
 		return image_dos_header
 
 	def _get_attr_image_nt_headers_addr(self):
@@ -258,7 +261,7 @@ class WindowsProcess(ProcessBase):
 			image_nt_headers = wintypes.IMAGE_NT_HEADERS32()
 		else:
 			raise Exception('the selected architecture is not supported')
-		self.k32.ReadProcessMemory(self.handle, self.get_proc_attribute('image_nt_headers_addr'), ctypes.byref(image_nt_headers), ctypes.sizeof(image_nt_headers), 0)
+		m_k32.ReadProcessMemory(self.handle, self.get_proc_attribute('image_nt_headers_addr'), ctypes.byref(image_nt_headers), ctypes.sizeof(image_nt_headers), 0)
 		return image_nt_headers
 
 	def _get_attr_image_import_descriptor_addr(self):
@@ -273,19 +276,19 @@ class WindowsProcess(ProcessBase):
 		import_directory = optional_header.DataDirectory[IMAGE_DIRECTORY_ENTRY_IMPORT]
 		_import_descriptors = wintypes.IMAGE_IMPORT_DESCRIPTOR * ((import_directory.Size / ctypes.sizeof(wintypes.IMAGE_IMPORT_DESCRIPTOR)) - 1)
 		import_descriptors = _import_descriptors()
-		self.k32.ReadProcessMemory(self.handle, image_dos_header_addr + import_directory.VirtualAddress, ctypes.byref(import_descriptors), ctypes.sizeof(import_descriptors), 0)
+		m_k32.ReadProcessMemory(self.handle, image_dos_header_addr + import_directory.VirtualAddress, ctypes.byref(import_descriptors), ctypes.sizeof(import_descriptors), 0)
 		return import_descriptors
 
 	def _get_attr_system_info(self):
 		system_info = wintypes.SYSTEM_INFO()
-		self.k32.GetSystemInfo(ctypes.byref(system_info))
+		m_k32.GetSystemInfo(ctypes.byref(system_info))
 		return system_info
 
 	def _get_name_for_ilt_entry(self, ilt_ent):
 		image_dos_header_addr = self.get_proc_attribute('image_dos_header_addr')
 		_name = (ctypes.c_char * 0x200)
 		name = _name()
-		self.k32.ReadProcessMemory(self.handle, image_dos_header_addr + ilt_ent + ctypes.sizeof(wintypes.WORD), ctypes.byref(name), ctypes.sizeof(name), 0)
+		m_k32.ReadProcessMemory(self.handle, image_dos_header_addr + ilt_ent + ctypes.sizeof(wintypes.WORD), ctypes.byref(name), ctypes.sizeof(name), 0)
 		name = ''.join(name)
 		name = name.split('\x00')[0]
 		return name
@@ -297,7 +300,7 @@ class WindowsProcess(ProcessBase):
 		image_dos_header_addr = self.get_proc_attribute('image_dos_header_addr')
 		_name = (ctypes.c_char * 0x400)
 		name = _name()
-		self.k32.ReadProcessMemory(self.handle, image_dos_header_addr + iid.Name, ctypes.byref(name), ctypes.sizeof(name), 0)
+		m_k32.ReadProcessMemory(self.handle, image_dos_header_addr + iid.Name, ctypes.byref(name), ctypes.sizeof(name), 0)
 		name = ''.join(name)
 		name = name.split('\x00')[0]
 		return name
@@ -306,14 +309,14 @@ class WindowsProcess(ProcessBase):
 		image_dos_header_addr = self.get_proc_attribute('image_dos_header_addr')
 		_ilt = (ctypes.c_void_p * 0x200)
 		ilt = _ilt()
-		self.k32.ReadProcessMemory(self.handle, image_dos_header_addr + iid.OriginalFirstThunk, ctypes.byref(ilt), ctypes.sizeof(ilt), 0)
+		m_k32.ReadProcessMemory(self.handle, image_dos_header_addr + iid.OriginalFirstThunk, ctypes.byref(ilt), ctypes.sizeof(ilt), 0)
 		return ilt
 
 	def _get_iat_for_image_import_descriptor(self, iid): # import address table
 		image_dos_header_addr = self.get_proc_attribute('image_dos_header_addr')
 		_iat = (ctypes.c_void_p * 0x200)
 		iat = _iat()
-		self.k32.ReadProcessMemory(self.handle, image_dos_header_addr + iid.FirstThunk, ctypes.byref(iat), ctypes.sizeof(iat), 0)
+		m_k32.ReadProcessMemory(self.handle, image_dos_header_addr + iid.FirstThunk, ctypes.byref(iat), ctypes.sizeof(iat), 0)
 		return iat
 
 	def _get_image_base_by_name(self, name):
@@ -325,51 +328,24 @@ class WindowsProcess(ProcessBase):
 			firstFLink = peb_ldr_data.InLoadOrderModuleList.Flink
 			module = wintypes.LDR_MODULE()
 
-			self.k32.ReadProcessMemory(self.handle, fLink, ctypes.byref(module), ctypes.sizeof(module), 0)
+			m_k32.ReadProcessMemory(self.handle, fLink, ctypes.byref(module), ctypes.sizeof(module), 0)
 
 			_base_dll_name = (ctypes.c_wchar * module.BaseDllName.MaximumLength)
 			base_dll_name = _base_dll_name()
 
-			self.k32.ReadProcessMemory(self.handle, module.BaseDllName.Buffer, base_dll_name, module.BaseDllName.Length + 2, 0)
+			m_k32.ReadProcessMemory(self.handle, module.BaseDllName.Buffer, base_dll_name, module.BaseDllName.Length + 2, 0)
 			base_dll_name = base_dll_name[:(module.BaseDllName.Length / 2)]
 			if name == base_dll_name:
 				return module
 			fLink = module.InLoadOrderModuleList.Flink
 		return None
 
-	def _setup_winapi(self):
-		self.k32.CreateRemoteThread.argtypes = [wintypes.HANDLE, ctypes.POINTER(wintypes.SECURITY_ATTRIBUTES), wintypes.SIZE_T, ctypes.c_void_p, wintypes.LPVOID, wintypes.DWORD, wintypes.PDWORD]
-		self.k32.CreateRemoteThread.restype = wintypes.HANDLE
-		self.k32.GetExitCodeThread.argtypes = [wintypes.HANDLE, wintypes.PDWORD]
-		self.k32.GetModuleHandleA.argtypes = [wintypes.LPSTR]
-		self.k32.GetModuleHandleA.restype = wintypes.HANDLE
-		self.k32.GetProcAddress.argtypes = [wintypes.HMODULE, wintypes.LPSTR]
-		self.k32.GetProcAddress.restype = ctypes.c_void_p
-		self.k32.GetProcessId.argtypes = [wintypes.HANDLE]
-		self.k32.GetProcessId.restype = wintypes.DWORD
-		self.k32.ReadProcessMemory.argtypes = [wintypes.HANDLE, wintypes.LPVOID, wintypes.LPVOID, wintypes.SIZE_T, wintypes.SIZE_T]
-		self.k32.VirtualAllocEx.argtypes = [wintypes.HANDLE, wintypes.LPVOID, wintypes.SIZE_T, wintypes.DWORD, wintypes.DWORD]
-		self.k32.VirtualAllocEx.restype = wintypes.SIZE_T
-		self.k32.VirtualFreeEx.argtypes = [wintypes.HANDLE, wintypes.LPVOID, wintypes.SIZE_T, wintypes.DWORD]
-		self.k32.VirtualProtectEx.argtypes = [wintypes.HANDLE, wintypes.LPVOID, wintypes.SIZE_T, wintypes.DWORD, ctypes.POINTER(wintypes.DWORD)]
-		self.k32.VirtualQueryEx.argtypes = [wintypes.HANDLE, wintypes.LPVOID, wintypes.PMEMORY_BASIC_INFORMATION, wintypes.SIZE_T]
-		self.k32.VirtualQueryEx.restype = wintypes.SIZE_T
-		self.k32.WaitForSingleObject.argtypes = [wintypes.HANDLE, wintypes.DWORD]
-		self.k32.WaitForSingleObject.restype = wintypes.DWORD
-		self.k32.WriteProcessMemory.argtypes = [wintypes.HANDLE, wintypes.LPVOID, wintypes.LPVOID, wintypes.SIZE_T, ctypes.POINTER(wintypes.SIZE_T)]
-		if hasattr(self.psapi, 'GetModuleFileNameExA'):
-			self.psapi.GetModuleFileNameExA.argtypes = [wintypes.HANDLE, wintypes.HMODULE, wintypes.LPSTR, wintypes.DWORD]
-			self.psapi.GetModuleFileNameExA.restype = wintypes.DWORD
-		else:
-			self.k32.GetModuleFileNameExA.argtypes = [wintypes.HANDLE, wintypes.HMODULE, wintypes.LPSTR, wintypes.DWORD]
-			self.k32.GetModuleFileNameExA.restype = wintypes.DWORD
-
 	@property
 	def maps(self):
 		sys_info = self.get_proc_attribute('system_info')
 		_maps = collections.deque()
 		address_cursor = 0
-		VirtualQueryEx = self.k32.VirtualQueryEx
+		VirtualQueryEx = m_k32.VirtualQueryEx
 		meminfo = wintypes.MEMORY_BASIC_INFORMATION()
 		MEM_COMMIT = flags('MEM_COMMIT')
 		MEM_PRIVATE = flags('MEM_PRIVATE')
@@ -423,15 +399,15 @@ class WindowsProcess(ProcessBase):
 					new_addr = ctypes.c_void_p()
 					new_addr.value = new_address
 					written = wintypes.DWORD()
-					if self.k32.WriteProcessMemory(self.handle, iat_ent_addr, ctypes.byref(new_addr), ctypes.sizeof(new_addr), ctypes.byref(written)) == 0:
-						errno = self.k32.GetLastError()
+					if m_k32.WriteProcessMemory(self.handle, iat_ent_addr, ctypes.byref(new_addr), ctypes.sizeof(new_addr), ctypes.byref(written)) == 0:
+						errno = m_k32.GetLastError()
 						if errno == 998:
 							errno = 0
 							old_permissions = wintypes.DWORD()
-							if (self.k32.VirtualProtectEx(self.handle, iat_ent_addr, 0x400, flags('PAGE_READWRITE'), ctypes.byref(old_permissions)) == 0):
-								raise WindowsProcessError('Error: VirtualProtectEx', get_last_error=self.k32.GetLastError())
-							if self.k32.WriteProcessMemory(self.handle, iat_ent_addr, ctypes.byref(new_addr), ctypes.sizeof(new_addr), ctypes.byref(written)) == 0:
-								errno = self.k32.GetLastError()
+							if (m_k32.VirtualProtectEx(self.handle, iat_ent_addr, 0x400, flags('PAGE_READWRITE'), ctypes.byref(old_permissions)) == 0):
+								raise WindowsProcessError('Error: VirtualProtectEx', get_last_error=m_k32.GetLastError())
+							if m_k32.WriteProcessMemory(self.handle, iat_ent_addr, ctypes.byref(new_addr), ctypes.sizeof(new_addr), ctypes.byref(written)) == 0:
+								errno = m_k32.GetLastError()
 							self.protect(iat_ent_addr, permissions=old_permissions)
 						if errno:
 							raise WindowsProcessError('Error: WriteProcessMemory', get_last_error=errno)
@@ -441,28 +417,27 @@ class WindowsProcess(ProcessBase):
 		raise ProcessError('failed to find location to install hook')
 
 	def close(self):
-		self.k32.CloseHandle(self.handle)
+		m_k32.CloseHandle(self.handle)
 		self.handle = None
 
 	def kill(self):
-		self.k32.TerminateProcess(self.handle, 0)
+		m_k32.TerminateProcess(self.handle, 0)
 		self.close()
 
 	def load_library(self, libpath):
 		libpath = os.path.abspath(libpath)
 		libpath = libpath.encode('utf-8') + b'\x00'
-		LoadLibraryA = self.k32.GetProcAddress(self.k32.GetModuleHandleA(b'kernel32.dll'), b'LoadLibraryA')
-		remote_page = self.k32.VirtualAllocEx(self.handle, None, len(libpath), flags("MEM_COMMIT"), flags("PAGE_EXECUTE_READWRITE"))
+		remote_page = m_k32.VirtualAllocEx(self.handle, None, len(libpath), flags("MEM_COMMIT"), flags("PAGE_EXECUTE_READWRITE"))
 		if not remote_page:
 			raise WindowsProcessError('Error: failed to allocate space for library name in the target process')
-		if not self.k32.WriteProcessMemory(self.handle, remote_page, libpath, len(libpath), None):
+		if not m_k32.WriteProcessMemory(self.handle, remote_page, libpath, len(libpath), None):
 			raise WindowsProcessError('Error: failed to copy the library name to the target process')
-		remote_thread = self.k32.CreateRemoteThread(self.handle, None, 0, LoadLibraryA, remote_page, 0, None)
-		self.k32.WaitForSingleObject(remote_thread, -1)
+		remote_thread = m_k32.CreateRemoteThread(self.handle, None, 0, m_k32.LoadLibraryA.address, remote_page, 0, None)
+		m_k32.WaitForSingleObject(remote_thread, -1)
 
 		exitcode = wintypes.DWORD(0)
-		self.k32.GetExitCodeThread(remote_thread, ctypes.byref(exitcode))
-		self.k32.VirtualFreeEx(self.handle, remote_page, len(libpath), flags("MEM_RELEASE"))
+		m_k32.GetExitCodeThread(remote_thread, ctypes.byref(exitcode))
+		m_k32.VirtualFreeEx(self.handle, remote_page, len(libpath), flags("MEM_RELEASE"))
 		if exitcode.value == 0:
 			raise WindowsProcessError("Error: failed to load: {0}, thread exited with status: 0x{1:x}".format(libpath, exitcode.value))
 		return exitcode.value
@@ -470,8 +445,8 @@ class WindowsProcess(ProcessBase):
 	def read_memory(self, address, size=0x400):
 		_data = (ctypes.c_byte * size)
 		data = _data()
-		if (self.k32.ReadProcessMemory(self.handle, address, ctypes.byref(data), ctypes.sizeof(data), 0) == 0):
-			raise WindowsProcessError('Error: ReadProcessMemory', get_last_error=self.k32.GetLastError())
+		if (m_k32.ReadProcessMemory(self.handle, address, ctypes.byref(data), ctypes.sizeof(data), 0) == 0):
+			raise WindowsProcessError('Error: ReadProcessMemory', get_last_error=m_k32.GetLastError())
 		return ctarray_to_bytes(data)
 
 	def write_memory(self, address, data):
@@ -481,35 +456,35 @@ class WindowsProcess(ProcessBase):
 		wr_data = _wr_data()
 		wr_data.value = data
 		written = wintypes.SIZE_T()
-		if not self.k32.WriteProcessMemory(self.handle, address, ctypes.byref(wr_data), ctypes.sizeof(wr_data), ctypes.byref(written)):
-			raise WindowsProcessError('Error: WriteProcessMemory', get_last_error=self.k32.GetLastError())
+		if not m_k32.WriteProcessMemory(self.handle, address, ctypes.byref(wr_data), ctypes.sizeof(wr_data), ctypes.byref(written)):
+			raise WindowsProcessError('Error: WriteProcessMemory', get_last_error=m_k32.GetLastError())
 		return
 
 	def allocate(self, size=0x400, address=None, permissions=None):
 		alloc_type = flags('MEM_COMMIT')
 		permissions = flags(permissions or 'PAGE_EXECUTE_READWRITE')
-		result = self.k32.VirtualAllocEx(self.handle, address, size, alloc_type, permissions)
+		result = m_k32.VirtualAllocEx(self.handle, address, size, alloc_type, permissions)
 		return result
 
 	def free(self, address):
 		free_type = flags('MEM_RELEASE')
-		if (self.k32.VirtualFreeEx(self.handle, address, 0, free_type) == 0):
-			raise WindowsProcessError('Error: VirtualFreeEx', get_last_error=self.k32.GetLastError())
+		if (m_k32.VirtualFreeEx(self.handle, address, 0, free_type) == 0):
+			raise WindowsProcessError('Error: VirtualFreeEx', get_last_error=m_k32.GetLastError())
 		return
 
 	def protect(self, address, permissions=None, size=0x400):
 		permissions = flags(permissions or 'PAGE_EXECUTE_READWRITE')
 		old_permissions = wintypes.DWORD()
-		if (self.k32.VirtualProtectEx(self.handle, address, size, permissions, ctypes.byref(old_permissions)) == 0):
-			raise WindowsProcessError('Error: VirtualProtectEx', get_last_error=self.k32.GetLastError())
+		if (m_k32.VirtualProtectEx(self.handle, address, size, permissions, ctypes.byref(old_permissions)) == 0):
+			raise WindowsProcessError('Error: VirtualProtectEx', get_last_error=m_k32.GetLastError())
 		return
 
 	def start_thread(self, address, targ=None):
-		handle = self.k32.CreateRemoteThread(self.handle, None, 0, address, targ, 0, None)
+		handle = m_k32.CreateRemoteThread(self.handle, None, 0, address, targ, 0, None)
 		if handle == 0:
-			raise WindowsProcessError('Error: CreateRemoteThread', get_last_error=self.k32.GetLastError())
+			raise WindowsProcessError('Error: CreateRemoteThread', get_last_error=m_k32.GetLastError())
 		return handle
 
 	def join_thread(self, thread_id):
-		self.k32.WaitForSingleObject(thread_id, -1)
+		m_k32.WaitForSingleObject(thread_id, -1)
 		return

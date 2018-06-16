@@ -261,6 +261,23 @@ GetLastError = _patch_winfunctype(
 	wintypes.DWORD
 )
 
+if hasattr(_kernel32, 'GetModuleFileNameExA'):
+	# https://msdn.microsoft.com/en-us/library/windows/desktop/ms683198(v=vs.85).aspx
+	GetModuleFileNameExA = _patch_winfunctype(
+		_kernel32.GetModuleFileNameExA,
+		wintypes.DWORD,
+		(wintypes.HANDLE, wintypes.HMODULE, wintypes.LPSTR, wintypes.DWORD)
+	)
+
+if hasattr(_kernel32, 'GetModuleFileNameExW'):
+	# https://msdn.microsoft.com/en-us/library/windows/desktop/ms683198(v=vs.85).aspx
+	GetModuleFileNameExW = _patch_winfunctype(
+		_kernel32.GetModuleFileNameExW,
+		wintypes.DWORD,
+		(wintypes.HANDLE, wintypes.HMODULE, wintypes.LPSTR, wintypes.DWORD)
+	)
+
+
 GetModuleHandleA = _patch_winfunctype(
 	_kernel32.GetModuleHandleA,
 	wintypes.HANDLE,
@@ -449,9 +466,5 @@ WriteProcessMemory = _patch_winfunctype(
 	wintypes.BOOL,
 	(wintypes.HANDLE, wintypes.LPVOID, wintypes.LPVOID, wintypes.SIZE_T, wintypes.PSIZE_T)
 )
-
-#if hasattr(ctypes.windll.kernel32, 'GetModuleFileNameExA'):
-	#GetModuleFileNameExA.argtypes = [wintypes.HANDLE, wintypes.HMODULE, wintypes.LPSTR, wintypes.DWORD]
-	#GetModuleFileNameExA.restype = wintypes.DWORD
 
 address = GetModuleHandleW('kernel32.dll')

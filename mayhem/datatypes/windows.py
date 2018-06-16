@@ -46,7 +46,7 @@ VOID    = None
 
 # http://msdn.microsoft.com/en-us/library/windows/desktop/aa383751(v=vs.85).aspx
 BOOLEAN = ctypes.c_byte
-BOOL    = ctypes.c_int
+BOOL    = ctypes.c_bool
 PBOOL   = ctypes.POINTER(BOOL)
 BYTE    = ctypes.c_uint8
 PBYTE   = ctypes.POINTER(BYTE)
