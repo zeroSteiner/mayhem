@@ -118,6 +118,9 @@ PVOID     = ctypes.c_void_p
 LPVOID    = PVOID
 LPVOID    = PVOID
 
+SE_SIGNING_LEVEL  = ULONG
+PSE_SIGNING_LEVEL = ctypes.POINTER(ULONG)
+
 NTSTATUS  = ctypes.c_uint32
 
 # platform specific data primitives
