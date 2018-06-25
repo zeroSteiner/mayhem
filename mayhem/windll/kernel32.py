@@ -55,6 +55,20 @@ ConnectNamedPipe = _patch_winfunctype(
 	(wintypes.HANDLE, wintypes.POVERLAPPED)
 )
 
+# https://msdn.microsoft.com/en-us/library/windows/desktop/ms682396(v=vs.85).aspx
+CreateEventA = _patch_winfunctype(
+	_kernel32.CreateEventA,
+	wintypes.HANDLE,
+	(wintypes.PSECURITY_ATTRIBUTES, wintypes.BOOL, wintypes.BOOL, wintypes.LPSTR)
+)
+
+# https://msdn.microsoft.com/en-us/library/windows/desktop/ms682396(v=vs.85).aspx
+CreateEventW = _patch_winfunctype(
+	_kernel32.CreateEventW,
+	wintypes.HANDLE,
+	(wintypes.PSECURITY_ATTRIBUTES, wintypes.BOOL, wintypes.BOOL, wintypes.LPWSTR)
+)
+
 # https://msdn.microsoft.com/en-us/library/windows/desktop/aa363858(v=vs.85).aspx
 CreateFileA = _patch_winfunctype(
 	_kernel32.CreateFileA,

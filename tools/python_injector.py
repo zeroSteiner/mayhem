@@ -68,10 +68,21 @@ pipe.close()
 
 ctypes.windll.kernel32.ExitThread(0)
 """
+WAIT_OBJECT_0 = 0x00000000
+WAIT_TIMEOUT = 0x00000102
+FILE_FLAG_OVERLAPPED = 0x40000000
+ERROR_IO_PENDING = 997
+ERROR_PIPE_CONNECTED = 535
+ERROR_BROKEN_PIPE = 109
 
 def _escape(path):
 	escaped_path = path.replace('\\', '\\\\')
 	return escaped_path.replace('\'', '\\\'')
+
+def _wait_overlapped_io(overlapped, timeout=-1):
+	result = m_k32.WaitForSingleObject(overlapped.hEvent, timeout) == WAIT_OBJECT_0
+	m_k32.CloseHandle(overlapped.hEvent)
+	return result
 
 class NamedPipeClient(object):
 	def __init__(self, handle, buffer_size=4096):
@@ -81,9 +92,17 @@ class NamedPipeClient(object):
 	def read(self):
 		ctarray = (ctypes.c_byte * self.buffer_size)()
 		bytes_read = wintypes.DWORD(0)
-		if not m_k32.ReadFile(self.handle, ctypes.byref(ctarray), self.buffer_size, ctypes.byref(bytes_read), None):
+
+		overlapped = wintypes.OVERLAPPED()
+		overlapped.hEvent = m_k32.CreateEventW(None, True, False, None)
+		if m_k32.ReadFile(self.handle, ctypes.byref(ctarray), self.buffer_size, ctypes.byref(bytes_read), ctypes.byref(overlapped)):
+			return utilities.ctarray_to_bytes(ctarray)[:bytes_read.value]
+		error = m_k32.GetLastError()
+		if error == ERROR_IO_PENDING and _wait_overlapped_io(overlapped):
+			return utilities.ctarray_to_bytes(ctarray)[:overlapped.InternalHigh]
+		if error == ERROR_BROKEN_PIPE:
 			return None
-		return utilities.ctarray_to_bytes(ctarray)[:bytes_read.value]
+		raise ctypes.WinError()
 
 	def close(self):
 		m_k32.CloseHandle(self.handle)
@@ -92,7 +111,7 @@ class NamedPipeClient(object):
 	def from_named_pipe(cls, name, buffer_size=4096, default_timeout=100, max_instances=5):
 		handle = m_k32.CreateNamedPipeW(
 			'\\\\.\\pipe\\' + name,                     # _In_     LPCTSTR               lpName
-			PIPE_ACCESS_DUPLEX,                         # _In_     DWORD                 dwOpenMode
+			PIPE_ACCESS_DUPLEX | FILE_FLAG_OVERLAPPED,  # _In_     DWORD                 dwOpenMode
 			PIPE_TYPE_MESSAGE | PIPE_READMODE_MESSAGE,  # _In_     DWORD                 dwPipeMode
 			max_instances,                              # _In_     DWORD                 nMaxInstances
 			buffer_size,                                # _In_     DWORD                 nInBufferSize
@@ -103,17 +122,27 @@ class NamedPipeClient(object):
 		if handle == INVALID_HANDLE_VALUE:
 			raise ctypes.WinError()
 
-		result = m_k32.ConnectNamedPipe(handle, None)
-		if result == 0:
-			m_k32.CloseHandle(handle)
-			raise ctypes.WinError()
-		return cls(handle, buffer_size=buffer_size)
+		success = lambda: cls(handle, buffer_size=buffer_size)
+		overlapped = wintypes.OVERLAPPED()
+		overlapped.hEvent = m_k32.CreateEventW(None, True, False, None)
+		if m_k32.ConnectNamedPipe(handle, ctypes.byref(overlapped)):
+			m_k32.CloseHandle(overlapped.hEvent)
+			return success()
+		error = m_k32.GetLastError()
+		if error == ERROR_IO_PENDING and _wait_overlapped_io(overlapped, default_timeout):
+			m_k32.CloseHandle(overlapped.hEvent)
+			return success()
+		m_k32.CloseHandle(overlapped.hEvent)
+		if error == ERROR_PIPE_CONNECTED:
+			return success()
+		m_k32.CloseHandle(handle)
+		raise ctypes.WinError()
 
 def main():
 	parser = argparse.ArgumentParser(description='python_injector: inject python code into a process', conflict_handler='resolve')
 	parser.add_argument('script_path', action='store', help='python script to inject into the process')
 	parser.add_argument('pid', action='store', type=int, help='process to inject into')
-	parser.epilog = 'the __name__ variable will be set to __mayhem__'
+	parser.epilog = 'The __name__ variable will be set to "__mayhem__".'
 	arguments = parser.parse_args()
 
 	if not sys.platform.startswith('win'):
@@ -167,9 +196,9 @@ def main():
 	)
 	injection_stub = injection_stub.encode('utf-8') + b'\x00'
 
-	shellcode_addr = process_h.allocate(size=utilities.align_up(len(injection_stub)), permissions='PAGE_READWRITE')
-	process_h.write_memory(shellcode_addr, injection_stub)
-	thread_h = process_h.start_thread(py_run_simple_string, shellcode_addr)
+	alloced_addr = process_h.allocate(size=utilities.align_up(len(injection_stub)), permissions='PAGE_READWRITE')
+	process_h.write_memory(alloced_addr, injection_stub)
+	thread_h = process_h.start_thread(py_run_simple_string, alloced_addr)
 	client = NamedPipeClient.from_named_pipe(PIPE_NAME)
 	print('[*] Client connected on named pipe')
 	while True:

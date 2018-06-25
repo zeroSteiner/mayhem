@@ -50,7 +50,7 @@ if hasattr(_psapi, 'GetModuleFileNameExW'):
 	GetModuleFileNameExW = m_k32._patch_winfunctype(
 		_psapi.GetModuleFileNameExW,
 		wintypes.DWORD,
-		(wintypes.HANDLE, wintypes.HMODULE, wintypes.LPSTR, wintypes.DWORD)
+		(wintypes.HANDLE, wintypes.HMODULE, wintypes.LPWSTR, wintypes.DWORD)
 	)
 
 address = m_k32.GetModuleHandleW('psapi.dll')
