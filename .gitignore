@@ -1,6 +1,6 @@
 *.py[cod]
 
-docs/html/*
+docs/html
 
 # C extensions
 *.so
