@@ -16,11 +16,11 @@ GetClipboardData = prototype(py_GetClipboardData)
 def jump_stub(address):
 	arch = platform.machine()
 	if utilities.architecture_is_32bit(arch):
-		stub = b'\x48\xb8' + struct.pack('Q', address)  # mov rax, address
-		stub += b'\xff\xe0'                             # jmp rax
-	elif utilities.architecture_is_64bit(arch):
 		stub = b'\xb8' + struct.pack('I', address)      # mov eax, address
 		stub += b'\xff\xe0'                             # jmp eax
+	elif utilities.architecture_is_64bit(arch):
+		stub = b'\x48\xb8' + struct.pack('Q', address)  # mov rax, address
+		stub += b'\xff\xe0'                             # jmp rax
 	return stub
 
 def mayhem():

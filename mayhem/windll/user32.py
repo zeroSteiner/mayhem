@@ -40,14 +40,14 @@ _user32 = ctypes.windll.user32
 # https://docs.microsoft.com/en-us/windows/desktop/api/winuser/nf-winuser-messagebox
 MessageBoxA = m_k32._patch_winfunctype(
 	_user32.MessageBoxA,
-	ctypes.int,
+	ctypes.c_int,
 	(wintypes.HWND, wintypes.LPSTR, wintypes.LPSTR, wintypes.UINT)
 )
 
 # https://docs.microsoft.com/en-us/windows/desktop/api/winuser/nf-winuser-messagebox
 MessageBoxW = m_k32._patch_winfunctype(
 	_user32.MessageBoxW,
-	ctypes.int,
+	ctypes.c_int,
 	(wintypes.HWND, wintypes.LPWSTR, wintypes.LPWSTR, wintypes.UINT)
 )
 
