@@ -426,18 +426,18 @@ class WindowsProcess(ProcessBase):
 
 	def load_library(self, libpath):
 		libpath = os.path.abspath(libpath)
-		libpath = libpath.encode('utf-8') + b'\x00'
-		remote_page = m_k32.VirtualAllocEx(self.handle, None, len(libpath), flags("MEM_COMMIT"), flags("PAGE_EXECUTE_READWRITE"))
+		libpath_bytes = libpath.encode('utf-8') + b'\x00'
+		remote_page = m_k32.VirtualAllocEx(self.handle, None, len(libpath_bytes), flags("MEM_COMMIT"), flags("PAGE_EXECUTE_READWRITE"))
 		if not remote_page:
 			raise WindowsProcessError('Error: failed to allocate space for library name in the target process')
-		if not m_k32.WriteProcessMemory(self.handle, remote_page, libpath, len(libpath), None):
+		if not m_k32.WriteProcessMemory(self.handle, remote_page, libpath_bytes, len(libpath_bytes), None):
 			raise WindowsProcessError('Error: failed to copy the library name to the target process')
 		remote_thread = m_k32.CreateRemoteThread(self.handle, None, 0, m_k32.LoadLibraryA.address, remote_page, 0, None)
 		m_k32.WaitForSingleObject(remote_thread, -1)
 
 		exitcode = wintypes.DWORD(0)
 		m_k32.GetExitCodeThread(remote_thread, ctypes.byref(exitcode))
-		m_k32.VirtualFreeEx(self.handle, remote_page, len(libpath), flags("MEM_RELEASE"))
+		m_k32.VirtualFreeEx(self.handle, remote_page, len(libpath_bytes), flags("MEM_RELEASE"))
 		if exitcode.value == 0:
 			raise WindowsProcessError("Error: failed to load: {0}, thread exited with status: 0x{1:x}".format(libpath, exitcode.value))
 		return exitcode.value

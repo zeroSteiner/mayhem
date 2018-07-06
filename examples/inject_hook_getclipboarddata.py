@@ -36,7 +36,7 @@ def mayhem():
 
 	stub = jump_stub(ctypes.cast(GetClipboardData, ctypes.c_void_p).value)
 	if m_k32.WriteProcessMemory(handle, address, stub, len(stub), None):
-		print('successfully installed the trampoline')
+		print("successfully installed the trampoline at 0x{0:x}".format(address))
 	else:
 		print('failed to install the trampoline')
 
