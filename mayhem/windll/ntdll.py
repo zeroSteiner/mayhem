@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+NtSetCachedSigningLevel#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
 #  mayhem/windll/ntdll.py
@@ -79,16 +79,17 @@ NtQueryInformationProcess = m_k32._patch_winfunctype(
 	)
 )
 
-NtSetCachedSigningLevel = m_k32._patch_winfunctype(
-	_ntdll.NtSetCachedSigningLevel,
-	wintypes.NTSTATUS,
-	(
-		wintypes.ULONG,
-		wintypes.SE_SIGNING_LEVEL,
-		wintypes.PHANDLE,
-		wintypes.ULONG,
-		wintypes.HANDLE
+if hasattr(_ntdll, 'NtSetCachedSigningLevel'):
+	NtSetCachedSigningLevel = m_k32._patch_winfunctype(
+		_ntdll.NtSetCachedSigningLevel,
+		wintypes.NTSTATUS,
+		(
+			wintypes.ULONG,
+			wintypes.SE_SIGNING_LEVEL,
+			wintypes.PHANDLE,
+			wintypes.ULONG,
+			wintypes.HANDLE
+		)
 	)
-)
 
 address = m_k32.GetModuleHandleW('ntdll.dll')
