@@ -1,4 +1,4 @@
-NtSetCachedSigningLevel#!/usr/bin/env python
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
 #  mayhem/windll/ntdll.py
