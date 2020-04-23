@@ -106,3 +106,5 @@ StretchBlt = m_k32._patch_winfunctype(
 		wintypes.DWORD
 	)
 )
+
+address = m_k32.GetModuleHandleW('gdi32.dll')

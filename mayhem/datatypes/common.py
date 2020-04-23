@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-#  mayhem/datatypes/structure.py
+#  mayhem/datatypes/common.py
 #
 #  Redistribution and use in source and binary forms, with or without
 #  modification, are permitted provided that the following conditions are
@@ -63,7 +63,13 @@ class MayhemCFuncPtr(_ctypes.CFuncPtr):
 		return new
 
 class MayhemStructure(ctypes.Structure):
-	pass
+	@classmethod
+	def from_bytes(cls, value):
+		instance = cls()
+		if len(value) != ctypes.sizeof(instance):
+			raise ValueError('Value is not the correct size')
+		ctypes.memmove(ctypes.byref(instance), value, ctypes.sizeof(instance))
+		return instance
 
 # defined here so it can use the function cache
 def _WINFUNCTYPE(restype, *argtypes, use_errno=False, use_last_error=False):

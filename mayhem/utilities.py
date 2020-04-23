@@ -150,7 +150,7 @@ def struct_unpack(structure, raw_data):
 
 	:param structure: The structure that describes *raw_data*.
 	:type structure: :py:class:`ctypes.Structure`
-	:param str raw_data: The binary string which contains the structures data.
+	:param bytes raw_data: The binary string which contains the structures data.
 	:return: A new instance of *structure*.
 	:rtype: :py:class:`ctypes.Structure`
 	"""

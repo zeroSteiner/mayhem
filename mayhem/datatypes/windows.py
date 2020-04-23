@@ -30,8 +30,10 @@
 #  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
+import binascii
 import ctypes
 import platform
+import re
 
 from . import common
 from .windows_ntstatus import NTSTATUS_CODES
@@ -623,3 +625,44 @@ class MENUITEMINFOW(common.MayhemStructure):
 		('hbmpItem', HANDLE),
 	]
 PMENUITEMINFOW = ctypes.POINTER(MENUITEMINFOW)
+
+class GUID(common.MayhemStructure):
+	_fields_ = [
+		('Data1', ctypes.c_uint32),
+		('Data2', ctypes.c_uint16),
+		('Data3', ctypes.c_uint16),
+		('Data4', ctypes.c_uint8 * 8)
+	]
+	def __eq__(self, other):
+		if not isinstance(other, GUID):
+			return False
+		if self.Data1 != other.Data1:
+			return False
+		if self.Data2 != other.Data2:
+			return False
+		if self.Data3 != other.Data3:
+			return False
+		if tuple(self.Data4) != tuple(other.Data4):
+			return False
+		return True
+
+	def __str__(self):
+		value = bytes(self)
+		parts = [value[0:4], value[4:6], value[6:8], value[8:10], value[10:16]]
+		parts[0] = bytes(reversed(parts[0]))
+		parts[1] = bytes(reversed(parts[1]))
+		parts[2] = bytes(reversed(parts[2]))
+		parts = [binascii.b2a_hex(part).decode('ascii') for part in parts]
+		return '-'.join(parts)
+
+	@classmethod
+	def from_string(cls, value):
+		if re.match('^[a-f0-9]{8}(-[a-f0-9]{4}){3}-[a-f0-9]{12}$', value, flags=re.IGNORECASE) is None:
+			raise ValueError('Invalid GUID string (not in format xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx)')
+		parts = [binascii.a2b_hex(part) for part in value.split('-')]
+		parts[0] = bytes(reversed(parts[0]))
+		parts[1] = bytes(reversed(parts[1]))
+		parts[2] = bytes(reversed(parts[2]))
+		return cls.from_bytes(parts[0] + parts[1] + parts[2] + parts[3] + parts[4])
+
+PGUID = ctypes.POINTER(GUID)
