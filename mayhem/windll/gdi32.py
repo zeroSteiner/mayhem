@@ -47,46 +47,37 @@ PHGDIOBJ  = ctypes.POINTER(HGDIOBJ)
 CreateCompatibleBitmap = m_k32._patch_winfunctype(
 	_gdi32.CreateCompatibleBitmap,
 	HBITMAP,
-	(
-		HDC,
-		ctypes.c_int,
-		ctypes.c_int
-	)
+	(HDC, ctypes.c_int, ctypes.c_int)
 )
 
 CreateCompatibleDC = m_k32._patch_winfunctype(
 	_gdi32.CreateCompatibleDC,
 	HDC,
-	(
-		HDC,
-	)
+	(HDC,)
 )
 
 SelectObject = m_k32._patch_winfunctype(
 	_gdi32.SelectObject,
 	HGDIOBJ,
-	(
-		HDC,
-		HGDIOBJ
-	)
+	(HDC, HGDIOBJ)
 )
 
 SetLayout = m_k32._patch_winfunctype(
 	_gdi32.SetLayout,
 	wintypes.DWORD,
-	(
-		HDC,
-		wintypes.DWORD
-	)
+	(HDC, wintypes.DWORD)
+)
+
+SetMapMode = m_k32._patch_winfunctype(
+	_gdi32.SetMapMode,
+	ctypes.c_int,
+	(HDC, ctypes.c_int)
 )
 
 SetStretchBltMode = m_k32._patch_winfunctype(
 	_gdi32.SetStretchBltMode,
 	ctypes.c_int,
-	(
-		HDC,
-		ctypes.c_int
-	)
+	(HDC,ctypes.c_int)
 )
 
 StretchBlt = m_k32._patch_winfunctype(
