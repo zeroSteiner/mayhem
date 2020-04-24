@@ -1,5 +1,7 @@
 *.py[cod]
-
+.pylintrc
+.python-version
+Pipfile.lock
 docs/html
 
 # C extensions
