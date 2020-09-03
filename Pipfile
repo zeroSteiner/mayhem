@@ -11,4 +11,3 @@ pefile = "==2017.11.5"
 tabulate = "==0.7.3"
 
 [requires]
-python_version = "3.7"

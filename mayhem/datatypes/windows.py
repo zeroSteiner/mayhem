@@ -666,3 +666,15 @@ class GUID(common.MayhemStructure):
 		return cls.from_bytes(parts[0] + parts[1] + parts[2] + parts[3] + parts[4])
 
 PGUID = ctypes.POINTER(GUID)
+
+class RGBQUAD(common.MayhemStructure):
+	"""see:
+	https://docs.microsoft.com/en-us/windows/win32/api/wingdi/ns-wingdi-rgbquad
+	"""
+	_fields_ = [
+		('rgbBlue', BYTE),
+		('rgbGreen', BYTE),
+		('rgbRed', BYTE),
+		('rgbReserved', BYTE),
+	]
+PRGBQUAD = ctypes.POINTER(RGBQUAD)
