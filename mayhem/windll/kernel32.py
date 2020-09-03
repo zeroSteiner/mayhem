@@ -31,15 +31,41 @@
 #
 
 import ctypes
+import functools
+import itertools
+import re
 
 import mayhem.datatypes.windows as wintypes
 
 _kernel32 = ctypes.windll.kernel32
 
+_Pointer = type(ctypes.POINTER(ctypes.c_void_p))
+
+def _repr_ctype(value, value_type):
+	if isinstance(value, str):
+		return "\"{}\"".format(re.sub(r'([\\"])', r'\\\1', value))
+	if isinstance(value, bool):
+		return repr(value).upper()
+	if isinstance(value, int):
+		if isinstance(value_type, _Pointer) or value_type is ctypes.c_void_p:
+			if value == 0:
+				return 'NULL'
+			return "0x{:0{}x}".format(value, ctypes.sizeof(ctypes.c_void_p) * 2)
+		return "0x{:0{}x}".format(value, ctypes.sizeof(value_type) * 2)
+	return repr(value)
+
 def _patch_winfunctype(function, restype, argtypes=(), **kwargs):
 	address = ctypes.cast(function, ctypes.c_void_p).value
 	prototype = wintypes.WINFUNCTYPE(restype, *argtypes, **kwargs)
-	return prototype(address)
+	name = function.__name__
+	function = prototype(address)
+	@functools.wraps(function)
+	def wrapper(*args):
+		print("{}({})".format(name, ', '.join(itertools.starmap(_repr_ctype, zip(args, argtypes)))), end='')
+		result = function(*args)
+		print(" = {}".format(_repr_ctype(result, restype)))
+		return result
+	return wrapper
 
 # https://msdn.microsoft.com/en-us/library/windows/desktop/ms724211(v=vs.85).aspx
 CloseHandle = _patch_winfunctype(
