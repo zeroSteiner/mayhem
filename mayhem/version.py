@@ -32,7 +32,7 @@
 
 import collections
 
-version_info = collections.namedtuple('version_info', ('major', 'minor', 'micro'))(0, 3, 0)
+version_info = collections.namedtuple('version_info', ('major', 'minor', 'micro'))(0, 4, 0)
 
 version_label = 'alpha'
 version = "{0}.{1}.{2}".format(version_info.major, version_info.minor, version_info.micro)
