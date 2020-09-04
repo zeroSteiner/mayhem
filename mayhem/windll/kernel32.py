@@ -41,7 +41,13 @@ _kernel32 = ctypes.windll.kernel32
 
 _Pointer = type(ctypes.POINTER(ctypes.c_void_p))
 
-def _repr_ctype(value, value_type):
+def repr_cvalue(value, value_type):
+	if value is None:
+		return 'NULL'
+	if isinstance(value, ctypes.Structure):
+		values = (getattr(value, field[0]) for field in value._fields_)
+		value_types = (field[1] for field in value._fields_)
+		return '{' + ', '.join(itertools.starmap(repr_cvalue, zip(values, value_types))) + '}'
 	if isinstance(value, str):
 		return "\"{}\"".format(re.sub(r'([\\"])', r'\\\1', value))
 	if isinstance(value, bool):
@@ -61,9 +67,9 @@ def _patch_winfunctype(function, restype, argtypes=(), **kwargs):
 	function = prototype(address)
 	@functools.wraps(function)
 	def wrapper(*args):
-		print("{}({})".format(name, ', '.join(itertools.starmap(_repr_ctype, zip(args, argtypes)))), end='')
+		print("{}({})".format(name, ', '.join(itertools.starmap(repr_cvalue, zip(args, argtypes)))), end='')
 		result = function(*args)
-		print(" = {}".format(_repr_ctype(result, restype)))
+		print(" = {}".format(repr_cvalue(result, restype)))
 		return result
 	return wrapper
 
