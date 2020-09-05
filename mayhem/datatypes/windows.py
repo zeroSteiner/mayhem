@@ -657,6 +657,7 @@ class GUID(common.MayhemStructure):
 
 	@classmethod
 	def from_string(cls, value):
+		# see the example from https://docs.microsoft.com/en-us/dotnet/api/system.guid.tobytearray?view=netcore-3.1
 		if re.match('^[a-f0-9]{8}(-[a-f0-9]{4}){3}-[a-f0-9]{12}$', value, flags=re.IGNORECASE) is None:
 			raise ValueError('Invalid GUID string (not in format xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx)')
 		parts = [binascii.a2b_hex(part) for part in value.split('-')]
@@ -664,7 +665,6 @@ class GUID(common.MayhemStructure):
 		parts[1] = bytes(reversed(parts[1]))
 		parts[2] = bytes(reversed(parts[2]))
 		return cls.from_bytes(parts[0] + parts[1] + parts[2] + parts[3] + parts[4])
-
 PGUID = ctypes.POINTER(GUID)
 
 class RGBQUAD(common.MayhemStructure):
