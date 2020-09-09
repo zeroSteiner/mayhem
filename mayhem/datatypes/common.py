@@ -33,6 +33,8 @@
 import _ctypes
 import collections
 import ctypes
+import itertools
+import re
 
 _function_cache = {}
 _function_cache_entry = collections.namedtuple('FunctionCacheEntry', ('restype', 'argtypes', 'flags'))
@@ -85,3 +87,41 @@ def _WINFUNCTYPE(restype, *argtypes, use_errno=False, use_last_error=False):
 	FunctionType = MayhemCFuncPtr.new('CFunctionType', **cache_entry._asdict())
 	_function_cache[cache_entry] = FunctionType
 	return FunctionType
+
+
+_Ref = type(ctypes.byref(ctypes.c_int()))
+_Ints = tuple(getattr(ctypes, name) for name in dir(ctypes) if re.match(r'c_int\d*', name))
+_Uints = tuple(getattr(ctypes, name) for name in dir(ctypes) if re.match(r'c_uint\d*', name))
+_Pointer = ctypes.pointer(ctypes.c_int()).__class__.__bases__[0]
+_PointerType = type(ctypes.POINTER(ctypes.c_int))
+def repr_cvalue(value, value_type):
+	# handle value when it is a ctypes value
+	if isinstance(value, ctypes.Structure):
+		values = (getattr(value, field[0]) for field in value._fields_)
+		value_types = (field[1] for field in value._fields_)
+		return '{' + ', '.join(itertools.starmap(repr_cvalue, zip(values, value_types))) + '}'
+	if isinstance(value, ctypes.c_bool):
+		return repr(value.value).upper()
+	if isinstance(value, ctypes.c_void_p):
+		return "0x{:0{}x}".format(value.value, ctypes.sizeof(ctypes.c_void_p) * 2)
+	if isinstance(value, (_Pointer, _Ref)):
+		return "0x{:0{}x}".format(ctypes.cast(value, ctypes.c_void_p).value, ctypes.sizeof(ctypes.c_void_p) * 2)
+	if isinstance(value, _Ints):
+		return str(value.value)
+	if isinstance(value, _Uints):
+		return "0x{:0{}x}".format(value.value, ctypes.sizeof(value) * 2)
+
+	# handle value when it is a native python value
+	if value is None:
+		return 'NULL'
+	if isinstance(value, str):
+		return "\"{}\"".format(re.sub(r'([\\"])', r'\\\1', value))
+	if isinstance(value, bool):
+		return repr(value).upper()
+	if isinstance(value, int):
+		if isinstance(value_type, _Pointer) or value_type is ctypes.c_void_p:
+			if value == 0:
+				return 'NULL'
+			return "0x{:0{}x}".format(value, ctypes.sizeof(ctypes.c_void_p) * 2)
+		return "0x{:0{}x}".format(value, ctypes.sizeof(value_type) * 2)
+	return repr(value)

@@ -33,43 +33,28 @@
 import ctypes
 import functools
 import itertools
-import re
+import os
 
+import mayhem.datatypes.common as common
 import mayhem.datatypes.windows as wintypes
 
 _kernel32 = ctypes.windll.kernel32
-
-_Pointer = type(ctypes.POINTER(ctypes.c_void_p))
-
-def repr_cvalue(value, value_type):
-	if value is None:
-		return 'NULL'
-	if isinstance(value, ctypes.Structure):
-		values = (getattr(value, field[0]) for field in value._fields_)
-		value_types = (field[1] for field in value._fields_)
-		return '{' + ', '.join(itertools.starmap(repr_cvalue, zip(values, value_types))) + '}'
-	if isinstance(value, str):
-		return "\"{}\"".format(re.sub(r'([\\"])', r'\\\1', value))
-	if isinstance(value, bool):
-		return repr(value).upper()
-	if isinstance(value, int):
-		if isinstance(value_type, _Pointer) or value_type is ctypes.c_void_p:
-			if value == 0:
-				return 'NULL'
-			return "0x{:0{}x}".format(value, ctypes.sizeof(ctypes.c_void_p) * 2)
-		return "0x{:0{}x}".format(value, ctypes.sizeof(value_type) * 2)
-	return repr(value)
 
 def _patch_winfunctype(function, restype, argtypes=(), **kwargs):
 	address = ctypes.cast(function, ctypes.c_void_p).value
 	prototype = wintypes.WINFUNCTYPE(restype, *argtypes, **kwargs)
 	name = function.__name__
 	function = prototype(address)
+	if os.getenv('MAYHEM_API_TRACE') is None:
+		return function
 	@functools.wraps(function)
 	def wrapper(*args):
-		print("{}({})".format(name, ', '.join(itertools.starmap(repr_cvalue, zip(args, argtypes)))), end='')
+		print("[api-trace] {}({})".format(
+			name,
+			', '.join(itertools.starmap(common.repr_cvalue, zip(args, argtypes)))
+		), end='')
 		result = function(*args)
-		print(" = {}".format(repr_cvalue(result, restype)))
+		print(" = {}".format(common.repr_cvalue(result, restype)))
 		return result
 	return wrapper
 
