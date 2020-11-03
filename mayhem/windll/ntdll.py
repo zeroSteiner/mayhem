@@ -37,6 +37,16 @@ import mayhem.datatypes.windows as wintypes
 
 _ntdll = ctypes.windll.ntdll
 
+NtAllocateReserveObject = m_k32._patch_winfunctype(
+	_ntdll.NtAllocateReserveObject,
+	wintypes.NTSTATUS,
+	(
+		wintypes.PHANDLE,
+		wintypes.POBJECT_ATTRIBUTES,
+		wintypes.DWORD
+	)
+)
+
 NtAllocateVirtualMemory = m_k32._patch_winfunctype(
 	_ntdll.NtAllocateVirtualMemory,
 	wintypes.NTSTATUS,
