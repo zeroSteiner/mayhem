@@ -131,6 +131,18 @@ CreateNamedPipeW = _patch_winfunctype(
 	)
 )
 
+# https://docs.microsoft.com/en-us/windows/win32/api/namedpipeapi/nf-namedpipeapi-createpipe
+CreatePipe = _patch_winfunctype(
+	_kernel32.CreatePipe,
+	wintypes.BOOL,
+	(
+		wintypes.PHANDLE,
+		wintypes.PHANDLE,
+		wintypes.PSECURITY_ATTRIBUTES,
+		wintypes.DWORD
+	)
+)
+
 # https://msdn.microsoft.com/en-us/library/windows/desktop/ms682425(v=vs.85).aspx
 CreateProcessA = _patch_winfunctype(
 	_kernel32.CreateProcessA,
@@ -472,6 +484,13 @@ WaitForSingleObjectEx = _patch_winfunctype(
 	_kernel32.WaitForSingleObjectEx,
 	wintypes.DWORD,
 	(wintypes.HANDLE, wintypes.DWORD, wintypes.BOOL)
+)
+
+# https://docs.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-writefile
+WriteFile = _patch_winfunctype(
+	_kernel32.WriteFile,
+	wintypes.BOOL,
+	(wintypes.HANDLE, wintypes.LPVOID, wintypes.DWORD, wintypes.PDWORD, wintypes.POVERLAPPED)
 )
 
 # https://msdn.microsoft.com/en-us/library/windows/desktop/ms681674(v=vs.85).aspx

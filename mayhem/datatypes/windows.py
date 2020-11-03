@@ -678,3 +678,17 @@ class RGBQUAD(common.MayhemStructure):
 		('rgbReserved', BYTE),
 	]
 PRGBQUAD = ctypes.POINTER(RGBQUAD)
+
+class OBJECT_ATTRIBUTES(common.MayhemStructure):
+	"""see:
+	https://docs.microsoft.com/en-us/windows/win32/api/ntdef/ns-ntdef-_object_attributes
+	"""
+	_fields_ = [
+		('Length', ULONG),
+		('RootDirectory', HANDLE),
+		('ObjectName', PUNICODE_STRING),
+		('Attributes', ULONG),
+		('SecurityDescriptor', PVOID),
+		('SecurityQualityOfService', PVOID),
+	]
+POBJECT_ATTRIBUTES = ctypes.POINTER(OBJECT_ATTRIBUTES)
