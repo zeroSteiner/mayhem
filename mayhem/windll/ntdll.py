@@ -31,11 +31,34 @@
 #
 
 import ctypes
+import enum
 
 from . import kernel32 as m_k32
 import mayhem.datatypes.windows as wintypes
 
 _ntdll = ctypes.windll.ntdll
+
+class ReserveType(enum.IntEnum):
+	UserApcReserve = 0
+	IoCompletion = 1
+
+# see: https://www.geoffchappell.com/studies/windows/km/ntoskrnl/api/ex/sysinfo/class.htm?tx=64,66
+class SystemInformationClass(enum.IntEnum):  # incomplete
+	SystemBasicInformation = 0                      # 3.10 and higher
+	SystemProcessorInformation = 1                  # 3.10 and higher
+	SystemPerformanceInformation = 2                # 3.10 and higher
+	SystemTimeOfDayInformation = 3                  # 3.10 and higher
+	SystemPathInformation = 4                       # 3.10 and higher
+	SystemProcessInformation = 5                    # 3.10 and higher
+	SystemProcessorPerformanceInformation = 8       # 3.10 and higher
+	SystemExceptionInformation = 33                 # 3.50 and higher
+	SystemRegistryQuotaInformation = 37             # 3.51 and higher
+	SystemLookasideInformation = 45                 # 4.0 and higher
+	SystemBigPoolInformation = 66                   # 5.2 and higher
+	SystemCodeIntegrityInformation = 103            # 6.0 and higher
+	SystemQueryPerformanceCounterInformation = 124  # 6.1 and higher
+	SystemKernelVaShadowInformation = 196           # 1803 and higher
+	SystemSpeculationControlInformation = 201       # 1803 and higher
 
 NtAllocateReserveObject = m_k32._patch_winfunctype(
 	_ntdll.NtAllocateReserveObject,
@@ -77,11 +100,35 @@ NtDeviceIoControlFile = m_k32._patch_winfunctype(
 	)
 )
 
+NtQueueApcThreadEx = m_k32._patch_winfunctype(
+	_ntdll.NtQueueApcThreadEx,
+	wintypes.NTSTATUS,
+	(
+		wintypes.HANDLE,
+		wintypes.HANDLE,
+		wintypes.PVOID,
+		wintypes.PVOID,
+		wintypes.PVOID,
+		wintypes.PVOID
+	)
+)
+
 NtQueryInformationProcess = m_k32._patch_winfunctype(
 	_ntdll.NtQueryInformationProcess,
 	wintypes.NTSTATUS,
 	(
 		wintypes.HANDLE,
+		wintypes.DWORD,
+		wintypes.PVOID,
+		wintypes.ULONG,
+		wintypes.PULONG
+	)
+)
+
+NtQuerySystemInformation = m_k32._patch_winfunctype(
+	_ntdll.NtQuerySystemInformation,
+	wintypes.NTSTATUS,
+	(
 		wintypes.DWORD,
 		wintypes.PVOID,
 		wintypes.ULONG,

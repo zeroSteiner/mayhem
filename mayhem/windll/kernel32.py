@@ -413,6 +413,20 @@ ReadProcessMemory = _patch_winfunctype(
 	(wintypes.HANDLE, wintypes.LPVOID, wintypes.LPVOID, wintypes.SIZE_T, wintypes.SIZE_T)
 )
 
+# https://docs.microsoft.com/en-us/windows/win32/api/synchapi/nf-synchapi-sleep
+Sleep = _patch_winfunctype(
+	_kernel32.Sleep,
+	wintypes.VOID,
+	(wintypes.DWORD,)
+)
+
+# https://docs.microsoft.com/en-us/windows/win32/api/synchapi/nf-synchapi-sleepex
+SleepEx = _patch_winfunctype(
+	_kernel32.SleepEx,
+	wintypes.DWORD,
+	(wintypes.DWORD, wintypes.BOOL)
+)
+
 # https://msdn.microsoft.com/en-us/library/windows/desktop/ms686714(v=vs.85).aspx
 TerminateProcess = _patch_winfunctype(
 	_kernel32.TerminateProcess,
