@@ -51,6 +51,14 @@ class SystemInformationClass(enum.IntEnum):  # incomplete
 	SystemPathInformation = 4                       # 3.10 and higher
 	SystemProcessInformation = 5                    # 3.10 and higher
 	SystemProcessorPerformanceInformation = 8       # 3.10 and higher
+	SystemFlagsInformation = 9                      # 3.10 and higher
+	SystemCallTimeInformation = 10                  # 3.10 and higher
+	SystemModuleInformation = 11                    # 3.10 and higher
+	SystemLocksInformation = 12                     # 3.10 and higher
+	SystemStackTraceInformation = 13                # 3.10 and higher
+	SystemPagedPoolInformation = 14                 # 3.10 and higher
+	SystemNonPagedPoolInformation = 15              # 3.10 and higher
+	SystemHandleInformation = 16                    # 3.10 and higher
 	SystemExceptionInformation = 33                 # 3.50 and higher
 	SystemRegistryQuotaInformation = 37             # 3.51 and higher
 	SystemLookasideInformation = 45                 # 4.0 and higher
