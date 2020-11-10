@@ -97,7 +97,7 @@ def eval_number(number):
 	elif number.isdigit():
 		return int(number)
 	else:
-		raise ValueError('unknown numerical value: \'' + number + '\'')
+		raise ValueError('Unknown numerical value: \'' + number + '\'')
 
 def print_hexdump(data, address=0, stream=None):
 	"""
@@ -159,14 +159,16 @@ def struct_unpack(structure, raw_data):
 	ctypes.memmove(ctypes.byref(structure), raw_data, ctypes.sizeof(structure))
 	return structure
 
-def bytes_to_ctarray(bytes_):
+def bytes_to_ctarray(bytes_, member_type=ctypes.c_byte):
 	"""
 	Convert a bytes object into a ctypes array.
 
 	:param bytes bytes_: The bytes object to convert.
 	:return: The converted byte array.
 	"""
-	ctarray = (ctypes.c_byte * len(bytes_))()
+	if len(bytes_) % ctypes.sizeof(member_type):
+		raise ValueError('sizeof(bytes) is not a multiple of sizeof(member_type)')
+	ctarray = (member_type * (len(bytes_) // ctypes.sizeof(member_type)))()
 	ctypes.memmove(ctypes.byref(ctarray), bytes_, len(bytes_))
 	return ctarray
 

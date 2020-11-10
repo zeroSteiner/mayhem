@@ -71,6 +71,10 @@ class MayhemStructure(ctypes.Structure):
 		ctypes.memmove(ctypes.byref(instance), value, ctypes.sizeof(instance))
 		return instance
 
+	@classmethod
+	def from_cast(cls, value):
+		return ctypes.cast(value, ctypes.POINTER(cls)).contents
+
 # defined here so it can use the function cache
 def _WINFUNCTYPE(restype, *argtypes, use_errno=False, use_last_error=False):
 	flags = _ctypes.FUNCFLAG_STDCALL
