@@ -207,6 +207,22 @@ CreateThread = _patch_winfunctype(
 	)
 )
 
+# https://docs.microsoft.com/en-us/windows/win32/api/ioapiset/nf-ioapiset-deviceiocontrol
+DeviceIoControl = _patch_winfunctype(
+	_kernel32.DeviceIoControl,
+	wintypes.BOOL,
+	(
+		wintypes.HANDLE,
+		wintypes.DWORD,
+		wintypes.LPVOID,
+		wintypes.DWORD,
+		wintypes.LPVOID,
+		wintypes.DWORD,
+		wintypes.PDWORD,
+		wintypes.POVERLAPPED
+	)
+)
+
 # https://msdn.microsoft.com/en-us/library/windows/desktop/ms724251(v=vs.85).aspx
 DuplicateHandle = _patch_winfunctype(
 	_kernel32.DuplicateHandle,
@@ -411,6 +427,20 @@ ReadProcessMemory = _patch_winfunctype(
 	_kernel32.ReadProcessMemory,
 	wintypes.BOOL,
 	(wintypes.HANDLE, wintypes.LPVOID, wintypes.LPVOID, wintypes.SIZE_T, wintypes.SIZE_T)
+)
+
+# https://docs.microsoft.com/en-us/windows/win32/api/synchapi/nf-synchapi-resetevent
+ResetEvent = _patch_winfunctype(
+	_kernel32.ResetEvent,
+	wintypes.BOOL,
+	(wintypes.HANDLE,)
+)
+
+# https://docs.microsoft.com/en-us/windows/win32/api/synchapi/nf-synchapi-setevent
+SetEvent = _patch_winfunctype(
+	_kernel32.SetEvent,
+	wintypes.BOOL,
+	(wintypes.HANDLE,)
 )
 
 # https://docs.microsoft.com/en-us/windows/win32/api/synchapi/nf-synchapi-sleep
