@@ -99,6 +99,52 @@ CreateFileW = _patch_winfunctype(
 	)
 )
 
+# https://docs.microsoft.com/en-us/windows/win32/api/synchapi/nf-synchapi-createmutexa
+CreateMutexA = _patch_winfunctype(
+	_kernel32.CreateMutexA,
+	wintypes.HANDLE,
+	(
+		wintypes.PSECURITY_ATTRIBUTES,
+		wintypes.BOOL,
+		wintypes.LPSTR
+	)
+)
+
+# https://docs.microsoft.com/en-us/windows/win32/api/synchapi/nf-synchapi-createmutexexa
+CreateMutexExA = _patch_winfunctype(
+	_kernel32.CreateMutexExA,
+	wintypes.HANDLE,
+	(
+		wintypes.PSECURITY_ATTRIBUTES,
+		wintypes.LPSTR,
+		wintypes.DWORD,
+		wintypes.DWORD
+	)
+)
+
+# https://docs.microsoft.com/en-us/windows/win32/api/synchapi/nf-synchapi-createmutexexw
+CreateMutexExW = _patch_winfunctype(
+	_kernel32.CreateMutexExW,
+	wintypes.HANDLE,
+	(
+		wintypes.PSECURITY_ATTRIBUTES,
+		wintypes.LPWSTR,
+		wintypes.DWORD,
+		wintypes.DWORD
+	)
+)
+
+# https://docs.microsoft.com/en-us/windows/win32/api/synchapi/nf-synchapi-createmutexw
+CreateMutexW = _patch_winfunctype(
+	_kernel32.CreateMutexW,
+	wintypes.HANDLE,
+	(
+		wintypes.PSECURITY_ATTRIBUTES,
+		wintypes.BOOL,
+		wintypes.LPWSTR
+	)
+)
+
 # https://msdn.microsoft.com/en-us/library/windows/desktop/aa365150(v=vs.85).aspx
 CreateNamedPipeA = _patch_winfunctype(
 	_kernel32.CreateNamedPipeA,
@@ -190,6 +236,58 @@ CreateRemoteThread = _patch_winfunctype(
 		wintypes.LPVOID,
 		wintypes.DWORD,
 		wintypes.LPDWORD
+	)
+)
+
+# https://docs.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-createsemaphorea
+CreateSemaphoreA = _patch_winfunctype(
+	_kernel32.CreateSemaphoreA,
+	wintypes.HANDLE,
+	(
+		wintypes.PSECURITY_ATTRIBUTES,
+		wintypes.LONG,
+		wintypes.LONG,
+		wintypes.LPSTR
+	)
+)
+
+# https://docs.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-createsemaphoreexa
+CreateSemaphoreExA = _patch_winfunctype(
+	_kernel32.CreateSemaphoreExA,
+	wintypes.HANDLE,
+	(
+		wintypes.PSECURITY_ATTRIBUTES,
+		wintypes.LONG,
+		wintypes.LONG,
+		wintypes.LPSTR,
+		wintypes.DWORD,
+		wintypes.DWORD
+	)
+)
+
+# https://docs.microsoft.com/en-us/windows/win32/api/synchapi/nf-synchapi-createsemaphoreexw
+CreateSemaphoreExW = _patch_winfunctype(
+	_kernel32.CreateSemaphoreExW,
+	wintypes.HANDLE,
+	(
+		wintypes.PSECURITY_ATTRIBUTES,
+		wintypes.LONG,
+		wintypes.LONG,
+		wintypes.LPWSTR,
+		wintypes.DWORD,
+		wintypes.DWORD
+	)
+)
+
+# https://docs.microsoft.com/en-us/windows/win32/api/synchapi/nf-synchapi-createsemaphorew
+CreateSemaphoreW = _patch_winfunctype(
+	_kernel32.CreateSemaphoreW,
+	wintypes.HANDLE,
+	(
+		wintypes.PSECURITY_ATTRIBUTES,
+		wintypes.LONG,
+		wintypes.LONG,
+		wintypes.LPWSTR
 	)
 )
 
@@ -399,6 +497,20 @@ LoadLibraryExW = _patch_winfunctype(
 	_kernel32.LoadLibraryExW,
 	wintypes.HMODULE,
 	(wintypes.LPWSTR, wintypes.HANDLE, wintypes.DWORD)
+)
+
+# https://docs.microsoft.com/en-us/windows/win32/api/synchapi/nf-synchapi-openeventa
+OpenEventA = _patch_winfunctype(
+	_kernel32.OpenEventA,
+	wintypes.HANDLE,
+	(wintypes.DWORD, wintypes.BOOL, wintypes.LPSTR)
+)
+
+# https://docs.microsoft.com/en-us/windows/win32/api/synchapi/nf-synchapi-openeventw
+OpenEventW = _patch_winfunctype(
+	_kernel32.OpenEventW,
+	wintypes.HANDLE,
+	(wintypes.DWORD, wintypes.BOOL, wintypes.LPWSTR)
 )
 
 # https://msdn.microsoft.com/en-us/library/windows/desktop/ms684320(v=vs.85).aspx
