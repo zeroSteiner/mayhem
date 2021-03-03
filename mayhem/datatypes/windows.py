@@ -692,3 +692,92 @@ class OBJECT_ATTRIBUTES(common.MayhemStructure):
 		('SecurityQualityOfService', PVOID),
 	]
 POBJECT_ATTRIBUTES = ctypes.POINTER(OBJECT_ATTRIBUTES)
+
+NET_IFINDEX = ctypes.c_ulong
+PNET_IFINDEX = ctypes.POINTER(NET_IFINDEX)
+
+class _NET_LUID_INFO(common.MayhemStructure):
+	# see: https://github.com/tpn/winsdk-10/blob/master/Include/10.0.16299.0/shared/ifdef.h#L116
+	_fields_ = [
+		('Reserved', ctypes.c_uint64, 24),
+		('NetLuidIndex', ctypes.c_uint64, 24),
+		('IfType', ctypes.c_uint64, 16)
+	]
+
+class NET_LUID(ctypes.Union):
+	# see: https://github.com/tpn/winsdk-10/blob/master/Include/10.0.16299.0/shared/ifdef.h#L116
+	_fields_ = [
+		('Value', ctypes.c_uint64),
+		('Info', _NET_LUID_INFO)
+	]
+PNET_LUID = ctypes.POINTER(NET_LUID)
+
+class _in_addr_u0_s0(common.MayhemStructure):
+	_fields_ = [
+		('s_b1', ctypes.c_uchar),
+		('s_b2', ctypes.c_uchar),
+		('s_b3', ctypes.c_uchar),
+		('s_b4', ctypes.c_uchar)
+	]
+
+class _in_addr_u0_s1(common.MayhemStructure):
+	_fields_ = [
+		('s_w1', ctypes.c_ushort),
+		('s_w2', ctypes.c_ushort)
+	]
+
+class _in_addr_u0(ctypes.Union):
+	_fields_ = [
+		('S_un_b', _in_addr_u0_s0),
+		('S_un_w', _in_addr_u0_s1),
+		('S_addr', ctypes.c_ulong),
+	]
+
+class in_addr(common.MayhemStructure):
+	"""see:
+	https://docs.microsoft.com/en-us/windows/win32/api/winsock2/ns-winsock2-in_addr
+	"""
+	_fields_ = [
+		('S_un', _in_addr_u0),
+	]
+
+class sockaddr_in(common.MayhemStructure):
+	"""see:
+	https://docs.microsoft.com/en-us/windows/win32/winsock/sockaddr-2
+	"""
+	_fields_ = [
+		('sin_family', ctypes.c_short),
+		('sin_port', ctypes.c_ushort),
+		('sin_addr', in_addr),
+		('sin_zero', ctypes.c_char * 8)
+	]
+SOCKADDR_IN = sockaddr_in
+PSOCKADDR_IN = ctypes.POINTER(SOCKADDR_IN)
+
+class _in6_addr_u0(ctypes.Union):
+	"""see:
+	https://docs.microsoft.com/en-us/previous-versions/windows/desktop/legacy/ms738560(v=vs.85)
+	"""
+	_fields_ = [
+		('Byte', ctypes.c_uchar * 16),
+		('Word', ctypes.c_ushort * 8),
+	]
+
+class in6_addr(common.MayhemStructure):
+	"""see:
+	https://docs.microsoft.com/en-us/previous-versions/windows/desktop/legacy/ms738560(v=vs.85)
+	"""
+	_fields_ = [
+		('u', _in6_addr_u0)
+	]
+
+class sockaddr_in6(common.MayhemStructure):
+	_fields_ = [
+		('sin6_family', ctypes.c_short),
+		('sin6_port', ctypes.c_ushort),
+		('sin6_flowinfo', ctypes.c_ulong),
+		('sin6_addr', in6_addr),
+		('sin6_scope_id', ctypes.c_ulong)
+	]
+SOCKADDR6_IN = sockaddr_in6
+PSOCKADDR_IN6 = ctypes.POINTER(SOCKADDR6_IN)
