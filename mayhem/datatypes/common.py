@@ -76,6 +76,7 @@ class MayhemStructure(ctypes.Structure):
 		return ctypes.cast(value, ctypes.POINTER(cls)).contents
 
 # defined here so it can use the function cache
+# using this variant causes MayhemCFuncPtr to be used which adds useful properties
 def _WINFUNCTYPE(restype, *argtypes, use_errno=False, use_last_error=False):
 	flags = _ctypes.FUNCFLAG_STDCALL
 	if use_errno:

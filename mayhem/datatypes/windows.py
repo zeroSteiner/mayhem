@@ -772,6 +772,9 @@ class in6_addr(common.MayhemStructure):
 	]
 
 class sockaddr_in6(common.MayhemStructure):
+	"""see:
+	https://docs.microsoft.com/en-us/windows/win32/api/ws2ipdef/ns-ws2ipdef-sockaddr_in6_lh
+	"""
 	_fields_ = [
 		('sin6_family', ctypes.c_short),
 		('sin6_port', ctypes.c_ushort),
@@ -779,5 +782,25 @@ class sockaddr_in6(common.MayhemStructure):
 		('sin6_addr', in6_addr),
 		('sin6_scope_id', ctypes.c_ulong)
 	]
-SOCKADDR6_IN = sockaddr_in6
-PSOCKADDR_IN6 = ctypes.POINTER(SOCKADDR6_IN)
+SOCKADDR_IN6 = sockaddr_in6
+PSOCKADDR_IN6 = ctypes.POINTER(SOCKADDR_IN6)
+ADDRESS_FAMILY = ctypes.c_uint16 # this is actually an enum
+
+class SOCKADDR_INET(ctypes.Union):
+	"""see:
+	https://docs.microsoft.com/en-us/windows/win32/api/ws2ipdef/ns-ws2ipdef-sockaddr_inet
+	"""
+	_fields_ = [
+		('Ipv4', SOCKADDR_IN),
+		('Ipv6', SOCKADDR_IN6),
+		('si_family', ADDRESS_FAMILY)
+	]
+
+class IP_ADDRESS_PREFIX(common.MayhemStructure):
+	"""see:
+	https://docs.microsoft.com/en-us/windows/win32/api/netioapi/ns-netioapi-ip_address_prefix
+	"""
+	_fields_ = [
+		('Prefix', SOCKADDR_INET),
+		('PrefixLength', ctypes.c_uint8)
+	]
