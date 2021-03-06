@@ -695,8 +695,11 @@ class OBJECT_ATTRIBUTES(common.MayhemStructure):
 	]
 POBJECT_ATTRIBUTES = ctypes.POINTER(OBJECT_ATTRIBUTES)
 
+NETIO_STATUS = DWORD
 NET_IFINDEX = ctypes.c_ulong
 PNET_IFINDEX = ctypes.POINTER(NET_IFINDEX)
+IF_INDEX = NET_IFINDEX
+PIF_INDEX = PNET_IFINDEX
 
 class _NET_LUID_INFO(common.MayhemStructure):
 	# see: https://github.com/tpn/winsdk-10/blob/master/Include/10.0.16299.0/shared/ifdef.h#L116
@@ -829,6 +832,33 @@ class NL_ROUTE_PROTOCOL(common.MayhemEnum):
 	RouteProtocolRpl = 17
 	RouteProtocolDhcp = 18
 
+class MIB_IPFORWARD_PROTO(common.MayhemEnum):
+	# see: https://docs.microsoft.com/en-us/windows/win32/api/ipmib/ns-ipmib-mib_ipforwardrow
+	MIB_IPPROTO_OTHER = 1
+	MIB_IPPROTO_LOCAL = 2
+	MIB_IPPROTO_NETMGMT = 3
+	MIB_IPPROTO_ICMP = 4
+	MIB_IPPROTO_EGP = 5
+	MIB_IPPROTO_GGP = 6
+	MIB_IPPROTO_HELLO = 7
+	MIB_IPPROTO_RIP = 8
+	MIB_IPPROTO_IS_IS = 9
+	MIB_IPPROTO_ES_IS = 10
+	MIB_IPPROTO_CISCO = 11
+	MIB_IPPROTO_BBN = 12
+	MIB_IPPROTO_OSPF = 13
+	MIB_IPPROTO_BGP = 14
+	MIB_IPPROTO_NT_AUTOSTATIC = 10002
+	MIB_IPPROTO_NT_STATIC = 10006
+	MIB_IPPROTO_NT_STATIC_NON_DOD = 10007
+
+class MIB_IPFORWARD_TYPE(common.MayhemEnum):
+	# see: https://docs.microsoft.com/en-us/windows/win32/api/ipmib/ns-ipmib-mib_ipforwardrow
+	MIB_IPROUTE_TYPE_OTHER = 1
+	MIB_IPROUTE_TYPE_INVALID = 2
+	MIB_IPROUTE_TYPE_DIRECT = 3
+	MIB_IPROUTE_TYPE_INDIRECT = 4
+
 class IP_ADDRESS_PREFIX(common.MayhemStructure):
 	"""see:
 	https://docs.microsoft.com/en-us/windows/win32/api/netioapi/ns-netioapi-ip_address_prefix
@@ -837,3 +867,81 @@ class IP_ADDRESS_PREFIX(common.MayhemStructure):
 		('Prefix', SOCKADDR_INET),
 		('PrefixLength', ctypes.c_uint8)
 	]
+
+class _MIB_IPFORWARD_ROW_U0(common.MayhemUnion):
+	_fields_ = [
+		('dwForwardType', DWORD),
+		('ForwardType', MIB_IPFORWARD_TYPE)
+	]
+
+class _MIB_IPFORWARD_ROW_U1(common.MayhemUnion):
+	_fields_ = [
+		('dwForwardProto', DWORD),
+		('ForwardProto', MIB_IPFORWARD_PROTO)
+	]
+
+class MIB_IPFORWARD_ROW(common.MayhemStructure):
+	"""see:
+	https://docs.microsoft.com/en-us/windows/win32/api/ipmib/ns-ipmib-mib_ipforwardrow
+	"""
+	_anonymous_ = ('u0', 'u1')
+	_fields_ = [
+		('dwForwardDest', DWORD),
+		('dwForwardMask', DWORD),
+		('dwForwardPolicy', DWORD),
+		('dwForwardNextHop', DWORD),
+		('dwForwardIfIndex', IF_INDEX),
+		('u0', _MIB_IPFORWARD_ROW_U0),
+		('u1', _MIB_IPFORWARD_ROW_U1),
+		('dwForwardAge', DWORD),
+		('dwForwardNextHopAS', DWORD),
+		('dwForwardMetric1', DWORD),
+		('dwForwardMetric2', DWORD),
+		('dwForwardMetric3', DWORD),
+		('dwForwardMetric4', DWORD),
+		('dwForwardMetric5', DWORD),
+	]
+PMIB_IPFORWARD_ROW = ctypes.POINTER(MIB_IPFORWARD_ROW)
+
+class MIB_IPFORWARD_ROW2(common.MayhemStructure):
+	"""see:
+	https://docs.microsoft.com/en-us/windows/win32/api/netioapi/ns-netioapi-mib_ipforward_row2
+	"""
+	_fields_ = [
+		('InterfaceLuid', NET_LUID),
+		('InterfaceIndex', NET_IFINDEX),
+		('DestinationPrefix', IP_ADDRESS_PREFIX),
+		('NextHop', SOCKADDR_INET),
+		('SitePrefixLength', UCHAR),
+		('ValidLifetime', ULONG),
+		('PreferredLifetime', ULONG),
+		('Metric', ULONG),
+		('Protocol', NL_ROUTE_PROTOCOL),
+		('Loopback', BOOLEAN),
+		('AutoconfigureAddress', BOOLEAN),
+		('Publish', BOOLEAN),
+		('Immortal', BOOLEAN),
+		('Age', ULONG),
+		('Origin', NL_ROUTE_PROTOCOL),
+	]
+PMIB_IPFORWARD_ROW2 = ctypes.POINTER(MIB_IPFORWARD_ROW2)
+
+class MIB_IPFORWARD_TABLE(common.MayhemStructure):
+	"""see:
+	https://docs.microsoft.com/en-us/windows/win32/api/ipmib/ns-ipmib-mib_ipforwardtable
+	"""
+	_fields_ = [
+		('dwNumEntries', DWORD),
+		('table', MIB_IPFORWARD_ROW * 0)
+	]
+PMIB_IPFORWARD_TABLE = ctypes.POINTER(MIB_IPFORWARD_TABLE)
+
+class MIB_IPFORWARD_TABLE2(common.MayhemStructure):
+	"""see:
+	https://docs.microsoft.com/en-us/windows/win32/api/netioapi/ns-netioapi-mib_ipforward_table2
+	"""
+	_fields_ = [
+		('NumEntries', ULONG),
+		('Table', MIB_IPFORWARD_ROW2 * 0)
+	]
+PMIB_IPFORWARD_TABLE2 = ctypes.POINTER(MIB_IPFORWARD_TABLE2)
