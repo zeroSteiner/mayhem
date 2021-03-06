@@ -33,9 +33,49 @@
 import _ctypes
 import collections
 import ctypes
+import enum
+import math
 
 _function_cache = {}
 _function_cache_entry = collections.namedtuple('FunctionCacheEntry', ('restype', 'argtypes', 'flags'))
+
+def _int_width(value):
+	"""Calculate the number of bits required to represent *value*."""
+	if value < 0:
+		raise ValueError('value must be a positive integer')
+	if value == 0:
+		return 1
+	return math.floor(math.log(value, 2)) + 1
+
+class MayhemEnum(enum.IntEnum):
+	@classmethod
+	def from_param(cls, value):
+		return int(value)
+
+	@classmethod
+	def get_ctype(cls):
+		# https://docs.microsoft.com/en-us/cpp/c-language/cpp-integer-limits?view=msvc-160
+		types = [
+			(True,  ctypes.c_int16),
+			(True,  ctypes.c_int32),
+			(True,  ctypes.c_int64),
+			(False, ctypes.c_uint16),
+			(False, ctypes.c_uint32),
+			(False, ctypes.c_uint64)
+		]
+		val_min = min(cls)
+		val_max = max(cls)
+		required_bits = max(_int_width(abs(val_min)), _int_width(val_max))
+		val_signed = val_min < 0
+		for ctype_signed, ctype in types:
+			if ctype_signed != val_signed:
+				continue
+			available_bits = ctypes.sizeof(ctype) * 8
+			if ctype_signed:
+				available_bits -= 1
+			if required_bits <= available_bits:
+				return ctype
+		raise ValueError('could not calculate a compatible ctype')
 
 class MayhemCFuncPtr(_ctypes.CFuncPtr):
 	_argtypes_ = ()
