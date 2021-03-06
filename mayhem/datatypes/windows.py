@@ -38,7 +38,9 @@ import re
 from . import common
 from .windows_ntstatus import NTSTATUS_CODES
 
-_kernel32 = ctypes.windll.kernel32
+_kernel32 = None
+if hasattr(ctypes, 'windll'):
+	_kernel32 = ctypes.windll.kernel32
 WINFUNCTYPE = common._WINFUNCTYPE
 
 _IMAGE_NUMBEROF_DIRECTORY_ENTRIES = 16
@@ -370,7 +372,7 @@ class IMAGE_NT_HEADERS32(common.MayhemStructure):
 	]
 PIMAGE_NT_HEADERS32 = ctypes.POINTER(IMAGE_NT_HEADERS32)
 
-class _IO_STATUS_BLOCK_U0(ctypes.Union):
+class _IO_STATUS_BLOCK_U0(common.MayhemUnion):
 	_fields_ = [
 		('Status', NTSTATUS),
 		('Pointer', PVOID),
@@ -390,7 +392,7 @@ class _OVERLAPPED_U0_S0(common.MayhemStructure):
 		('OffsetHigh', DWORD)
 	]
 
-class _OVERLAPPED_U0(ctypes.Union):
+class _OVERLAPPED_U0(common.MayhemUnion):
 	_fields_ = [
 		('s0', _OVERLAPPED_U0_S0),
 		('Pointer', PVOID)
@@ -704,7 +706,7 @@ class _NET_LUID_INFO(common.MayhemStructure):
 		('IfType', ctypes.c_uint64, 16)
 	]
 
-class NET_LUID(ctypes.Union):
+class NET_LUID(common.MayhemUnion):
 	# see: https://github.com/tpn/winsdk-10/blob/master/Include/10.0.16299.0/shared/ifdef.h#L116
 	_fields_ = [
 		('Value', ctypes.c_uint64),
@@ -726,7 +728,7 @@ class _in_addr_u0_s1(common.MayhemStructure):
 		('s_w2', ctypes.c_ushort)
 	]
 
-class _in_addr_u0(ctypes.Union):
+class _in_addr_u0(common.MayhemUnion):
 	_fields_ = [
 		('S_un_b', _in_addr_u0_s0),
 		('S_un_w', _in_addr_u0_s1),
@@ -754,7 +756,7 @@ class sockaddr_in(common.MayhemStructure):
 SOCKADDR_IN = sockaddr_in
 PSOCKADDR_IN = ctypes.POINTER(SOCKADDR_IN)
 
-class _in6_addr_u0(ctypes.Union):
+class _in6_addr_u0(common.MayhemUnion):
 	"""see:
 	https://docs.microsoft.com/en-us/previous-versions/windows/desktop/legacy/ms738560(v=vs.85)
 	"""
@@ -784,9 +786,12 @@ class sockaddr_in6(common.MayhemStructure):
 	]
 SOCKADDR_IN6 = sockaddr_in6
 PSOCKADDR_IN6 = ctypes.POINTER(SOCKADDR_IN6)
-ADDRESS_FAMILY = ctypes.c_uint16 # this is actually an enum
+class ADDRESS_FAMILY(common.MayhemEnum):
+	AF_UNSPEC = 0
+	AF_INET = 2
+	AF_INET6 = 23
 
-class SOCKADDR_INET(ctypes.Union):
+class SOCKADDR_INET(common.MayhemUnion):
 	"""see:
 	https://docs.microsoft.com/en-us/windows/win32/api/ws2ipdef/ns-ws2ipdef-sockaddr_inet
 	"""
@@ -795,6 +800,34 @@ class SOCKADDR_INET(ctypes.Union):
 		('Ipv6', SOCKADDR_IN6),
 		('si_family', ADDRESS_FAMILY)
 	]
+
+class NL_ROUTE_ORIGIN(common.MayhemEnum):
+	NlroManual = 0
+	NlroWellKnown = 1
+	NlroDHCP = 2
+	NlroRouterAdvertisement = 3
+	Nlro6to4 = 4
+
+class NL_ROUTE_PROTOCOL(common.MayhemEnum):
+	RouteProtocolOther = 0
+	RouteProtocolLocal = 1
+	RouteProtocolNetMgmt = 2
+	RouteProtocolIcmp = 3
+	RouteProtocolEgp = 4
+	RouteProtocolGgp = 5
+	RouteProtocolHello = 6
+	RouteProtocolRip = 7
+	RouteProtocolIsIs = 8
+	RouteProtocolEsIs = 9
+	RouteProtocolCisco = 10
+	RouteProtocolBbn = 11
+	RouteProtocolOspf = 12
+	RouteProtocolBgp = 13
+	RouteProtocolIdpr = 14
+	RouteProtocolEigrp = 15
+	RouteProtocolDvmrp = 16
+	RouteProtocolRpl = 17
+	RouteProtocolDhcp = 18
 
 class IP_ADDRESS_PREFIX(common.MayhemStructure):
 	"""see:

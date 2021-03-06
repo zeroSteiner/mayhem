@@ -102,7 +102,84 @@ class MayhemCFuncPtr(_ctypes.CFuncPtr):
 		})
 		return new
 
-class MayhemStructure(ctypes.Structure):
+class _Field(object):
+	@staticmethod
+	def help_wrapper(field):
+		class Field2(field.__class__):
+			__doc__ = field.desc
+
+			def __repr__(self):
+				return self.__doc__
+		return Field2(field.name, field.type_, desc=field.desc, repr=field.repr, enum=field.enum)
+
+	@staticmethod
+	def repr_wrapper(value, transform):
+		class ReprWrapper(type(value)):
+			def __new__(cls, value):
+				return super().__new__(cls, value)
+
+			def __repr__(self):
+				return transform(self)
+		return ReprWrapper(value)
+
+	def __init__(self, name, type_, offset=0, **kwargs):
+		self.name = name
+		self.type_ = type_
+		self.real_name = '_' + name
+		self.desc = kwargs.pop('doc', 'Proxy structure field ' + name)
+		self.enum = kwargs.pop('enum', None)
+		self.repr = kwargs.pop('repr', None)
+		self.size = ctypes.sizeof(type_)
+		self.offset = offset
+
+	def __get__(self, instance, owner):
+		if not instance:
+			return self.help_wrapper(self)
+		value = getattr(instance, self.real_name)
+		if self.enum:
+			return self.enum(value)
+		if self.repr:
+			return self.repr_wrapper(value, self.repr)
+		return value
+
+	def __set__(self, instance, value):
+		if self.enum:
+			value = getattr(self.enum, value.name).value
+		setattr(instance, self.real_name, value)
+
+def _patch_fields(name, bases, namespace):
+	anonymous = namespace.get('_anonymous_', ())
+	_fields = namespace.get('_fields_', ())
+	new_fields = []
+	for args in _fields:
+		args = collections.deque(args)
+		# Create the set of descriptors for the new-style fields:
+		name = args.popleft()
+		if name in anonymous:
+			anon_field = args.popleft()
+			new_fields.append((name, anon_field))
+			for anon_name, anon_ctype in anon_field._fields_:
+				anon_name = anon_name[1:]
+				namespace[anon_name] = getattr(anon_field, anon_name)
+		else:
+			kwargs = {}
+			if isinstance(args[-1], dict):
+				kwargs = args.pop()
+			if issubclass(args[0], MayhemEnum):
+				kwargs['enum'] = enum = args.popleft()
+				args.insert(0, enum.get_ctype())
+			namespace[name] = _Field(name, *args, **kwargs)
+			args.appendleft('_' + name)
+			new_fields.append(tuple(args))
+	namespace['_fields_'] = new_fields
+	return name, bases, namespace
+
+class _MayhemStructureMeta(type(ctypes.Structure)):
+	def __new__(metacls, name, bases, namespace):
+		return super().__new__(metacls, *_patch_fields(name, bases, namespace))
+
+class MayhemStructure(ctypes.Structure, metaclass=_MayhemStructureMeta):
+	__slots__ = ()
 	@classmethod
 	def from_bytes(cls, value):
 		instance = cls()
@@ -114,6 +191,13 @@ class MayhemStructure(ctypes.Structure):
 	@classmethod
 	def from_cast(cls, value):
 		return ctypes.cast(value, ctypes.POINTER(cls)).contents
+
+class _MayhemUnionMeta(type(ctypes.Union)):
+	def __new__(metacls, name, bases, namespace):
+		return super().__new__(metacls, *_patch_fields(name, bases, namespace))
+
+class MayhemUnion(ctypes.Union, metaclass=_MayhemUnionMeta):
+	__slots__ = ()
 
 # defined here so it can use the function cache
 # using this variant causes MayhemCFuncPtr to be used which adds useful properties

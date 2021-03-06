@@ -31,6 +31,7 @@
 #
 
 import ctypes
+from . import common
 
 Elf32_Addr = ctypes.c_uint32
 Elf32_Half = ctypes.c_uint16
@@ -141,7 +142,7 @@ class constants:
 	STT_COMMON              = 5
 	STT_TLS                 = 6
 
-class Elf32_Ehdr(ctypes.Structure):
+class Elf32_Ehdr(common.MayhemStructure):
 	_fields_ = [
 		('e_ident', (ctypes.c_ubyte * 16)),
 		('e_type', Elf32_Half),
@@ -159,7 +160,7 @@ class Elf32_Ehdr(ctypes.Structure):
 		('e_shstrndx', Elf32_Half),
 	]
 
-class Elf64_Ehdr(ctypes.Structure):
+class Elf64_Ehdr(common.MayhemStructure):
 	_fields_ = [
 		('e_ident', (ctypes.c_ubyte * 16)),
 		('e_type', Elf64_Half),
@@ -177,7 +178,7 @@ class Elf64_Ehdr(ctypes.Structure):
 		('e_shstrndx', Elf64_Half),
 	]
 
-class Elf32_Phdr(ctypes.Structure):
+class Elf32_Phdr(common.MayhemStructure):
 	_fields_ = [
 		('p_type', Elf32_Word),
 		('p_offset', Elf32_Off),
@@ -189,7 +190,7 @@ class Elf32_Phdr(ctypes.Structure):
 		('p_align', Elf32_Word),
 	]
 
-class Elf64_Phdr(ctypes.Structure):
+class Elf64_Phdr(common.MayhemStructure):
 	_fields_ = [
 		('p_type', Elf64_Word),
 		('p_flags', Elf64_Word),
@@ -201,7 +202,7 @@ class Elf64_Phdr(ctypes.Structure):
 		('p_align', Elf64_Xword),
 	]
 
-class Elf32_Shdr(ctypes.Structure):
+class Elf32_Shdr(common.MayhemStructure):
 	_fields_ = [
 		('sh_name', Elf32_Word),
 		('sh_type', Elf32_Word),
@@ -215,7 +216,7 @@ class Elf32_Shdr(ctypes.Structure):
 		('sh_entsize', Elf32_Word),
 	]
 
-class Elf64_Shdr(ctypes.Structure):
+class Elf64_Shdr(common.MayhemStructure):
 	_fields_ = [
 		('sh_name', Elf64_Word),
 		('sh_type', Elf64_Word),
@@ -229,33 +230,33 @@ class Elf64_Shdr(ctypes.Structure):
 		('sh_entsize', Elf64_Xword),
 	]
 
-class _U__Elf32_Dyn(ctypes.Union):
+class _U__Elf32_Dyn(common.MayhemUnion):
 	_fields_ = [
 		('d_val', Elf32_Sword),
 		('d_ptr', Elf32_Addr),
 	]
 
-class Elf32_Dyn(ctypes.Structure):
+class Elf32_Dyn(common.MayhemStructure):
 	_anonymous_ = ('d_un',)
 	_fields_ = [
 		('d_tag', Elf32_Sword),
 		('d_un', _U__Elf32_Dyn),
 	]
 
-class _U__Elf64_Dyn(ctypes.Union):
+class _U__Elf64_Dyn(common.MayhemUnion):
 	_fields_ = [
 		('d_val', Elf64_Xword),
 		('d_ptr', Elf64_Addr),
 	]
 
-class Elf64_Dyn(ctypes.Structure):
+class Elf64_Dyn(common.MayhemStructure):
 	_anonymous_ = ('d_un',)
 	_fields_ = [
 		('d_tag', Elf64_Sxword),
 		('d_un', _U__Elf64_Dyn),
 	]
 
-class Elf32_Sym(ctypes.Structure):
+class Elf32_Sym(common.MayhemStructure):
 	_fields_ = [
 		('st_name', Elf32_Word),
 		('st_value', Elf32_Addr),
@@ -265,7 +266,7 @@ class Elf32_Sym(ctypes.Structure):
 		('st_shndx', Elf32_Half),
 	]
 
-class Elf64_Sym(ctypes.Structure):
+class Elf64_Sym(common.MayhemStructure):
 	_fields_ = [
 		('st_name', Elf64_Word),
 		('st_info', ctypes.c_ubyte),
@@ -275,7 +276,7 @@ class Elf64_Sym(ctypes.Structure):
 		('st_size', Elf64_Xword),
 	]
 
-class Elf32_Link_Map(ctypes.Structure):
+class Elf32_Link_Map(common.MayhemStructure):
 	_fields_ = [
 		('l_addr', Elf32_Addr),
 		('l_name', Elf32_Addr),
@@ -284,7 +285,7 @@ class Elf32_Link_Map(ctypes.Structure):
 		('l_prev', Elf32_Addr),
 	]
 
-class Elf64_Link_Map(ctypes.Structure):
+class Elf64_Link_Map(common.MayhemStructure):
 	_fields_ = [
 		('l_addr', Elf64_Addr),
 		('l_name', Elf64_Addr),
