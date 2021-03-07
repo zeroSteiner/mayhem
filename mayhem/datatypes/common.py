@@ -35,6 +35,7 @@ import collections
 import ctypes
 import enum
 import math
+import sys
 
 _function_cache = {}
 _function_cache_entry = collections.namedtuple('FunctionCacheEntry', ('restype', 'argtypes', 'flags'))
@@ -122,7 +123,7 @@ class _Field(object):
 				return transform(self)
 		return ReprWrapper(value)
 
-	def __init__(self, name, type_, offset=0, **kwargs):
+	def __init__(self, name, type_, **kwargs):
 		self.name = name
 		self.type_ = type_
 		self.real_name = '_' + name
@@ -130,7 +131,6 @@ class _Field(object):
 		self.enum = kwargs.pop('enum', None)
 		self.repr = kwargs.pop('repr', None)
 		self.size = ctypes.sizeof(type_)
-		self.offset = offset
 
 	def __get__(self, instance, owner):
 		if not instance:
@@ -147,7 +147,7 @@ class _Field(object):
 			value = getattr(self.enum, value.name).value
 		setattr(instance, self.real_name, value)
 
-def _patch_fields(name, bases, namespace):
+def _patch_fields(cls_name, bases, namespace):
 	anonymous = namespace.get('_anonymous_', ())
 	_fields = namespace.get('_fields_', ())
 	new_fields = []
@@ -168,11 +168,11 @@ def _patch_fields(name, bases, namespace):
 			if issubclass(args[0], MayhemEnum):
 				kwargs['enum'] = enum = args.popleft()
 				args.insert(0, enum.get_ctype())
-			namespace[name] = _Field(name, *args, **kwargs)
+			namespace[name] = _Field(name, args[0], **kwargs)
 			args.appendleft('_' + name)
 			new_fields.append(tuple(args))
 	namespace['_fields_'] = new_fields
-	return name, bases, namespace
+	return cls_name, bases, namespace
 
 class _MayhemStructureMeta(type(ctypes.Structure)):
 	def __new__(metacls, name, bases, namespace):

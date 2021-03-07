@@ -76,7 +76,7 @@ class BITMAPINFO(common.MayhemStructure):
 PBITMAPINFO = ctypes.POINTER(BITMAPINFO)
 
 # see: https://docs.microsoft.com/en-us/openspecs/windows_protocols/ms-wmf/97b31821-a0db-4113-a210-fffbcedcec4a
-class MapMode(enum.IntEnum):
+class MapMode(common.MayhemEnum):
 	TEXT = 0x0001
 	LOMETRIC = 0x0002
 	HIMETRIC = 0x0003

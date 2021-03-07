@@ -719,10 +719,10 @@ PNET_LUID = ctypes.POINTER(NET_LUID)
 
 class _in_addr_u0_s0(common.MayhemStructure):
 	_fields_ = [
-		('s_b1', ctypes.c_uchar),
-		('s_b2', ctypes.c_uchar),
-		('s_b3', ctypes.c_uchar),
-		('s_b4', ctypes.c_uchar)
+		('s_b1', ctypes.c_uint8),
+		('s_b2', ctypes.c_uint8),
+		('s_b3', ctypes.c_uint8),
+		('s_b4', ctypes.c_uint8)
 	]
 
 class _in_addr_u0_s1(common.MayhemStructure):
@@ -764,7 +764,7 @@ class _in6_addr_u0(common.MayhemUnion):
 	https://docs.microsoft.com/en-us/previous-versions/windows/desktop/legacy/ms738560(v=vs.85)
 	"""
 	_fields_ = [
-		('Byte', ctypes.c_uchar * 16),
+		('Byte', ctypes.c_uint8 * 16),
 		('Word', ctypes.c_ushort * 8),
 	]
 
@@ -789,6 +789,7 @@ class sockaddr_in6(common.MayhemStructure):
 	]
 SOCKADDR_IN6 = sockaddr_in6
 PSOCKADDR_IN6 = ctypes.POINTER(SOCKADDR_IN6)
+
 class ADDRESS_FAMILY(common.MayhemEnum):
 	AF_UNSPEC = 0
 	AF_INET = 2
