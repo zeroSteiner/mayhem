@@ -32,6 +32,7 @@
 
 import binascii
 import ctypes
+import ipaddress
 import platform
 import re
 
@@ -717,6 +718,14 @@ class NET_LUID(common.MayhemUnion):
 	]
 PNET_LUID = ctypes.POINTER(NET_LUID)
 
+class ADDRESS_FAMILY(common.MayhemEnum):
+	AF_UNSPEC = 0
+	AF_INET = 2
+	AF_INET6 = 23
+	@classmethod
+	def get_ctype(cls):
+		return USHORT
+
 class _in_addr_u0_s0(common.MayhemStructure):
 	_fields_ = [
 		('s_b1', ctypes.c_uint8),
@@ -745,6 +754,21 @@ class in_addr(common.MayhemStructure):
 	_fields_ = [
 		('S_un', _in_addr_u0),
 	]
+	def __repr__(self):
+		return "<{} ({}) >".format(self.__class__.__name__, str(self.to_ip_address()))
+
+	@classmethod
+	def from_ip_address(cls, ip_address):
+		if isinstance(ip_address, str):
+			ip_address = ipaddress.IPv4Address(ip_address)
+		if not isinstance(ip_address, ipaddress.IPv4Address):
+			raise TypeError('ip_address must be an IPv4 address')
+		self = cls()
+		self.S_un.S_addr = int(ip_address)
+		return self
+
+	def to_ip_address(self):
+		return ipaddress.IPv4Address(self.S_un.S_addr)
 
 class sockaddr_in(common.MayhemStructure):
 	"""see:
@@ -756,6 +780,11 @@ class sockaddr_in(common.MayhemStructure):
 		('sin_addr', in_addr),
 		('sin_zero', ctypes.c_char * 8)
 	]
+	def __init__(self, sin_family=ADDRESS_FAMILY.AF_INET, **kwargs):
+		return super().__init__(sin_family=sin_family, **kwargs)
+
+	def __repr__(self):
+		return "<{} ({}:{}) >".format(self.__class__.__name__, str(self.sin_addr.to_ip_address()), self.sin_port)
 SOCKADDR_IN = sockaddr_in
 PSOCKADDR_IN = ctypes.POINTER(SOCKADDR_IN)
 
@@ -775,6 +804,22 @@ class in6_addr(common.MayhemStructure):
 	_fields_ = [
 		('u', _in6_addr_u0)
 	]
+	def __repr__(self):
+		return "<{} ({}) >".format(self.__class__.__name__, str(self.to_ip_address()))
+
+	@classmethod
+	def from_ip_address(cls, ip_address):
+		if isinstance(ip_address, str):
+			ip_address = ipaddress.IPv6Address(ip_address)
+		if not isinstance(ip_address, ipaddress.IPv6Address):
+			raise TypeError('ip_address must be an IPv6 address')
+		self = cls()
+		for index, value in enumerate(ip_address.packed):
+			self.u.Byte[index] = value
+		return self
+
+	def to_ip_address(self):
+		return ipaddress.IPv6Address(bytes(self.u.Byte))
 
 class sockaddr_in6(common.MayhemStructure):
 	"""see:
@@ -787,16 +832,13 @@ class sockaddr_in6(common.MayhemStructure):
 		('sin6_addr', in6_addr),
 		('sin6_scope_id', ctypes.c_ulong)
 	]
+	def __init__(self, sin6_family=ADDRESS_FAMILY.AF_INET6, **kwargs):
+		return super().__init__(sin6_family=sin6_family, **kwargs)
+
+	def __repr__(self):
+		return "<{} ([{}]:{}) >".format(self.__class__.__name__, str(self.sin6_addr.to_ip_address()), self.sin6_port)
 SOCKADDR_IN6 = sockaddr_in6
 PSOCKADDR_IN6 = ctypes.POINTER(SOCKADDR_IN6)
-
-class ADDRESS_FAMILY(common.MayhemEnum):
-	AF_UNSPEC = 0
-	AF_INET = 2
-	AF_INET6 = 23
-	@classmethod
-	def get_ctype(cls):
-		return USHORT
 
 class SOCKADDR_INET(common.MayhemUnion):
 	"""see:
@@ -807,6 +849,19 @@ class SOCKADDR_INET(common.MayhemUnion):
 		('Ipv6', SOCKADDR_IN6),
 		('si_family', ADDRESS_FAMILY)
 	]
+	def __repr__(self):
+		if self.si_family == ADDRESS_FAMILY.AF_INET:
+			return "<{} ({}:{}) >".format(self.__class__.__name__, str(self.Ipv4.sin_addr.to_ip_address()), self.Ipv4.sin_port)
+		elif self.si_family == ADDRESS_FAMILY.AF_INET6:
+			return "<{} ([{}]:{}) >".format(self.__class__.__name__, str(self.Ipv6.sin6_addr.to_ip_address()), self.Ipv6.sin6_port)
+		return "<{} >".format(self.__class__.__name__)
+
+	def to_ip_address(self):
+		if self.si_family == ADDRESS_FAMILY.AF_INET:
+			return self.Ipv4.sin_addr.to_ip_address()
+		elif self.si_family == ADDRESS_FAMILY.AF_INET6:
+			return self.Ipv6.sin6_addr.to_ip_address()
+		return None
 
 class NL_ROUTE_ORIGIN(common.MayhemEnum):
 	NlroManual = 0
