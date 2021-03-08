@@ -696,7 +696,7 @@ class OBJECT_ATTRIBUTES(common.MayhemStructure):
 POBJECT_ATTRIBUTES = ctypes.POINTER(OBJECT_ATTRIBUTES)
 
 NETIO_STATUS = DWORD
-NET_IFINDEX = ctypes.c_ulong
+NET_IFINDEX = ctypes.c_uint32
 PNET_IFINDEX = ctypes.POINTER(NET_IFINDEX)
 IF_INDEX = NET_IFINDEX
 PIF_INDEX = PNET_IFINDEX
@@ -794,6 +794,9 @@ class ADDRESS_FAMILY(common.MayhemEnum):
 	AF_UNSPEC = 0
 	AF_INET = 2
 	AF_INET6 = 23
+	@classmethod
+	def get_ctype(cls):
+		return USHORT
 
 class SOCKADDR_INET(common.MayhemUnion):
 	"""see:
@@ -869,19 +872,19 @@ class IP_ADDRESS_PREFIX(common.MayhemStructure):
 		('PrefixLength', ctypes.c_uint8)
 	]
 
-class _MIB_IPFORWARD_ROW_U0(common.MayhemUnion):
+class _MIB_IPFORWARDROW_U0(common.MayhemUnion):
 	_fields_ = [
 		('dwForwardType', DWORD),
 		('ForwardType', MIB_IPFORWARD_TYPE)
 	]
 
-class _MIB_IPFORWARD_ROW_U1(common.MayhemUnion):
+class _MIB_IPFORWARDROW_U1(common.MayhemUnion):
 	_fields_ = [
 		('dwForwardProto', DWORD),
 		('ForwardProto', MIB_IPFORWARD_PROTO)
 	]
 
-class MIB_IPFORWARD_ROW(common.MayhemStructure):
+class MIB_IPFORWARDROW(common.MayhemStructure):
 	"""see:
 	https://docs.microsoft.com/en-us/windows/win32/api/ipmib/ns-ipmib-mib_ipforwardrow
 	"""
@@ -892,8 +895,8 @@ class MIB_IPFORWARD_ROW(common.MayhemStructure):
 		('dwForwardPolicy', DWORD),
 		('dwForwardNextHop', DWORD),
 		('dwForwardIfIndex', IF_INDEX),
-		('u0', _MIB_IPFORWARD_ROW_U0),
-		('u1', _MIB_IPFORWARD_ROW_U1),
+		('u0', _MIB_IPFORWARDROW_U0),
+		('u1', _MIB_IPFORWARDROW_U1),
 		('dwForwardAge', DWORD),
 		('dwForwardNextHopAS', DWORD),
 		('dwForwardMetric1', DWORD),
@@ -902,7 +905,7 @@ class MIB_IPFORWARD_ROW(common.MayhemStructure):
 		('dwForwardMetric4', DWORD),
 		('dwForwardMetric5', DWORD),
 	]
-PMIB_IPFORWARD_ROW = ctypes.POINTER(MIB_IPFORWARD_ROW)
+PMIB_IPFORWARDROW = ctypes.POINTER(MIB_IPFORWARDROW)
 
 class MIB_IPFORWARD_ROW2(common.MayhemStructure):
 	"""see:
@@ -933,7 +936,7 @@ class MIB_IPFORWARD_TABLE(common.MayhemStructure):
 	"""
 	_fields_ = [
 		('dwNumEntries', DWORD),
-		('table', MIB_IPFORWARD_ROW * 0)
+		('table', MIB_IPFORWARDROW * 0)
 	]
 PMIB_IPFORWARD_TABLE = ctypes.POINTER(MIB_IPFORWARD_TABLE)
 
