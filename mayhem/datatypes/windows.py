@@ -35,6 +35,7 @@ import ctypes
 import ipaddress
 import platform
 import re
+import socket
 
 from . import common
 from .windows_ntstatus import NTSTATUS_CODES
@@ -764,11 +765,11 @@ class in_addr(common.MayhemStructure):
 		if not isinstance(ip_address, ipaddress.IPv4Address):
 			raise TypeError('ip_address must be an IPv4 address')
 		self = cls()
-		self.S_un.S_addr = int(ip_address)
+		self.S_un.S_addr = socket.ntohl(int(ip_address))
 		return self
 
 	def to_ip_address(self):
-		return ipaddress.IPv4Address(self.S_un.S_addr)
+		return ipaddress.IPv4Address(socket.htonl(self.S_un.S_addr))
 
 class sockaddr_in(common.MayhemStructure):
 	"""see:
@@ -785,6 +786,9 @@ class sockaddr_in(common.MayhemStructure):
 
 	def __repr__(self):
 		return "<{} ({}:{}) >".format(self.__class__.__name__, str(self.sin_addr.to_ip_address()), self.sin_port)
+
+	def to_ip_address(self):
+		return self.sin_addr.to_ip_address()
 SOCKADDR_IN = sockaddr_in
 PSOCKADDR_IN = ctypes.POINTER(SOCKADDR_IN)
 
@@ -837,6 +841,9 @@ class sockaddr_in6(common.MayhemStructure):
 
 	def __repr__(self):
 		return "<{} ([{}]:{}) >".format(self.__class__.__name__, str(self.sin6_addr.to_ip_address()), self.sin6_port)
+
+	def to_ip_address(self):
+		return self.sin6_addr.to_ip_address()
 SOCKADDR_IN6 = sockaddr_in6
 PSOCKADDR_IN6 = ctypes.POINTER(SOCKADDR_IN6)
 
@@ -851,16 +858,16 @@ class SOCKADDR_INET(common.MayhemUnion):
 	]
 	def __repr__(self):
 		if self.si_family == ADDRESS_FAMILY.AF_INET:
-			return "<{} ({}:{}) >".format(self.__class__.__name__, str(self.Ipv4.sin_addr.to_ip_address()), self.Ipv4.sin_port)
+			return "<{} ({}:{}) >".format(self.__class__.__name__, str(self.Ipv4.to_ip_address()), self.Ipv4.sin_port)
 		elif self.si_family == ADDRESS_FAMILY.AF_INET6:
-			return "<{} ([{}]:{}) >".format(self.__class__.__name__, str(self.Ipv6.sin6_addr.to_ip_address()), self.Ipv6.sin6_port)
+			return "<{} ([{}]:{}) >".format(self.__class__.__name__, str(self.Ipv6.to_ip_address()), self.Ipv6.sin6_port)
 		return "<{} >".format(self.__class__.__name__)
 
 	def to_ip_address(self):
 		if self.si_family == ADDRESS_FAMILY.AF_INET:
-			return self.Ipv4.sin_addr.to_ip_address()
+			return self.Ipv4.to_ip_address()
 		elif self.si_family == ADDRESS_FAMILY.AF_INET6:
-			return self.Ipv6.sin6_addr.to_ip_address()
+			return self.Ipv6.to_ip_address()
 		return None
 
 class NL_ROUTE_ORIGIN(common.MayhemEnum):
@@ -985,7 +992,7 @@ class MIB_IPFORWARD_ROW2(common.MayhemStructure):
 	]
 PMIB_IPFORWARD_ROW2 = ctypes.POINTER(MIB_IPFORWARD_ROW2)
 
-class MIB_IPFORWARD_TABLE(common.MayhemStructure):
+class MIB_IPFORWARDTABLE(common.MayhemStructure):
 	"""see:
 	https://docs.microsoft.com/en-us/windows/win32/api/ipmib/ns-ipmib-mib_ipforwardtable
 	"""
@@ -993,7 +1000,7 @@ class MIB_IPFORWARD_TABLE(common.MayhemStructure):
 		('dwNumEntries', DWORD),
 		('table', MIB_IPFORWARDROW * 0)
 	]
-PMIB_IPFORWARD_TABLE = ctypes.POINTER(MIB_IPFORWARD_TABLE)
+PMIB_IPFORWARDTABLE = ctypes.POINTER(MIB_IPFORWARDTABLE)
 
 class MIB_IPFORWARD_TABLE2(common.MayhemStructure):
 	"""see:

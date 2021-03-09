@@ -37,22 +37,33 @@ import mayhem.datatypes.windows as wintypes
 
 _iphlpapi = ctypes.windll.iphlpapi
 
+# https://docs.microsoft.com/en-us/windows/win32/api/netioapi/nf-netioapi-freemibtable
+FreeMibTable = m_k32._patch_winfunctype(
+	_iphlpapi.FreeMibTable,
+	wintypes.VOID,
+	(
+		wintypes.PVOID,
+	)
+)
+
+# https://docs.microsoft.com/en-us/windows/win32/api/iphlpapi/nf-iphlpapi-getipforwardtable
 GetIpForwardTable = m_k32._patch_winfunctype(
 	_iphlpapi.GetIpForwardTable,
 	wintypes.DWORD,
 	(
-		wintypes.PMIB_IPFORWARD_TABLE,
+		wintypes.PMIB_IPFORWARDTABLE,
 		wintypes.PULONG,
 		wintypes.BOOL
 	)
 )
 
+# https://docs.microsoft.com/en-us/windows/win32/api/netioapi/nf-netioapi-getipforwardtable2
 GetIpForwardTable2 = m_k32._patch_winfunctype(
 	_iphlpapi.GetIpForwardTable2,
 	wintypes.NETIO_STATUS,
 	(
 		wintypes.ADDRESS_FAMILY,
-		wintypes.PMIB_IPFORWARD_TABLE2
+		ctypes.POINTER(wintypes.PMIB_IPFORWARD_TABLE2)
 	)
 )
 
