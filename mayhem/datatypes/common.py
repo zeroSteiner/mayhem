@@ -35,7 +35,6 @@ import collections
 import ctypes
 import enum
 import math
-import sys
 
 _function_cache = {}
 _function_cache_entry = collections.namedtuple('FunctionCacheEntry', ('restype', 'argtypes', 'flags'))

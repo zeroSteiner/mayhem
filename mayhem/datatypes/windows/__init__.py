@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-#  mayhem/datatypes/windows.py
+#  mayhem/datatypes/windows/__init__.py
 #
 #  Redistribution and use in source and binary forms, with or without
 #  modification, are permitted provided that the following conditions are
@@ -32,13 +32,14 @@
 
 import binascii
 import ctypes
-import ipaddress
 import platform
 import re
-import socket
 
-from . import common
-from .windows_ntstatus import NTSTATUS_CODES
+from ._net import *
+from ._scalars import *
+from .ntstatus import NTSTATUS_CODES
+from .wingdi import *
+from .. import common
 
 _kernel32 = None
 if hasattr(ctypes, 'windll'):
@@ -46,95 +47,7 @@ if hasattr(ctypes, 'windll'):
 WINFUNCTYPE = common._WINFUNCTYPE
 
 _IMAGE_NUMBEROF_DIRECTORY_ENTRIES = 16
-is_64bit = platform.architecture()[0] == '64bit'
-
-VOID    = None
-
-# http://msdn.microsoft.com/en-us/library/windows/desktop/aa383751(v=vs.85).aspx
-BOOLEAN = ctypes.c_byte
-BOOL    = ctypes.c_bool
-PBOOL   = ctypes.POINTER(BOOL)
-BYTE    = ctypes.c_uint8
-PBYTE   = ctypes.POINTER(BYTE)
-LPBYTE  = PBYTE
-
-WORD    = ctypes.c_uint16
-PWORD   = ctypes.POINTER(WORD)
-LPWORD  = PWORD
-
-DWORD     = ctypes.c_uint32
-DWORDLONG = ctypes.c_uint64
-DWORD32   = ctypes.c_uint32
-DWORD64   = ctypes.c_uint64
-PDWORD    = ctypes.POINTER(DWORD)
-LPDWORD   = PDWORD
-
-QWORD    = ctypes.c_uint64
-PQWORD   = ctypes.POINTER(QWORD)
-LPQWORD  = PQWORD
-
-SHORT    = ctypes.c_int16
-INT      = ctypes.c_int32
-
-LONG     = ctypes.c_int32
-LONGLONG = ctypes.c_int64
-LONG32   = ctypes.c_int32
-LONG64   = ctypes.c_int64
-PLONG    = ctypes.POINTER(LONG)
-LPLONG   = PLONG
-
-UCHAR       = ctypes.c_uint8
-USHORT      = ctypes.c_uint16
-UINT        = ctypes.c_uint32
-ULONG       = ctypes.c_uint32
-PULONG      = ctypes.POINTER(ULONG)
-LPULONG     = PULONG
-ULONGLONG   = ctypes.c_uint64
-PULONGLONG  = ctypes.POINTER(ULONGLONG)
-LPULONGLONG = PULONGLONG
-ULONG_PTR   = ctypes.c_uint64 if is_64bit else ctypes.c_ulong
-
-class PSTR(ctypes.c_char_p):
-	def __str__(self):
-		return self.value.decode('ascii')
-
-	@classmethod
-	def from_param(cls, param):
-		if isinstance(param, str):
-			param = param.encode('ascii')
-		return super(PSTR, cls).from_param(param)
-LPSTR  = PSTR
-
-class PWSTR(ctypes.c_wchar_p):
-	def __str__(self):
-		return self.value
-LPWSTR = PWSTR
-
-UCHAR  = ctypes.c_ubyte
-PUCHAR = ctypes.POINTER(ctypes.c_ubyte)
-
-HANDLE    = ctypes.c_void_p
-LPHANDLE  = PHANDLE  = ctypes.POINTER(HANDLE)
-HMODULE   = HANDLE
-LPHMODULE = PHMODULE = ctypes.POINTER(HMODULE)
-HWND      = HANDLE
-LPHWND    = PHWND    = ctypes.POINTER(HWND)
-HINSTANCE = HANDLE
-
-PVOID     = ctypes.c_void_p
-LPVOID    = PVOID
-
-SE_SIGNING_LEVEL  = ULONG
-PSE_SIGNING_LEVEL = ctypes.POINTER(ULONG)
-
-NTSTATUS  = ctypes.c_uint32
-
-# platform specific data primitives
-if is_64bit:
-	SIZE_T = ctypes.c_uint64
-else:
-	SIZE_T = ctypes.c_uint32
-PSIZE_T = ctypes.POINTER(SIZE_T)
+_is_64bit = platform.architecture()[0] == '64bit'
 
 class LARGE_INTEGER(common.MayhemStructure):
 	_fields_ = [
@@ -497,7 +410,7 @@ class SHARED_INFO(common.MayhemStructure):
 		('aheList', ctypes.c_void_p),
 		('HeEntrySize', ctypes.c_uint32),
 		('pDispInfo', ctypes.c_void_p),
-		('ulSharedDelta', ctypes.c_uint64 if is_64bit else ctypes.c_uint32),
+		('ulSharedDelta', ctypes.c_uint64 if _is_64bit else ctypes.c_uint32),
 		('awmControl', WND_MSG * 31),
 		('DefWindowMsgs', WND_MSG),
 		('DefWindowSpecMsgs', WND_MSG),
@@ -604,7 +517,7 @@ class MEMORY_BASIC_INFORMATION64(common.MayhemStructure):
 	]
 
 # platform specific structures
-if is_64bit:
+if _is_64bit:
 	MEMORY_BASIC_INFORMATION = MEMORY_BASIC_INFORMATION64
 else:
 	MEMORY_BASIC_INFORMATION = MEMORY_BASIC_INFORMATION32
@@ -671,18 +584,6 @@ class GUID(common.MayhemStructure):
 		return cls.from_bytes(parts[0] + parts[1] + parts[2] + parts[3] + parts[4])
 PGUID = ctypes.POINTER(GUID)
 
-class RGBQUAD(common.MayhemStructure):
-	"""see:
-	https://docs.microsoft.com/en-us/windows/win32/api/wingdi/ns-wingdi-rgbquad
-	"""
-	_fields_ = [
-		('rgbBlue', BYTE),
-		('rgbGreen', BYTE),
-		('rgbRed', BYTE),
-		('rgbReserved', BYTE),
-	]
-PRGBQUAD = ctypes.POINTER(RGBQUAD)
-
 class OBJECT_ATTRIBUTES(common.MayhemStructure):
 	"""see:
 	https://docs.microsoft.com/en-us/windows/win32/api/ntdef/ns-ntdef-_object_attributes
@@ -696,318 +597,3 @@ class OBJECT_ATTRIBUTES(common.MayhemStructure):
 		('SecurityQualityOfService', PVOID),
 	]
 POBJECT_ATTRIBUTES = ctypes.POINTER(OBJECT_ATTRIBUTES)
-
-NETIO_STATUS = DWORD
-NET_IFINDEX = ctypes.c_uint32
-PNET_IFINDEX = ctypes.POINTER(NET_IFINDEX)
-IF_INDEX = NET_IFINDEX
-PIF_INDEX = PNET_IFINDEX
-
-class _NET_LUID_INFO(common.MayhemStructure):
-	# see: https://github.com/tpn/winsdk-10/blob/master/Include/10.0.16299.0/shared/ifdef.h#L116
-	_fields_ = [
-		('Reserved', ctypes.c_uint64, 24),
-		('NetLuidIndex', ctypes.c_uint64, 24),
-		('IfType', ctypes.c_uint64, 16)
-	]
-
-class NET_LUID(common.MayhemUnion):
-	# see: https://github.com/tpn/winsdk-10/blob/master/Include/10.0.16299.0/shared/ifdef.h#L116
-	_fields_ = [
-		('Value', ctypes.c_uint64),
-		('Info', _NET_LUID_INFO)
-	]
-PNET_LUID = ctypes.POINTER(NET_LUID)
-
-class ADDRESS_FAMILY(common.MayhemEnum):
-	AF_UNSPEC = 0
-	AF_INET = 2
-	AF_INET6 = 23
-	@classmethod
-	def get_ctype(cls):
-		return USHORT
-
-class _in_addr_u0_s0(common.MayhemStructure):
-	_fields_ = [
-		('s_b1', ctypes.c_uint8),
-		('s_b2', ctypes.c_uint8),
-		('s_b3', ctypes.c_uint8),
-		('s_b4', ctypes.c_uint8)
-	]
-
-class _in_addr_u0_s1(common.MayhemStructure):
-	_fields_ = [
-		('s_w1', ctypes.c_ushort),
-		('s_w2', ctypes.c_ushort)
-	]
-
-class _in_addr_u0(common.MayhemUnion):
-	_fields_ = [
-		('S_un_b', _in_addr_u0_s0),
-		('S_un_w', _in_addr_u0_s1),
-		('S_addr', ctypes.c_ulong),
-	]
-
-class in_addr(common.MayhemStructure):
-	"""see:
-	https://docs.microsoft.com/en-us/windows/win32/api/winsock2/ns-winsock2-in_addr
-	"""
-	_fields_ = [
-		('S_un', _in_addr_u0),
-	]
-	def __repr__(self):
-		return "<{} ({}) >".format(self.__class__.__name__, str(self.to_ip_address()))
-
-	@classmethod
-	def from_ip_address(cls, ip_address):
-		if isinstance(ip_address, str):
-			ip_address = ipaddress.IPv4Address(ip_address)
-		if not isinstance(ip_address, ipaddress.IPv4Address):
-			raise TypeError('ip_address must be an IPv4 address')
-		self = cls()
-		self.S_un.S_addr = socket.ntohl(int(ip_address))
-		return self
-
-	def to_ip_address(self):
-		return ipaddress.IPv4Address(socket.htonl(self.S_un.S_addr))
-
-class sockaddr_in(common.MayhemStructure):
-	"""see:
-	https://docs.microsoft.com/en-us/windows/win32/winsock/sockaddr-2
-	"""
-	_fields_ = [
-		('sin_family', ctypes.c_short),
-		('sin_port', ctypes.c_ushort),
-		('sin_addr', in_addr),
-		('sin_zero', ctypes.c_char * 8)
-	]
-	def __init__(self, sin_family=ADDRESS_FAMILY.AF_INET, **kwargs):
-		return super().__init__(sin_family=sin_family, **kwargs)
-
-	def __repr__(self):
-		return "<{} ({}:{}) >".format(self.__class__.__name__, str(self.sin_addr.to_ip_address()), self.sin_port)
-
-	def to_ip_address(self):
-		return self.sin_addr.to_ip_address()
-SOCKADDR_IN = sockaddr_in
-PSOCKADDR_IN = ctypes.POINTER(SOCKADDR_IN)
-
-class _in6_addr_u0(common.MayhemUnion):
-	"""see:
-	https://docs.microsoft.com/en-us/previous-versions/windows/desktop/legacy/ms738560(v=vs.85)
-	"""
-	_fields_ = [
-		('Byte', ctypes.c_uint8 * 16),
-		('Word', ctypes.c_ushort * 8),
-	]
-
-class in6_addr(common.MayhemStructure):
-	"""see:
-	https://docs.microsoft.com/en-us/previous-versions/windows/desktop/legacy/ms738560(v=vs.85)
-	"""
-	_fields_ = [
-		('u', _in6_addr_u0)
-	]
-	def __repr__(self):
-		return "<{} ({}) >".format(self.__class__.__name__, str(self.to_ip_address()))
-
-	@classmethod
-	def from_ip_address(cls, ip_address):
-		if isinstance(ip_address, str):
-			ip_address = ipaddress.IPv6Address(ip_address)
-		if not isinstance(ip_address, ipaddress.IPv6Address):
-			raise TypeError('ip_address must be an IPv6 address')
-		self = cls()
-		for index, value in enumerate(ip_address.packed):
-			self.u.Byte[index] = value
-		return self
-
-	def to_ip_address(self):
-		return ipaddress.IPv6Address(bytes(self.u.Byte))
-
-class sockaddr_in6(common.MayhemStructure):
-	"""see:
-	https://docs.microsoft.com/en-us/windows/win32/api/ws2ipdef/ns-ws2ipdef-sockaddr_in6_lh
-	"""
-	_fields_ = [
-		('sin6_family', ctypes.c_short),
-		('sin6_port', ctypes.c_ushort),
-		('sin6_flowinfo', ctypes.c_ulong),
-		('sin6_addr', in6_addr),
-		('sin6_scope_id', ctypes.c_ulong)
-	]
-	def __init__(self, sin6_family=ADDRESS_FAMILY.AF_INET6, **kwargs):
-		return super().__init__(sin6_family=sin6_family, **kwargs)
-
-	def __repr__(self):
-		return "<{} ([{}]:{}) >".format(self.__class__.__name__, str(self.sin6_addr.to_ip_address()), self.sin6_port)
-
-	def to_ip_address(self):
-		return self.sin6_addr.to_ip_address()
-SOCKADDR_IN6 = sockaddr_in6
-PSOCKADDR_IN6 = ctypes.POINTER(SOCKADDR_IN6)
-
-class SOCKADDR_INET(common.MayhemUnion):
-	"""see:
-	https://docs.microsoft.com/en-us/windows/win32/api/ws2ipdef/ns-ws2ipdef-sockaddr_inet
-	"""
-	_fields_ = [
-		('Ipv4', SOCKADDR_IN),
-		('Ipv6', SOCKADDR_IN6),
-		('si_family', ADDRESS_FAMILY)
-	]
-	def __repr__(self):
-		if self.si_family == ADDRESS_FAMILY.AF_INET:
-			return "<{} ({}:{}) >".format(self.__class__.__name__, str(self.Ipv4.to_ip_address()), self.Ipv4.sin_port)
-		elif self.si_family == ADDRESS_FAMILY.AF_INET6:
-			return "<{} ([{}]:{}) >".format(self.__class__.__name__, str(self.Ipv6.to_ip_address()), self.Ipv6.sin6_port)
-		return "<{} >".format(self.__class__.__name__)
-
-	def to_ip_address(self):
-		if self.si_family == ADDRESS_FAMILY.AF_INET:
-			return self.Ipv4.to_ip_address()
-		elif self.si_family == ADDRESS_FAMILY.AF_INET6:
-			return self.Ipv6.to_ip_address()
-		return None
-
-class NL_ROUTE_ORIGIN(common.MayhemEnum):
-	NlroManual = 0
-	NlroWellKnown = 1
-	NlroDHCP = 2
-	NlroRouterAdvertisement = 3
-	Nlro6to4 = 4
-
-class NL_ROUTE_PROTOCOL(common.MayhemEnum):
-	RouteProtocolOther = 0
-	RouteProtocolLocal = 1
-	RouteProtocolNetMgmt = 2
-	RouteProtocolIcmp = 3
-	RouteProtocolEgp = 4
-	RouteProtocolGgp = 5
-	RouteProtocolHello = 6
-	RouteProtocolRip = 7
-	RouteProtocolIsIs = 8
-	RouteProtocolEsIs = 9
-	RouteProtocolCisco = 10
-	RouteProtocolBbn = 11
-	RouteProtocolOspf = 12
-	RouteProtocolBgp = 13
-	RouteProtocolIdpr = 14
-	RouteProtocolEigrp = 15
-	RouteProtocolDvmrp = 16
-	RouteProtocolRpl = 17
-	RouteProtocolDhcp = 18
-
-class MIB_IPFORWARD_PROTO(common.MayhemEnum):
-	# see: https://docs.microsoft.com/en-us/windows/win32/api/ipmib/ns-ipmib-mib_ipforwardrow
-	MIB_IPPROTO_OTHER = 1
-	MIB_IPPROTO_LOCAL = 2
-	MIB_IPPROTO_NETMGMT = 3
-	MIB_IPPROTO_ICMP = 4
-	MIB_IPPROTO_EGP = 5
-	MIB_IPPROTO_GGP = 6
-	MIB_IPPROTO_HELLO = 7
-	MIB_IPPROTO_RIP = 8
-	MIB_IPPROTO_IS_IS = 9
-	MIB_IPPROTO_ES_IS = 10
-	MIB_IPPROTO_CISCO = 11
-	MIB_IPPROTO_BBN = 12
-	MIB_IPPROTO_OSPF = 13
-	MIB_IPPROTO_BGP = 14
-	MIB_IPPROTO_NT_AUTOSTATIC = 10002
-	MIB_IPPROTO_NT_STATIC = 10006
-	MIB_IPPROTO_NT_STATIC_NON_DOD = 10007
-
-class MIB_IPFORWARD_TYPE(common.MayhemEnum):
-	# see: https://docs.microsoft.com/en-us/windows/win32/api/ipmib/ns-ipmib-mib_ipforwardrow
-	MIB_IPROUTE_TYPE_OTHER = 1
-	MIB_IPROUTE_TYPE_INVALID = 2
-	MIB_IPROUTE_TYPE_DIRECT = 3
-	MIB_IPROUTE_TYPE_INDIRECT = 4
-
-class IP_ADDRESS_PREFIX(common.MayhemStructure):
-	"""see:
-	https://docs.microsoft.com/en-us/windows/win32/api/netioapi/ns-netioapi-ip_address_prefix
-	"""
-	_fields_ = [
-		('Prefix', SOCKADDR_INET),
-		('PrefixLength', ctypes.c_uint8)
-	]
-
-class _MIB_IPFORWARDROW_U0(common.MayhemUnion):
-	_fields_ = [
-		('dwForwardType', DWORD),
-		('ForwardType', MIB_IPFORWARD_TYPE)
-	]
-
-class _MIB_IPFORWARDROW_U1(common.MayhemUnion):
-	_fields_ = [
-		('dwForwardProto', DWORD),
-		('ForwardProto', MIB_IPFORWARD_PROTO)
-	]
-
-class MIB_IPFORWARDROW(common.MayhemStructure):
-	"""see:
-	https://docs.microsoft.com/en-us/windows/win32/api/ipmib/ns-ipmib-mib_ipforwardrow
-	"""
-	_anonymous_ = ('u0', 'u1')
-	_fields_ = [
-		('dwForwardDest', DWORD),
-		('dwForwardMask', DWORD),
-		('dwForwardPolicy', DWORD),
-		('dwForwardNextHop', DWORD),
-		('dwForwardIfIndex', IF_INDEX),
-		('u0', _MIB_IPFORWARDROW_U0),
-		('u1', _MIB_IPFORWARDROW_U1),
-		('dwForwardAge', DWORD),
-		('dwForwardNextHopAS', DWORD),
-		('dwForwardMetric1', DWORD),
-		('dwForwardMetric2', DWORD),
-		('dwForwardMetric3', DWORD),
-		('dwForwardMetric4', DWORD),
-		('dwForwardMetric5', DWORD),
-	]
-PMIB_IPFORWARDROW = ctypes.POINTER(MIB_IPFORWARDROW)
-
-class MIB_IPFORWARD_ROW2(common.MayhemStructure):
-	"""see:
-	https://docs.microsoft.com/en-us/windows/win32/api/netioapi/ns-netioapi-mib_ipforward_row2
-	"""
-	_fields_ = [
-		('InterfaceLuid', NET_LUID),
-		('InterfaceIndex', NET_IFINDEX),
-		('DestinationPrefix', IP_ADDRESS_PREFIX),
-		('NextHop', SOCKADDR_INET),
-		('SitePrefixLength', UCHAR),
-		('ValidLifetime', ULONG),
-		('PreferredLifetime', ULONG),
-		('Metric', ULONG),
-		('Protocol', NL_ROUTE_PROTOCOL),
-		('Loopback', BOOLEAN),
-		('AutoconfigureAddress', BOOLEAN),
-		('Publish', BOOLEAN),
-		('Immortal', BOOLEAN),
-		('Age', ULONG),
-		('Origin', NL_ROUTE_PROTOCOL),
-	]
-PMIB_IPFORWARD_ROW2 = ctypes.POINTER(MIB_IPFORWARD_ROW2)
-
-class MIB_IPFORWARDTABLE(common.MayhemStructure):
-	"""see:
-	https://docs.microsoft.com/en-us/windows/win32/api/ipmib/ns-ipmib-mib_ipforwardtable
-	"""
-	_fields_ = [
-		('dwNumEntries', DWORD),
-		('table', MIB_IPFORWARDROW * 0)
-	]
-PMIB_IPFORWARDTABLE = ctypes.POINTER(MIB_IPFORWARDTABLE)
-
-class MIB_IPFORWARD_TABLE2(common.MayhemStructure):
-	"""see:
-	https://docs.microsoft.com/en-us/windows/win32/api/netioapi/ns-netioapi-mib_ipforward_table2
-	"""
-	_fields_ = [
-		('NumEntries', ULONG),
-		('Table', MIB_IPFORWARD_ROW2 * 0)
-	]
-PMIB_IPFORWARD_TABLE2 = ctypes.POINTER(MIB_IPFORWARD_TABLE2)

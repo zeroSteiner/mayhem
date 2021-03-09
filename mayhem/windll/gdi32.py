@@ -31,113 +31,64 @@
 #
 
 import ctypes
-import enum
 
 from . import kernel32 as m_k32
-import mayhem.datatypes.common as common
 import mayhem.datatypes.windows as wintypes
 
 _gdi32 = ctypes.windll.gdi32
 
-HBITMAP           = wintypes.HANDLE
-PHBITMAP          = ctypes.POINTER(HBITMAP)
-HDC               = wintypes.HANDLE
-PHDC              = ctypes.POINTER(HDC)
-HGDIOBJ           = wintypes.HANDLE
-PHGDIOBJ          = ctypes.POINTER(HGDIOBJ)
-
-class BITMAPINFOHEADER(common.MayhemStructure):
-	"""see:
-	https://docs.microsoft.com/en-us/previous-versions/dd183376(v=vs.85)
-	"""
-	_fields_ = [
-		('biSize', wintypes.DWORD),
-		('biWidth', wintypes.LONG),
-		('biHeight', wintypes.LONG),
-		('biPlanes', wintypes.WORD),
-		('biBitCount', wintypes.WORD),
-		('biCompression', wintypes.DWORD),
-		('biSizeImage', wintypes.DWORD),
-		('biXPelsPerMeter', wintypes.LONG),
-		('biYPelsPerMeter', wintypes.LONG),
-		('biClrUsed', wintypes.DWORD),
-		('biClrImportant', wintypes.DWORD),
-	]
-PBITMAPINFOHEADER = ctypes.POINTER(BITMAPINFOHEADER)
-
-class BITMAPINFO(common.MayhemStructure):
-	"""see:
-	https://docs.microsoft.com/en-us/windows/win32/api/wingdi/ns-wingdi-bitmapinfo
-	"""
-	_fields_ = [
-		('bmiHeader', BITMAPINFOHEADER),
-		('bmiColors', wintypes.RGBQUAD * 0),
-	]
-PBITMAPINFO = ctypes.POINTER(BITMAPINFO)
-
-# see: https://docs.microsoft.com/en-us/openspecs/windows_protocols/ms-wmf/97b31821-a0db-4113-a210-fffbcedcec4a
-class MapMode(common.MayhemEnum):
-	TEXT = 0x0001
-	LOMETRIC = 0x0002
-	HIMETRIC = 0x0003
-	LOENGLISH = 0x0004
-	HIENGLISH = 0x0005
-	TWIPS = 0x0006
-	ISOTROPIC = 0x0007
-	ANISOTROPIC = 0x0008
-
 CreateCompatibleBitmap = m_k32._patch_winfunctype(
 	_gdi32.CreateCompatibleBitmap,
-	HBITMAP,
-	(HDC, ctypes.c_int, ctypes.c_int)
+	wintypes.HBITMAP,
+	(wintypes.HDC, ctypes.c_int, ctypes.c_int)
 )
 
 CreateCompatibleDC = m_k32._patch_winfunctype(
 	_gdi32.CreateCompatibleDC,
-	HDC,
-	(HDC,)
+	wintypes.HDC,
+	(wintypes.HDC,)
 )
 
 CreateDIBitmap = m_k32._patch_winfunctype(
 	_gdi32.CreateDIBitmap,
-	HBITMAP,
-	(HDC, PBITMAPINFOHEADER, wintypes.DWORD, wintypes.PVOID, PBITMAPINFO, wintypes.UINT)
+	wintypes.HBITMAP,
+	(wintypes.HDC, wintypes.PBITMAPINFOHEADER, wintypes.DWORD, wintypes.PVOID, wintypes.PBITMAPINFO, wintypes.UINT)
 )
 
 SelectObject = m_k32._patch_winfunctype(
 	_gdi32.SelectObject,
-	HGDIOBJ,
-	(HDC, HGDIOBJ)
+	wintypes.HGDIOBJ,
+	(wintypes.HDC, wintypes.HGDIOBJ)
 )
 
 SetLayout = m_k32._patch_winfunctype(
 	_gdi32.SetLayout,
 	wintypes.DWORD,
-	(HDC, wintypes.DWORD)
+	(wintypes.HDC, wintypes.DWORD)
 )
 
 SetMapMode = m_k32._patch_winfunctype(
 	_gdi32.SetMapMode,
 	ctypes.c_int,
-	(HDC, ctypes.c_int)
+	(wintypes.HDC, ctypes.c_int)
 )
 
 SetStretchBltMode = m_k32._patch_winfunctype(
 	_gdi32.SetStretchBltMode,
 	ctypes.c_int,
-	(HDC,ctypes.c_int)
+	(wintypes.HDC, ctypes.c_int)
 )
 
 StretchBlt = m_k32._patch_winfunctype(
 	_gdi32.StretchBlt,
 	wintypes.BOOL,
 	(
-		HDC,
+		wintypes.HDC,
 		ctypes.c_int,
 		ctypes.c_int,
 		ctypes.c_int,
 		ctypes.c_int,
-		HDC,
+		wintypes.HDC,
 		ctypes.c_int,
 		ctypes.c_int,
 		ctypes.c_int,
