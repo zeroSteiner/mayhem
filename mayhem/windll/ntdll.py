@@ -34,16 +34,17 @@ import ctypes
 import enum
 
 from . import kernel32 as m_k32
+import mayhem.datatypes.common as common
 import mayhem.datatypes.windows as wintypes
 
 _ntdll = ctypes.windll.ntdll
 
-class ReserveType(enum.IntEnum):
+class ReserveType(common.MayhemEnum):
 	UserApcReserve = 0
 	IoCompletion = 1
 
 # see: https://www.geoffchappell.com/studies/windows/km/ntoskrnl/api/ex/sysinfo/class.htm?tx=64,66
-class SystemInformationClass(enum.IntEnum):  # incomplete
+class SystemInformationClass(common.MayhemEnum):  # incomplete
 	SystemBasicInformation = 0                      # 3.10 and higher
 	SystemProcessorInformation = 1                  # 3.10 and higher
 	SystemPerformanceInformation = 2                # 3.10 and higher
@@ -156,5 +157,15 @@ if hasattr(_ntdll, 'NtSetCachedSigningLevel'):
 			wintypes.HANDLE
 		)
 	)
+
+RtlGetNtVersionNumbers = m_k32._patch_winfunctype(
+	_ntdll.RtlGetNtVersionNumbers,
+	wintypes.VOID,
+	(
+		wintypes.PDWORD,
+		wintypes.PDWORD,
+		wintypes.PDWORD
+	)
+)
 
 address = m_k32.GetModuleHandleW('ntdll.dll')
