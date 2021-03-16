@@ -67,4 +67,13 @@ GetIpForwardTable2 = m_k32._patch_winfunctype(
 	)
 )
 
+# https://docs.microsoft.com/en-us/windows/win32/api/netioapi/nf-netioapi-getipinterfaceentry
+GetIpInterfaceEntry = m_k32._patch_winfunctype(
+	_iphlpapi.GetIpInterfaceEntry,
+	wintypes.NETIO_STATUS,
+	(
+		wintypes.PMIB_IPINTERFACE_ROW,
+	)
+)
+
 address = m_k32.GetModuleHandleW('iphlpapi.dll')

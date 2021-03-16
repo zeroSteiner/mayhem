@@ -47,20 +47,26 @@ __all__ = (
 	'MIB_IPFORWARD_ROW2',
 	'MIB_IPFORWARD_TABLE2',
 	'MIB_IPFORWARD_TYPE',
+	'MIB_IPINTERFACE_ROW',
 	'NETIO_STATUS',
 	'NET_IFINDEX',
 	'NET_LUID',
+	'NL_INTERFACE_OFFLOAD_ROD',
+	'NL_LINK_LOCAL_ADDRESS_BEHAVIOR',
 	'NL_ROUTE_ORIGIN',
 	'NL_ROUTE_PROTOCOL',
+	'NL_ROUTER_DISCOVERY_BEHAVIOR',
 	'PIF_INDEX',
 	'PMIB_IPFORWARDROW',
 	'PMIB_IPFORWARDTABLE',
 	'PMIB_IPFORWARD_ROW2',
 	'PMIB_IPFORWARD_TABLE2',
+	'PMIB_IPINTERFACE_ROW',
 	'PNET_IFINDEX',
 	'PNET_LUID',
 	'PSOCKADDR_IN',
 	'PSOCKADDR_IN6',
+	'SCOPE_LEVEL',
 	'SOCKADDR_IN',
 	'SOCKADDR_IN6',
 	'SOCKADDR_INET',
@@ -245,6 +251,12 @@ class SOCKADDR_INET(common.MayhemUnion):
 			return self.Ipv6.to_ip_address()
 		return None
 
+class NL_LINK_LOCAL_ADDRESS_BEHAVIOR(common.MayhemEnum):
+	LinkLocalAlwaysOff = 0
+	LinkLocalDelayed = 1
+	LinkLocalAlwaysOn = 2
+	LinkLocalUnchanged = -1
+
 class NL_ROUTE_ORIGIN(common.MayhemEnum):
 	NlroManual = 0
 	NlroWellKnown = 1
@@ -273,6 +285,12 @@ class NL_ROUTE_PROTOCOL(common.MayhemEnum):
 	RouteProtocolRpl = 17
 	RouteProtocolDhcp = 18
 
+class NL_ROUTER_DISCOVERY_BEHAVIOR(common.MayhemEnum):
+	RouterDiscoveryDisabled = 0
+	RouterDiscoveryEnabled = 1
+	RouterDiscoveryDhcp = 2
+	RouterDiscoveryUnchanged = -1
+
 class MIB_IPFORWARD_PROTO(common.MayhemEnum):
 	# see: https://docs.microsoft.com/en-us/windows/win32/api/ipmib/ns-ipmib-mib_ipforwardrow
 	MIB_IPPROTO_OTHER = 1
@@ -300,6 +318,16 @@ class MIB_IPFORWARD_TYPE(common.MayhemEnum):
 	MIB_IPROUTE_TYPE_DIRECT = 3
 	MIB_IPROUTE_TYPE_INDIRECT = 4
 
+class SCOPE_LEVEL(common.MayhemEnum):
+	ScopeLevelInterface = 1
+	ScopeLevelLink = 2
+	ScopeLevelSubnet = 3
+	ScopeLevelAdmin = 4
+	ScopeLevelSite = 5
+	ScopeLevelOrganization = 8
+	ScopeLevelGlobal = 14
+	ScopeLevelCount = 16
+
 class IP_ADDRESS_PREFIX(common.MayhemStructure):
 	"""see:
 	https://docs.microsoft.com/en-us/windows/win32/api/netioapi/ns-netioapi-ip_address_prefix
@@ -307,6 +335,18 @@ class IP_ADDRESS_PREFIX(common.MayhemStructure):
 	_fields_ = [
 		('Prefix', SOCKADDR_INET),
 		('PrefixLength', ctypes.c_uint8)
+	]
+
+class NL_INTERFACE_OFFLOAD_ROD(common.MayhemStructure):
+	_fields_ = [
+		('NlChecksumSupported', BOOLEAN, 1),
+		('NlOptionsSupported', BOOLEAN, 1),
+		('TlDatagramChecksumSupported', BOOLEAN, 1),
+		('TlStreamChecksumSupported', BOOLEAN, 1),
+		('TlStreamOptionsSupported', BOOLEAN, 1),
+		('FastPathCompatible', BOOLEAN, 1),
+		('TlLargeSendOffloadSupported', BOOLEAN, 1),
+		('TlGiantSendOffloadSupported', BOOLEAN, 1),
 	]
 
 class _MIB_IPFORWARDROW_U0(common.MayhemUnion):
@@ -386,3 +426,46 @@ class MIB_IPFORWARD_TABLE2(common.MayhemStructure):
 		('Table', MIB_IPFORWARD_ROW2 * 0)
 	]
 PMIB_IPFORWARD_TABLE2 = ctypes.POINTER(MIB_IPFORWARD_TABLE2)
+
+class MIB_IPINTERFACE_ROW(common.MayhemStructure):
+	"""see:
+	https://docs.microsoft.com/en-us/windows/win32/api/netioapi/ns-netioapi-mib_ipinterface_row
+	"""
+	_fields_ = [
+		('Family', ADDRESS_FAMILY),
+		('InterfaceLuid', NET_LUID),
+		('InterfaceIndex', NET_IFINDEX),
+		('MaxReassemblySize', ULONG),
+		('InterfaceIdentifier', ULONG64),
+		('MinRouterAdvertisementInterval', ULONG),
+		('MaxRouterAdvertisementInterval', ULONG),
+		('AdvertisingEnabled', BOOLEAN),
+		('ForwardingEnabled', BOOLEAN),
+		('WeakHostSend', BOOLEAN),
+		('WeakHostReceive', BOOLEAN),
+		('UseAutomaticMetric', BOOLEAN),
+		('UseNeighborUnreachabilityDetection', BOOLEAN),
+		('ManagedAddressConfigurationSupported', BOOLEAN),
+		('OtherStatefulConfigurationSupported', BOOLEAN),
+		('AdvertiseDefaultRoute', BOOLEAN),
+		('RouterDiscoveryBehavior', NL_ROUTER_DISCOVERY_BEHAVIOR),
+		('DadTransmits', ULONG),
+		('BaseReachableTime', ULONG),
+		('RetransmitTime', ULONG),
+		('PathMtuDiscoveryTimeout', ULONG),
+		('LinkLocalAddressBehavior', NL_LINK_LOCAL_ADDRESS_BEHAVIOR),
+		('LinkLocalAddressTimeout', ULONG),
+		('ZoneIndices', ULONG * SCOPE_LEVEL.ScopeLevelCount),
+		('SitePrefixLength', ULONG),
+		('Metric', ULONG),
+		('NlMtu', ULONG),
+		('Connected', BOOLEAN),
+		('SupportsWakeUpPatterns', BOOLEAN),
+		('SupportsNeighborDiscovery', BOOLEAN),
+		('SupportsRouterDiscovery', BOOLEAN),
+		('ReachableTime', ULONG),
+		('TransmitOffload', NL_INTERFACE_OFFLOAD_ROD),
+		('ReceiveOffload', NL_INTERFACE_OFFLOAD_ROD),
+		('DisableDefaultRoutes', BOOLEAN),
+	]
+PMIB_IPINTERFACE_ROW = ctypes.POINTER(MIB_IPINTERFACE_ROW)
