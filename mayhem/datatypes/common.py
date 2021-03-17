@@ -125,7 +125,17 @@ class _Field(object):
 
 	def __set__(self, instance, value):
 		if self.enum:
-			value = getattr(self.enum, value.name).value
+			if isinstance(value, int):
+				value = self.enum(value)
+			elif isinstance(value, str):
+				if not hasattr(self.enum, value):
+					raise ValueError("{} is not a valid {}".format(value, self.enum.__name__))
+				value = getattr(self.enum, value)
+			elif isinstance(value, self.enum):
+				pass
+			else:
+				raise TypeError('unknown value')
+			value = value.value
 		setattr(instance, self.real_name, value)
 
 def _patch_fields(cls_name, bases, namespace):
