@@ -48,6 +48,20 @@ TOKEN_ALL_ACCESS        = 0xf00ff
 
 _advapi32 = ctypes.windll.advapi32
 
+# https://learn.microsoft.com/en-us/windows/win32/api/securitybaseapi/nf-securitybaseapi-duplicatetokenex
+DuplicateTokenEx = m_k32._patch_winfunctype(
+	_advapi32.DuplicateTokenEx,
+	wintypes.BOOL,
+	(wintypes.HANDLE, wintypes.DWORD, wintypes.PSECURITY_ATTRIBUTES, wintypes.SECURITY_IMPERSONATION_LEVEL, wintypes.TOKEN_TYPE, wintypes.PHANDLE)
+)
+
+# https://learn.microsoft.com/en-us/windows/win32/api/securitybaseapi/nf-securitybaseapi-impersonateloggedonuser
+ImpersonateLoggedOnUser = m_k32._patch_winfunctype(
+	_advapi32.ImpersonateLoggedOnUser,
+	wintypes.BOOL,
+	(wintypes.HANDLE,)
+)
+
 # https://docs.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-openprocesstoken
 OpenProcessToken = m_k32._patch_winfunctype(
 	_advapi32.OpenProcessToken,
@@ -60,6 +74,13 @@ OpenThreadToken = m_k32._patch_winfunctype(
 	_advapi32.OpenThreadToken,
 	wintypes.BOOL,
 	(wintypes.HANDLE, wintypes.DWORD, wintypes.BOOL, wintypes.PHANDLE)
+)
+
+# https://learn.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-setthreadtoken
+SetThreadToken = m_k32._patch_winfunctype(
+	_advapi32.SetThreadToken,
+	wintypes.BOOL,
+	(wintypes.PHANDLE, wintypes.HANDLE)
 )
 
 address = m_k32.GetModuleHandleW('advapi32.dll')

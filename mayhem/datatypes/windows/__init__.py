@@ -35,6 +35,7 @@ import ctypes
 import platform
 import re
 
+from ._enums import *
 from ._net import *
 from ._scalars import *
 from .ntstatus import NTSTATUS_CODES
