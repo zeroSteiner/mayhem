@@ -79,6 +79,13 @@ def _escape(path):
 	escaped_path = path.replace('\\', '\\\\')
 	return escaped_path.replace('\'', '\\\'')
 
+def _get_python_dll():
+	file_name = "python{0}{1}.dll".format(sys.version_info.major, sys.version_info.minor)
+	path = os.path.join(os.path.dirname(sys.executable), file_name)
+	if os.path.isfile(path):
+		return path
+	return ctypes.util.find_library(file_name)
+
 def _wait_overlapped_io(overlapped, timeout=-1):
 	result = m_k32.WaitForSingleObject(overlapped.hEvent, timeout) == WAIT_OBJECT_0
 	m_k32.CloseHandle(overlapped.hEvent)
@@ -158,13 +165,11 @@ def main():
 	print("[+] Opened a handle to pid: {0}".format(arguments.pid))
 
 	# find and inject the python library
-	python_lib = "python{0}{1}.dll".format(sys.version_info.major, sys.version_info.minor)
-	python_lib = ctypes.util.find_library(python_lib)
-	if python_lib:
-		print("[*] Found Python library at: {0}".format(python_lib))
-	else:
+	python_lib = _get_python_dll()
+	if python_lib is None:
 		print('[-] Failed to find the Python library')
 		return
+	print("[*] Found Python library at: {0}".format(python_lib))
 
 	print('[*] Injecting Python into the process...')
 	try:
