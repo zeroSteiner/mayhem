@@ -179,6 +179,7 @@ def flags(flags):
 class LinuxProcess(mayhem.proc.ProcessBase):
 	"""This class represents a process in a POSIX Linux environment."""
 	def __init__(self, pid=None, exe=None):
+		self._libc_name = os.path.basename(ctypes.util.find_library('c'))
 		if platform.system() != 'Linux':
 			raise RuntimeError('incompatible platform')
 		# Ensure that we are running in a version of python that matches the native architecture of the system.
@@ -341,10 +342,12 @@ class LinuxProcess(mayhem.proc.ProcessBase):
 	def _get_function_address(self, mod_name, func_name):
 		if mayhem.utilities.architecture_is_32bit(self.__arch__):
 			ehdr_struct = elf.Elf32_Ehdr
+			phdr_struct = elf.Elf64_Phdr
 			shdr_struct = elf.Elf32_Shdr
 			sym_struct = elf.Elf32_Sym
 		elif mayhem.utilities.architecture_is_64bit(self.__arch__):
 			ehdr_struct = elf.Elf64_Ehdr
+			phdr_struct = elf.Elf64_Phdr
 			shdr_struct = elf.Elf64_Shdr
 			sym_struct = elf.Elf64_Sym
 		else:
@@ -353,12 +356,20 @@ class LinuxProcess(mayhem.proc.ProcessBase):
 		func_name = func_name.encode('utf-8') + b'\x00'
 		if os.path.isabs(mod_name):
 			exe_maps = tuple(mr for mr in self.maps.values() if mr.pathname == mod_name)
-			filename = mod_name
 		else:
 			exe_maps = tuple(mr for mr in self.maps.values() if mr.pathname and os.path.basename(mr.pathname).startswith(mod_name))
-			filename = exe_maps[0].pathname
+		if not exe_maps:
+			raise LinuxProcessError('unable to locate module: ' + mod_name)
+		filename = exe_maps[0].pathname
 		handle = open(filename, 'rb')
 		ehdr = mayhem.utilities.struct_unpack(ehdr_struct, handle.read(ctypes.sizeof(ehdr_struct)))
+
+		# get the phdr
+		handle.seek(ehdr.e_phoff, os.SEEK_SET)
+		data = handle.read(ehdr.e_phnum * ehdr.e_phentsize)
+		_phdrs = (phdr_struct * ehdr.e_phnum)
+		phdrs = _phdrs()
+		ctypes.memmove(ctypes.byref(phdrs), data, len(data))
 
 		# get the shdrs
 		handle.seek(ehdr.e_shoff, os.SEEK_SET)
@@ -366,6 +377,8 @@ class LinuxProcess(mayhem.proc.ProcessBase):
 		_shdrs = (shdr_struct * ehdr.e_shnum)
 		shdrs = _shdrs()
 		ctypes.memmove(ctypes.byref(shdrs), data, len(data))
+
+		base_address = exe_maps[0].addr_low
 
 		symtab = strtab = 0
 		for idx, shdr in enumerate(shdrs):
@@ -392,9 +405,9 @@ class LinuxProcess(mayhem.proc.ProcessBase):
 					continue
 				if strsymtbl[sym.st_name:(sym.st_name + len(func_name))] != func_name:
 					continue
-				return sym.st_value
+				return base_address + sym.st_value
 			symtab = strtab = 0
-		raise LinuxProcessError('unable to locate function')
+		raise LinuxProcessError('unable to locate function: ' + func_name.decode()[:-1])
 
 	def _call_function(self, function_address, *args):
 		if len(args) > 6:
@@ -602,7 +615,7 @@ class LinuxProcess(mayhem.proc.ProcessBase):
 
 	def _allocate_malloc(self, size):
 		malloc_addr = None
-		for lib in ('libc-', 'ld-linux.so'):
+		for lib in (self._libc_name, 'ld-linux.so'):
 			try:
 				malloc_addr = self._get_function_address(lib, 'malloc')
 			except mayhem.proc.ProcessError:
@@ -614,7 +627,7 @@ class LinuxProcess(mayhem.proc.ProcessBase):
 
 	def _free_free(self, address):
 		free_addr = None
-		for lib in ('libc-', 'ld-linux.so'):
+		for lib in (self._libc_name, 'ld-linux.so'):
 			try:
 				free_addr = self._get_function_address(lib, 'free')
 			except mayhem.proc.ProcessError:
@@ -626,7 +639,7 @@ class LinuxProcess(mayhem.proc.ProcessBase):
 		return
 
 	def _allocate_mmap(self, size, address, permissions, mmap_flags=None):
-		mmap_addr = self._get_function_address('libc-', 'mmap')
+		mmap_addr = self._get_function_address(self._libc_name, 'mmap')
 		address = (address or 0)
 		permissions = (permissions or 'PROT_READ | PROT_WRITE | PROT_EXEC')
 		permissions = flags(permissions)
@@ -640,7 +653,7 @@ class LinuxProcess(mayhem.proc.ProcessBase):
 		return self._call_function(mmap_addr, address, size, permissions, mmap_flags, -1, 0)
 
 	def _free_munmap(self, address, size):
-		munmap_addr = self._get_function_address('libc-', 'munmap')
+		munmap_addr = self._get_function_address(self._libc_name, 'munmap')
 		result = self._call_function(munmap_addr, address, size)
 		if result != 0:
 			raise LinuxProcessError('Error: munmap')
@@ -716,7 +729,7 @@ class LinuxProcess(mayhem.proc.ProcessBase):
 
 	def protect(self, address, permissions=None, size=0x400):
 		permissions = (permissions or 'PROT_READ | PROT_WRITE | PROT_EXEC')
-		mprotect_addr = self._get_function_address('libc-', 'mprotect')
+		mprotect_addr = self._get_function_address(self._libc_name, 'mprotect')
 		permissions = flags(permissions)
 		result = self._call_function(mprotect_addr, address, size, permissions)
 		if result != 0:
@@ -750,7 +763,7 @@ class LinuxProcess(mayhem.proc.ProcessBase):
 	def load_library(self, libpath):
 		libpath = os.path.abspath(libpath)
 		libpath = libpath + "\x00"
-		dlopen_addr = self._get_function_address('libc-', '__libc_dlopen_mode')
+		dlopen_addr = self._get_function_address(self._libc_name, '__libc_dlopen_mode')
 		readable_address = self._allocate_malloc(0x400)
 		readdata_backup = self.read_memory(readable_address, len(libpath))
 		self.write_memory(readable_address, libpath)
